@@ -896,6 +896,52 @@ local options = {
                         GetDB().pets.sound = v
                     end
                 },
+                badPetEnable = {
+                    order = 107,
+                    type = "toggle",
+                    name = L["BAD_PET_ENABLE"],
+                    desc = L["BAD_PET_DESC"],
+                    width = "double",
+                    get = function()
+                        return GetDB().pets.badPetEnable
+                    end,
+                    set = function(_, v)
+                        GetDB().pets.badPetEnable = v
+                    end
+                },
+                badPetFreq = {
+                    order = 108,
+                    type = "select",
+                    name = L["BAD_PET_FREQ"],
+                    width = "normal",
+                    values = {
+                        ["INSTANCE"] = L["FREQ_INSTANCE"],
+                        ["BOSS"] = L["FREQ_BOSS"],
+                        ["ALWAYS"] = L["FREQ_ALWAYS"]
+                    },
+                    get = function()
+                        return GetDB().pets.badPetFreq
+                    end,
+                    set = function(_, v)
+                        GetDB().pets.badPetFreq = v
+                    end
+                },
+                badPetDesc = {
+                    order = 109,
+                    type = "description",
+                    name = L["BAD_PET_DESC"],
+                    fontSize = "small"
+                },
+                badPetSpacer = {
+                    order = 109.2,
+                    type = "description",
+                    name = " "
+                },
+                badPetExample = {
+                    order = 109.5,
+                    type = "description",
+                    name = L["EXAMPLE_BAD_PET"]
+                },
                 itemsHeader = {order = 110, type = "header", name = L["ITEMS"]},
                 itemsNote = {
                     order = 110.5,
