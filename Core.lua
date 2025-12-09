@@ -16,7 +16,6 @@ local IsInRaid = IsInRaid
 local IsInInstance = IsInInstance
 local SendChatMessage = SendChatMessage
 local PlaySoundFile = PlaySoundFile
-local GetSpellLink = GetSpellLink
 local string_format = string.format
 local string_find = string.find
 local bit_band = bit.band
@@ -202,7 +201,7 @@ function ControlFreak:UNIT_PET(_, unitId)
     local petGUID = UnitGUID(unitId .. "pet")
     if petGUID then
         petOwnerCache[petGUID] = {
-            ownerName = UnitName(unitId),
+            ownerName = GetUnitName(unitId, true),
             ownerGUID = UnitGUID(unitId)
         }
     end
