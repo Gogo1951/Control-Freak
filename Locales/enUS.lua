@@ -125,4 +125,4 @@ L["EXAMPLE_ANNOYANCE"] =
 L["EXAMPLE_ITEMS"] =
     "|cffFFF569 AOE Taunt! Gogorogue-Mal'ganis used |r|cff71d5ff[Advanced Target Dummy]|r|cffFFF569 // Control Freak|r"
 L["EXAMPLE_BAD_PET"] =
-    '|cffff80ffWhisper to Gogohunter-Mal\'ganis: "FYI // Gogocat, used [Growl] on Magtheridon. You can right-click the ability on your action bar or inside your spell book to disable auto-cast."|r'
+    '|cffff80ffWhisper to Gogohunter-Mal\'ganis: "FYI // Gogocat, used |r|cff71d5ff[Growl]|r|cff40C7EB on Magtheridon. You can right-click the ability on your action bar or inside your spell book to disable auto-cast."|r'
