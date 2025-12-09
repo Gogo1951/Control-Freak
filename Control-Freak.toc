@@ -2,11 +2,12 @@
 ## Title: Control Freak
 ## Notes: Tracker for Taunts, Fears, and Item usage in Classic.
 ## Author: Gogo1951
+
 ## Version: @project-version@
+## X-Curse-Project-ID: 1401345
+
 ## SavedVariables: ControlFreakDB
 ## OptionalDeps: Ace3, LibSharedMedia-3.0
-
-## X-Curse-Project-ID: 1401345
 
 ## Includes
 Includes\LibStub\LibStub.lua
