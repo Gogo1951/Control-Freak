@@ -29,6 +29,10 @@ L["CLEAN_SUCCESS_TARGET"] = "%s %s %s %s on %s%s%s"
 L["CLEAN_SUCCESS_NO_TARGET"] = "%s %s %s %s%s"
 L["CLEAN_FAIL"] = "%s %s%s %s %s's %s%s"
 
+-- Bad Pet Whisper
+L["BAD_PET_WHISPER"] =
+    "FYI // %s used %s on %s. You can right-click the ability on your action bar or inside your spell book to disable auto-cast."
+
 -- General UI
 L["TAGLINE"] = "|cffeda55fAn add-on for Tanks and Tank wanna-bes.|r\n"
 L["ENABLE"] = "Enable"
@@ -83,6 +87,15 @@ L["FAIL_PRINT_FMT"] = "Enable Print Out for %s Fails"
 L["FAIL_AUDIO_FMT"] = "Enable Audio for %s Fails"
 L["SOUND"] = "Sound"
 
+-- Bad Pet Settings
+L["BAD_PET_ENABLE"] = 'Enable "Bad Pet" Messages'
+L["BAD_PET_DESC"] =
+    "When enabled, you'll send a whisper to the offending Pet's Owner whenever you receive a notification."
+L["BAD_PET_FREQ"] = "Frequency"
+L["FREQ_INSTANCE"] = "Once per Instance"
+L["FREQ_BOSS"] = "Once per Boss"
+L["FREQ_ALWAYS"] = "Every Time"
+
 -- Dropdowns
 L["BOSSES_ONLY"] = "Bosses Only"
 L["ELITES_HIGHER"] = "Elites and Higher"
@@ -111,3 +124,5 @@ L["EXAMPLE_ANNOYANCE"] =
     "|cff40C7EB Annoyance! Gogomage-Mal'ganis used |r|cff71d5ff[Frost Nova]|r|cff40C7EB // Control Freak|r"
 L["EXAMPLE_ITEMS"] =
     "|cffFFF569 AOE Taunt! Gogorogue-Mal'ganis used |r|cff71d5ff[Advanced Target Dummy]|r|cffFFF569 // Control Freak|r"
+L["EXAMPLE_BAD_PET"] =
+    '|cffff80ffWhisper to Gogohunter-Mal\'ganis: "FYI // Gogocat, used [Growl] on Magtheridon. You can right-click the ability on your action bar or inside your spell book to disable auto-cast."|r'
