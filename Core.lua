@@ -16,6 +16,7 @@ local IsInRaid = IsInRaid
 local IsInInstance = IsInInstance
 local SendChatMessage = SendChatMessage
 local PlaySoundFile = PlaySoundFile
+local GetSpellLink = GetSpellLink
 local string_format = string.format
 local string_find = string.find
 local bit_band = bit.band
@@ -34,6 +35,10 @@ ControlFreak.version = projectVersion
 
 local petOwnerCache = {}
 local spamThrottle = {}
+local badPetHistory = {
+    instance = {},
+    boss = {}
+}
 
 local CLASS_HEX = {
     DEATHKNIGHT = "C41F3B",
@@ -114,21 +119,25 @@ function ControlFreak:OnInitialize()
                 print = true,
                 channel = "SELF",
                 audio = false,
-                sound = "Bite"
+                sound = "Bite",
+                badPetEnable = false,
+                badPetFreq = "BOSS"
             },
             fears = {
-                enable = true, 
-                rank = 3, 
-                print = true, 
-                channel = "SELF", 
-                audio = true, 
-                sound = "Voice: Idiot"},
+                enable = true,
+                rank = 3,
+                print = true,
+                channel = "SELF",
+                audio = true,
+                sound = "Voice: Idiot"
+            },
             annoyances = {
-                enable = true, 
-                print = true, 
-                channel = "SELF", 
-                audio = false, 
-                sound = "Voice: Idiot"},
+                enable = true,
+                print = true,
+                channel = "SELF",
+                audio = false,
+                sound = "Voice: Idiot"
+            },
             items = {
                 enable = true,
                 print = true,
@@ -179,11 +188,15 @@ function ControlFreak:OnEnable()
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("UNIT_PET")
     self:RegisterEvent("GROUP_ROSTER_UPDATE", "ScanAllPets")
+
+    self:RegisterEvent("ENCOUNTER_END")
+    self:RegisterEvent("PLAYER_ENTERING_WORLD")
+
     self:ScanAllPets()
 end
 
 --------------------------------------------------------------------------------
--- PET CACHING
+-- PET CACHING & HISTORY
 --------------------------------------------------------------------------------
 function ControlFreak:UNIT_PET(_, unitId)
     local petGUID = UnitGUID(unitId .. "pet")
@@ -208,6 +221,57 @@ function ControlFreak:ScanAllPets()
             self:UNIT_PET(nil, "party" .. i)
         end
     end
+end
+
+function ControlFreak:ENCOUNTER_END()
+    badPetHistory.boss = {}
+end
+
+function ControlFreak:PLAYER_ENTERING_WORLD()
+    badPetHistory.instance = {}
+    badPetHistory.boss = {}
+end
+
+function ControlFreak:CheckFrequency(guid, spellID)
+    local freq = self.db.profile.pets.badPetFreq or "BOSS"
+
+    if freq == "ALWAYS" then
+        return true
+    end
+
+    local key = guid .. "-" .. spellID
+
+    if freq == "INSTANCE" then
+        if badPetHistory.instance[key] then
+            return false
+        end
+        badPetHistory.instance[key] = true
+        return true
+    end
+
+    if freq == "BOSS" then
+        if badPetHistory.boss[key] then
+            return false
+        end
+        badPetHistory.boss[key] = true
+        return true
+    end
+
+    return true
+end
+
+function ControlFreak:SendBadPetWhisper(ownerName, petName, spellID, spellName, destName)
+    if not ownerName then
+        return
+    end
+
+    local safeDest = destName or "Unknown Target"
+
+    local spellLink = "|cff71d5ff|Hspell:" .. spellID .. ":0|h[" .. spellName .. "]|h|r"
+
+    local msg = string_format(L["BAD_PET_WHISPER"], petName, spellLink, safeDest)
+
+    SendChatMessage(msg, "WHISPER", nil, ownerName)
 end
 
 --------------------------------------------------------------------------------
@@ -405,6 +469,7 @@ function ControlFreak:COMBAT_LOG_EVENT_UNFILTERED()
     local categoryKey = "other"
     local db = self.db.profile
     local cfg
+    local petOwnerName = nil
 
     local isMine = (sourceGUID == PLAYER_GUID)
     local isGroup = (UnitInParty(sourceName) or UnitInRaid(sourceName))
@@ -426,6 +491,7 @@ function ControlFreak:COMBAT_LOG_EVENT_UNFILTERED()
             if UnitInParty(ownerData.ownerName) or UnitInRaid(ownerData.ownerName) then
                 isGroup = true
             end
+            petOwnerName = ownerData.ownerName
         end
         if not (isMine or isGroup) then
             return
@@ -486,6 +552,12 @@ function ControlFreak:COMBAT_LOG_EVENT_UNFILTERED()
 
         if playSound then
             PlayAlertSound(whichSound)
+        end
+
+        if spellType == "Pet" and cfg.badPetEnable and not isMine and petOwnerName then
+            if self:CheckFrequency(sourceGUID, spellID) then
+                self:SendBadPetWhisper(petOwnerName, sourceName, spellID, spellName, destName)
+            end
         end
 
         if cfg.print then
