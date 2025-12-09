@@ -1,0 +1,26 @@
+## Interface: 11508
+## Title: Control Freak
+## Notes: Tracker for Taunts, Fears, and Item usage in Classic.
+## Author: Gogo1951
+## Version: @project-version@
+## SavedVariables: ControlFreakDB
+## OptionalDeps: Ace3, LibSharedMedia-3.0
+
+## Includes
+Includes\LibStub\LibStub.lua
+Includes\CallbackHandler-1.0\CallbackHandler-1.0.xml
+Includes\AceAddon-3.0\AceAddon-3.0.xml
+Includes\AceEvent-3.0\AceEvent-3.0.xml
+Includes\AceDB-3.0\AceDB-3.0.xml
+Includes\AceDBOptions-3.0\AceDBOptions-3.0.xml
+Includes\AceConsole-3.0\AceConsole-3.0.xml
+Includes\AceGUI-3.0\AceGUI-3.0.xml
+Includes\AceConfig-3.0\AceConfig-3.0.xml
+Includes\AceLocale-3.0\AceLocale-3.0.xml
+Includes\LibSharedMedia-3.0\LibSharedMedia-3.0.lua
+
+## Control Freak
+Locales\enUS.lua
+Data\Vanilla.lua
+Core.lua
+Options.lua
