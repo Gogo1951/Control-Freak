@@ -1,5 +1,5 @@
 # .pkgmeta
-package-as: ControlFreak
+package-as: Control-Freak
 enable-nolib-creation: no
 
 externals:
