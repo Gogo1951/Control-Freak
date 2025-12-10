@@ -29,6 +29,7 @@ Data\Vanilla.lua
 Core.lua
 Options.lua
 
+# Feedback Welcome! (=
 # Control Freak on Curseforge // https://www.curseforge.com/wow/addons/control-freak
 # Control Freak on GitHub // https://github.com/Gogo1951/Control-Freak
 # Control Freak on Discord // https://discord.gg/eh8hKq992Q
