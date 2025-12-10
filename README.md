@@ -1,6 +1,6 @@
 # Control Freak
 
-## Helping Improve Combat Awareness for Tanks & Raid Leaders
+**Helping Improve Combat Awareness for Tanks & Raid Leaders**
 
 Control Freak gives you granular control over the Combat Log events that actually matter.
 
