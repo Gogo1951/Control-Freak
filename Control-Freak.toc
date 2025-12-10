@@ -10,7 +10,7 @@
 ## OptionalDeps: Ace3, LibSharedMedia-3.0
 ## SavedVariables: ControlFreakDB
 
-## Includes
+# Includes
 Includes\LibStub\LibStub.lua
 Includes\CallbackHandler-1.0\CallbackHandler-1.0.xml
 Includes\AceAddon-3.0\AceAddon-3.0.xml
@@ -23,7 +23,7 @@ Includes\AceConfig-3.0\AceConfig-3.0.xml
 Includes\AceLocale-3.0\AceLocale-3.0.xml
 Includes\LibSharedMedia-3.0\LibSharedMedia-3.0.lua
 
-## Control Freak
+# Control Freak
 Locales\enUS.lua
 Data\Vanilla.lua
 Core.lua
