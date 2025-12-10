@@ -42,6 +42,8 @@ externals:
 ignore:
     - .git
     - .gitignore
+    - .idea
     - .pkgmeta
     - .vscode
-    - .idea
+    - LICENSE
+    - README.md
