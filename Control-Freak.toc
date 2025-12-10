@@ -1,13 +1,14 @@
-## Interface: 11508
 ## Title: Control Freak
 ## Notes: Tracker for Taunts, Fears, and Item usage in Classic.
 ## Author: Gogo1951
+## X-License: MIT
 
+## Interface: 11505
 ## Version: @project-version@
 ## X-Curse-Project-ID: 1401345
 
-## SavedVariables: ControlFreakDB
 ## OptionalDeps: Ace3, LibSharedMedia-3.0
+## SavedVariables: ControlFreakDB
 
 ## Includes
 Includes\LibStub\LibStub.lua
@@ -27,3 +28,7 @@ Locales\enUS.lua
 Data\Vanilla.lua
 Core.lua
 Options.lua
+
+# Control Freak on Curseforge // https://www.curseforge.com/wow/addons/control-freak
+# Control Freak on GitHub // https://github.com/Gogo1951/Control-Freak
+# Control Freak on Discord // https://discord.gg/eh8hKq992Q
