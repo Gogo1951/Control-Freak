@@ -12,6 +12,9 @@ externals:
     Includes/LibSharedMedia-3.0:
         url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk
         tag: latest
+        ignore:
+            - LibStub
+            - CallbackHandler-1.0
     
     # Ace3 Modules
     Includes/AceAddon-3.0:
