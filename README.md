@@ -32,11 +32,9 @@ https://www.curseforge.com/wow/addons/control-freak
 
 ## Testing Status
 
-🟢 World of Warcraft Classic : Classic Era
+🟢 World of Warcraft Classic (🟡 Season of Discover)
 
-🔴 World of Warcraft Classic : Season of Discovery
-
-🟢 World of Warcraft Classic : Anniversary Realms
+🟢 Burning Crusade Anniversary
 
 🔴 Mists of Pandaria Classic
 
