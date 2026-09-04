@@ -39,6 +39,3 @@ ignore:
     - .vscode
     - Examples
     - LICENSE
-    - README.md
-    - README-Technical.md
-    - README-Testing.md
