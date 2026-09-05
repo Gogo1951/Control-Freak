@@ -1,35 +1,92 @@
 ## Title: Control Freak
-## Notes: Tracker for Taunts, Fears, and Item usage in Classic.
+## Notes: Taunt tracking that tells you who taunted, whose taunt was resisted, and whose pet is growling, plus interrupt, fear, parry, and armor debuff callouts from the combat log. Better information = better tanking. Better tanking = better raids.
 ## Author: Gogo1951
+
+## IconTexture: Interface/AddOns/Control-Freak/Includes/Images/Control-Freak.tga
 ## X-License: MIT
 
-## Interface: 11508, 20505
+## Category-enUS: Combat
+## Category-deDE: Kampf
+## Category-esES: Combate
+## Category-esMX: Combate
+## Category-frFR: Combat
+## Category-itIT: Combattimento
+## Category-koKR: 전투
+## Category-ptBR: Combate
+## Category-ruRU: Бой
+## Category-zhCN: 战斗
+## Category-zhTW: 戰鬥
+
+## Interface: 11509, 20506
 ## Version: @project-version@
 ## X-Curse-Project-ID: 1401345
+## X-Wago-ID: mNw73LNo
 
-## OptionalDeps: Ace3, LibSharedMedia-3.0
 ## SavedVariables: ControlFreakDB
 
 # Includes
-Includes\LibStub\LibStub.lua
-Includes\CallbackHandler-1.0\CallbackHandler-1.0.xml
-Includes\AceAddon-3.0\AceAddon-3.0.xml
-Includes\AceEvent-3.0\AceEvent-3.0.xml
-Includes\AceDB-3.0\AceDB-3.0.xml
-Includes\AceDBOptions-3.0\AceDBOptions-3.0.xml
-Includes\AceConsole-3.0\AceConsole-3.0.xml
-Includes\AceGUI-3.0\AceGUI-3.0.xml
-Includes\AceConfig-3.0\AceConfig-3.0.xml
-Includes\AceLocale-3.0\AceLocale-3.0.xml
-Includes\LibSharedMedia-3.0\lib.xml
+Includes/Libraries/LibStub/LibStub.lua
+Includes/Libraries/CallbackHandler-1.0/CallbackHandler-1.0.lua
+Includes/Libraries/AceLocale-3.0/AceLocale-3.0.lua
+Includes/Libraries/AceDB-3.0/AceDB-3.0.lua
+Includes/Libraries/AceGUI-3.0/AceGUI-3.0.xml
+Includes/Libraries/AceConfig-3.0/AceConfigRegistry-3.0/AceConfigRegistry-3.0.lua
+Includes/Libraries/AceConfig-3.0/AceConfigCmd-3.0/AceConfigCmd-3.0.lua
+Includes/Libraries/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
+Includes/Libraries/AceConfig-3.0/AceConfig-3.0.lua
+Includes/Libraries/AceDBOptions-3.0/AceDBOptions-3.0.lua
+Includes/Libraries/LibDataBroker-1.1/LibDataBroker-1.1.lua
+Includes/Libraries/LibDBIcon-1.0/LibDBIcon-1.0.lua
+Includes/Libraries/LibSharedMedia-3.0/LibSharedMedia-3.0/LibSharedMedia-3.0.lua
+
+# Localization
+Locales/enUS.lua
+Locales/deDE.lua
+Locales/esES.lua
+Locales/esMX.lua
+Locales/frFR.lua
+Locales/itIT.lua
+Locales/koKR.lua
+Locales/ptBR.lua
+Locales/ruRU.lua
+Locales/zhCN.lua
+Locales/zhTW.lua
+
+# Data
+Data/Data.lua
+Data/Default-Settings.lua
+Data/Abilities.lua
 
 # Control Freak
-Locales\enUS.lua
-Data\Vanilla.lua
-Core.lua
-Options.lua
+Features/Core.lua
+Features/Utilities.lua
+Features/Announcements.lua
+Features/Whisper-Election.lua
+Features/Combat-Log.lua
+Features/Taunts.lua
+Features/Interrupts.lua
+Features/Fears.lua
+Features/Bad-Pet.lua
+Features/Tanking-Tools-Cold-Opener.lua
+Features/Tanking-Tools-Armor.lua
+Features/Tanking-Tools-Parry.lua
+Features/Tanking-Tools-Nova.lua
+Features/Tanking-Tools-Bubble.lua
+Features/Diagnostics.lua
+Features/Minimap-Button.lua
+Options/Options-Utilities.lua
+Options/Options-General.lua
+# TEMPORARY: delete the next line after 2026-12-03; see Options/Options-Apology.lua
+Options/Options-Apology.lua
+Options/Options-Taunts.lua
+Options/Options-Interrupts.lua
+Options/Options-Fears.lua
+Options/Options-Bad-Pet.lua
+Options/Options-Tanking-Tools.lua
+Options/Options-Profiles.lua
+Options/Options-Diagnostics.lua
+Options/Options.lua
 
 # Feedback Welcome! (=
-# Control Freak on Curseforge // https://www.curseforge.com/wow/addons/control-freak
 # Control Freak on GitHub // https://github.com/Gogo1951/Control-Freak
 # Control Freak on Discord // https://discord.gg/eh8hKq992Q

@@ -1,52 +1,42 @@
-# .pkgmeta
 package-as: Control-Freak
+
 enable-nolib-creation: no
 
 externals:
-    Includes/LibStub:
-        url: https://repos.wowace.com/wow/libstub/trunk
-        tag: latest
-    Includes/CallbackHandler-1.0:
-        url: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
-        tag: latest
-    Includes/LibSharedMedia-3.0:
-        url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk
-        tag: latest
+    Includes/Libraries/LibStub:
+        url: https://repos.curseforge.com/wow/ace3/trunk/LibStub
+    Includes/Libraries/CallbackHandler-1.0:
+        url: https://repos.curseforge.com/wow/callbackhandler/trunk/CallbackHandler-1.0
+    Includes/Libraries/AceLocale-3.0:
+        url: https://repos.curseforge.com/wow/ace3/trunk/AceLocale-3.0
+    Includes/Libraries/AceDB-3.0:
+        url: https://repos.curseforge.com/wow/ace3/trunk/AceDB-3.0
+    Includes/Libraries/AceGUI-3.0:
+        url: https://repos.curseforge.com/wow/ace3/trunk/AceGUI-3.0
+    Includes/Libraries/AceConfig-3.0:
+        url: https://repos.curseforge.com/wow/ace3/trunk/AceConfig-3.0
+    Includes/Libraries/AceDBOptions-3.0:
+        url: https://repos.curseforge.com/wow/ace3/trunk/AceDBOptions-3.0
+    Includes/Libraries/LibDataBroker-1.1:
+        url: https://github.com/tekkub/libdatabroker-1-1
+    Includes/Libraries/LibDBIcon-1.0:
+        url: https://repos.curseforge.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
+    Includes/Libraries/LibSharedMedia-3.0:
+        url: https://repos.curseforge.com/wow/libsharedmedia-3-0/trunk
         ignore:
             - LibStub
             - CallbackHandler-1.0
-    
-    # Ace3 Modules
-    Includes/AceAddon-3.0:
-        url: https://repos.wowace.com/wow/ace3/trunk/AceAddon-3.0
-        tag: latest
-    Includes/AceEvent-3.0:
-        url: https://repos.wowace.com/wow/ace3/trunk/AceEvent-3.0
-        tag: latest
-    Includes/AceDB-3.0:
-        url: https://repos.wowace.com/wow/ace3/trunk/AceDB-3.0
-        tag: latest
-    Includes/AceDBOptions-3.0:
-        url: https://repos.wowace.com/wow/ace3/trunk/AceDBOptions-3.0
-        tag: latest
-    Includes/AceConsole-3.0:
-        url: https://repos.wowace.com/wow/ace3/trunk/AceConsole-3.0
-        tag: latest
-    Includes/AceGUI-3.0:
-        url: https://repos.wowace.com/wow/ace3/trunk/AceGUI-3.0
-        tag: latest
-    Includes/AceConfig-3.0:
-        url: https://repos.wowace.com/wow/ace3/trunk/AceConfig-3.0
-        tag: latest
-    Includes/AceLocale-3.0:
-        url: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
-        tag: latest
 
 ignore:
+    - .DS_Store
     - .git
+    - .gitattributes
+    - .github
     - .gitignore
     - .idea
+    - .luacheckrc
     - .pkgmeta
     - .vscode
+    - Examples
     - LICENSE
-    - README.md
+    
