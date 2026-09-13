@@ -21,10 +21,7 @@ externals:
   Includes/Libraries/LibDBIcon-1.0:
     url: https://repos.curseforge.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0/
   Includes/Libraries/LibSharedMedia-3.0:
-    url: https://repos.curseforge.com/wow/libsharedmedia-3-0/trunk/
-    ignore:
-      - LibStub
-      - CallbackHandler-1.0
+    url: https://repos.curseforge.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0/
 
 ignore:
   - .DS_Store
