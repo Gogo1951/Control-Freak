@@ -83,7 +83,8 @@ function ns.BuildDiagnosticsOptions()
 			order = 7,
 			hidden = Hidden,
 			func = function()
-				ns:StopEventLog()
+				-- Halts capture and keeps the buffer for Show; disabling the panel is what releases it.
+				ns.diagnostics.logging = false
 				Refresh()
 			end,
 		},
@@ -265,8 +266,10 @@ function ns.BuildDiagnosticsOptions()
 		},
 	}
 
-	-- One Validate Data section per manifest row, so a new data file cannot ship
-	-- without a validator.
+	--[[
+	    One Validate Data section per manifest row, so a new data file cannot ship
+	    without a validator.
+	]]
 	local order = 30
 	for index, source in ipairs(ns.DIAGNOSTIC_DATA_SOURCES) do
 		local field = "dataReport" .. index

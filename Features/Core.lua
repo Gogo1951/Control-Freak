@@ -4,8 +4,10 @@ local ADDON_NAME, ns = ...
 -- Version
 --------------------------------------------------------------------------------
 
--- The nil branch is load-bearing: an unpackaged metadata read comes back nil,
--- and testing "@" first would error on exactly the local-dev path.
+--[[
+    The nil branch is load-bearing: an unpackaged metadata read comes back nil,
+    and testing "@" first would error on exactly the local-dev path.
+]]
 local version = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version")
 if not version or version:find("@", 1, true) then
 	version = "Dev"
@@ -19,15 +21,24 @@ ns.Version = version
 ns.EVENT_NAMES = {
 	"PLAYER_LOGIN",
 	"PLAYER_ENTERING_WORLD",
-	"GROUP_ROSTER_UPDATE",
 	"ZONE_CHANGED_NEW_AREA",
 	"CHAT_MSG_ADDON",
 	"UNIT_SPELLCAST_INTERRUPTED",
+	--[[
+	    The one alert not driven by the combat log, so it is registered flat like
+	    the rest rather than through ns:UpdateCombatLogRegistration. It fires only
+	    when the player is actually crowd controlled, which is rare enough that
+	    gating the registration would cost more than it saves, and its handler
+	    asks the Incapacitated tab's own scope gates itself.
+	]]
+	"LOSS_OF_CONTROL_ADDED",
 	"COMBAT_LOG_EVENT_UNFILTERED",
 }
 
--- Feature files append the per-fight state they need cleared on every loading
--- screen; Core runs the list on PLAYER_ENTERING_WORLD.
+--[[
+    Feature files append the per-fight state they need cleared on every loading
+    screen; Core runs the list on PLAYER_ENTERING_WORLD.
+]]
 ns.stateResets = {}
 
 local frame = CreateFrame("Frame")
@@ -43,8 +54,10 @@ frame:SetScript("OnEvent", function(_, event, ...)
 	end
 end)
 
--- COMBAT_LOG_EVENT_UNFILTERED is owned by ns:UpdateCombatLogRegistration, so a
--- disabled or out-of-scope add-on is not woken for every combat line.
+--[[
+    COMBAT_LOG_EVENT_UNFILTERED is owned by ns:UpdateCombatLogRegistration, so a
+    disabled or out-of-scope add-on is not woken for every combat line.
+]]
 for _, event in ipairs(ns.EVENT_NAMES) do
 	if event ~= "COMBAT_LOG_EVENT_UNFILTERED" then
 		frame:RegisterEvent(event)
@@ -93,10 +106,6 @@ function ns:PLAYER_ENTERING_WORLD()
 	for _, reset in ipairs(ns.stateResets) do
 		reset()
 	end
-	ns:UpdateCombatLogRegistration()
-end
-
-function ns:GROUP_ROSTER_UPDATE()
 	ns:UpdateCombatLogRegistration()
 end
 

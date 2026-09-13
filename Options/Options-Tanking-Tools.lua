@@ -19,68 +19,74 @@ for _, seconds in ipairs(ns.COLD_OPENER_WINDOWS) do
 end
 
 --[[
-    Six warnings sharing a tab rather than four flavors of one alert, but drawn as
-    the same block as every other tab's: header, a sentence or two, the switch and
-    its sub-options, anything else the warning owns, and a sample of what the group
-    would see. ns.AddAlertSection owns that shape.
+    Four warnings sharing a tab rather than four flavors of one alert, drawn as
+    the same block as every other tab's. Two of them bend it:
 
-    Bubble Warnings and Taunt Overwrite Warnings are still being designed; orders
-    are spaced 20 apart with room left for them after Parry.
+      Cold Openers reports the player's own opener and nobody else's, so it has a
+      My row and no Others'. Its window -- how long into a pull an avoided
+      ability still counts -- is a parameter of the detection, not a filter, and
+      sits as a caption row under the whose row, "Within [10 Seconds of Fight]".
+      The slot beside the switch belongs to the target ladder, as everywhere.
+
+      Armor Debuffs has no whose at all: the report is the group's, told to the
+      player, so it draws one row for where that report goes and the handler
+      files every report under it.
+
+    Orders are spaced 20 apart throughout, with room left at the bottom for
+    whatever lands here next.
 ]]
 function ns.BuildTankingToolsOptions()
 	local args = {}
 	local hidden = ns.AddFeatureScope(args, Feature, nil, "TANKING_TOOLS_ENABLE", 1, "tankingTools")
 
-	ns.AddAlertSection(args, "coldOpener", Section("coldOpener"), 20, hidden, {
+	ns.AddWhoseAlertSection(args, "coldOpener", Section("coldOpener"), 20, hidden, {
 		headerKey = "TANKING_TOOLS_COLD_OPENER_HEADER",
 		enableKey = "TANKING_TOOLS_COLD_OPENER_ENABLE",
 		descKey = "TANKING_TOOLS_COLD_OPENER_DESC",
-		-- Always your own: the warning covers the player's own opener and nobody
-		-- else's, so there is no whose left to choose.
-		noScope = true,
-		-- BLOCK of the six outcomes, because it is the one the mock-up shows.
+		mineKey = "TANKING_TOOLS_COLD_OPENER_MINE",
+		-- BLOCK of the six outcomes: the one a tank meets most often on a pull.
 		sample = {
 			key = "COLD_OPENER_BLOCK",
 			args = { ns.SAMPLE_PLAYER, ns.SampleSpell(7386, "Sunder Armor"), ns.SampleBoss() },
 		},
-		--[[
-		    The window sits beside the switch because it is the same sentence: warn
-		    me about a cold opener, for this long into the pull. It is not a
-		    sub-option -- it narrows nothing, it measures.
-		]]
-		control = {
-			type = "select",
-			name = "",
-			desc = L["TANKING_TOOLS_COLD_OPENER_WINDOW_DESC"],
-			width = ns.OPTIONS_CONTROL_WIDTH,
-			values = coldOpenerWindows,
-			sorting = ns.COLD_OPENER_WINDOWS,
-			get = function()
-				return ns.ResolveChoice(
-					Section("coldOpener")().window,
-					ns.COLD_OPENER_WINDOWS,
-					ns.COLD_OPENER_WINDOW_DEFAULT
-				)
-			end,
-			set = function(_, value)
-				Section("coldOpener")().window = value
-			end,
+		captionRow = {
+			labelKey = "TANKING_TOOLS_COLD_OPENER_WITHIN",
+			control = {
+				type = "select",
+				name = "",
+				desc = L["TANKING_TOOLS_COLD_OPENER_WINDOW_DESC"],
+				width = ns.OPTIONS_SUB_CONTROL_WIDTH,
+				values = coldOpenerWindows,
+				sorting = ns.COLD_OPENER_WINDOWS,
+				get = function()
+					return ns.ResolveChoice(
+						Section("coldOpener")().window,
+						ns.COLD_OPENER_WINDOWS,
+						ns.COLD_OPENER_WINDOW_DEFAULT
+					)
+				end,
+				set = function(_, value)
+					Section("coldOpener")().window = value
+				end,
+			},
 		},
 	})
 
-	ns.AddAlertSection(args, "armor", Section("armor"), 40, hidden, {
+	ns.AddWhoseAlertSection(args, "armor", Section("armor"), 40, hidden, {
 		headerKey = "TANKING_TOOLS_ARMOR_HEADER",
 		enableKey = "TANKING_TOOLS_ARMOR_ENABLE",
 		descKey = "TANKING_TOOLS_ARMOR_DESC",
+		mineKey = "TANKING_TOOLS_ARMOR_REPORT",
+		mineDescKey = "TANKING_TOOLS_ARMOR_REPORT_DESC",
 		-- Under a second: everything in the first global is the result worth showing.
 		sample = { key = "ARMOR_REPORT", args = { ns.SampleBoss(), "0.8" } },
 		-- Fires once per target, after the fact. Nothing to react to.
 		noSound = true,
 		--[[
 		    The two optional components, drawn UNDER the indent because that is what
-		    they are: they narrow what counts as done, the same way Only Against
-		    Bosses & Elites narrows what counts at all. They take rowsHidden so they
-		    collapse with the rest when the alert is switched off.
+		    they are: they narrow what counts as done, the way the rows above them
+		    decide what counts at all. They take rowsHidden so they collapse with
+		    the rest when the alert is switched off.
 		]]
 		extraRow = function(rowArgs, order, rowsHidden)
 			local extras = {
@@ -107,21 +113,52 @@ function ns.BuildTankingToolsOptions()
 		end,
 	})
 
-	ns.AddAlertSection(args, "parry", Section("parry"), 60, hidden, {
+	--[[
+	    One mob for both of Parries' examples: the warning the group sees and the
+	    whisper its culprit gets describe the same swing.
+	]]
+	local PARRY_BOSS = ns.SampleBoss()
+
+	ns.AddWhoseAlertSection(args, "parry", Section("parry"), 60, hidden, {
 		headerKey = "TANKING_TOOLS_PARRY_HEADER",
 		enableKey = "TANKING_TOOLS_PARRY_ENABLE",
 		descKey = "TANKING_TOOLS_PARRY_DESC",
-		-- Always everyone: the culprit is by definition not the player tanking it.
-		noScope = true,
-		sample = { key = "PARRY_WARNING", args = { ns.SAMPLE_OTHER, ns.SampleBoss() } },
-		-- The whisper goes to the culprit rather than into the player's own window
-		-- or the group's chat, so it sits beside the alert, not under it.
-		extraRow = function(rowArgs, order)
-			ns.AddWhisperRow(rowArgs, "parry", order, hidden, {
+		mineKey = "TANKING_TOOLS_PARRY_MINE",
+		othersKey = "TANKING_TOOLS_PARRY_OTHERS",
+		sample = { key = "PARRY_WARNING", args = { ns.SAMPLE_OTHER, PARRY_BOSS } },
+		--[[
+		    Under the indent because it narrows who counts: an off-tank in front of
+		    the boss for a taunt swap is not a mistake to whisper about.
+		]]
+		extraRow = function(rowArgs, order, rowsHidden)
+			rowArgs.parryIgnoreTanks = ns.OptionsSubRow(order + 1, rowsHidden, {
+				ignoreTanks = {
+					type = "toggle",
+					name = ns.OptionsSubLabel(L["TANKING_TOOLS_PARRY_IGNORE_TANKS"]),
+					desc = L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"],
+					width = ns.OPTIONS_SUB_LABEL_WIDTH,
+					order = 1,
+					get = function()
+						return Section("parry")().ignoreTanks
+					end,
+					set = function(_, value)
+						Section("parry")().ignoreTanks = value
+					end,
+				},
+			})
+		end,
+		--[[
+		    The whisper goes to the culprit rather than into the player's own window
+		    or the group's chat, so it is not one of the alert's outputs: it sits
+		    below the block's example with an example of its own.
+		]]
+		afterSample = function(rowArgs, order, rowsHidden)
+			ns.AddWhisperRow(rowArgs, "parry", order, rowsHidden, {
 				labelKey = "TANKING_TOOLS_PARRY_WHISPER",
 				descKey = "TANKING_TOOLS_PARRY_WHISPER_DESC",
 				cooldownDescKey = "TANKING_TOOLS_PARRY_COOLDOWN_DESC",
 				cooldowns = ns.PARRY_COOLDOWNS,
+				sample = { key = "PARRY_WHISPER", args = { PARRY_BOSS } },
 				getWhisper = function()
 					return Section("parry")().whisper
 				end,
@@ -142,15 +179,21 @@ function ns.BuildTankingToolsOptions()
 		end,
 	})
 
-	ns.AddAlertSection(args, "nova", Section("nova"), 80, hidden, {
+	--[[
+	    Frost Nova is a ring, not a target: nothing for a ladder or a mark to apply
+	    to, so this draws like AOE Taunts, and its example is the AOE line the one
+	    nova in the category actually produces.
+	]]
+	ns.AddWhoseAlertSection(args, "nova", Section("nova"), 80, hidden, {
 		headerKey = "TANKING_TOOLS_NOVA_HEADER",
 		enableKey = "TANKING_TOOLS_NOVA_ENABLE",
 		descKey = "TANKING_TOOLS_NOVA_DESC",
-		-- Always everyone: a nova is somebody else scattering your pull.
-		noScope = true,
+		mineKey = "TANKING_TOOLS_NOVA_MINE",
+		othersKey = "TANKING_TOOLS_NOVA_OTHERS",
+		noTarget = true,
 		sample = {
-			key = "NOVA",
-			args = { ns.SAMPLE_OTHER, ns.SampleSpell(122, "Frost Nova"), ns.SampleBoss() },
+			key = "NOVA_AOE",
+			args = { ns.SAMPLE_OTHER, ns.SampleSpell(122, "Frost Nova") },
 		},
 	})
 

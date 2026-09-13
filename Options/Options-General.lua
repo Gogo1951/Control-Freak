@@ -4,13 +4,14 @@ local L = ns.L
 local GetColor = ns.GetColor
 
 --[[
-    The Feedback & Support rows override the default half-and-half label/control
-    split. Their labels are one short word each, so the standard
-    ns.OPTIONS_LABEL_WIDTH leaves a wide gap after "Wago" and spends half the row
-    on nothing, while the URL beside it — the part the player is there to copy —
-    truncates mid-address. Giving the label only what a word needs and the rest to
-    the input fits every URL but the longest, and the two still total
-    ns.OPTIONS_ROW_WIDTH, so the rows end where every other row ends.
+    The Feedback & Support rows override the default label/control split,
+    ns.OPTIONS_LABEL_WIDTH to ns.OPTIONS_CONTROL_WIDTH (2.1 to 1.3). Their labels
+    are one short word each, so the standard label width leaves a wide gap after
+    "Wago" and spends most of the row on nothing, while the URL beside it — the
+    part the player is there to copy — truncates mid-address. Giving the label
+    only what a word needs and the rest to the input fits every URL but the
+    longest, and the two still total ns.OPTIONS_ROW_WIDTH, so the rows end where
+    every other row ends.
 ]]
 local LINK_LABEL_WIDTH = 0.6
 local LINK_URL_WIDTH = ns.OPTIONS_ROW_WIDTH - LINK_LABEL_WIDTH
@@ -55,15 +56,24 @@ function ns.BuildGeneralOptions()
 			8
 		),
 
+		--[[
+		    Header, summary, switch -- the same three the feature tabs open on
+		    (ns.AddFeatureScope), because this is the same question asked once for
+		    all of them. The summary is what tells a player the switch is not on
+		    this page's scale: every other box on the General panel governs one
+		    thing, and this one governs the add-on.
+		]]
 		spaceKillSwitch0 = ns.OptionsSpacer(10),
 		headerKillSwitch = ns.OptionsHeader(L["KILL_SWITCH"], 11),
 		spaceKillSwitch1 = ns.OptionsSpacer(12),
+		descKillSwitch = ns.OptionsDesc(L["KILL_SWITCH_SUMMARY"], 13),
+		spaceKillSwitch2 = ns.OptionsSpacer(14),
 		enabled = {
 			type = "toggle",
 			name = L["KILL_SWITCH_ENABLE"],
 			desc = L["KILL_SWITCH_ENABLE_DESC"],
 			width = "full",
-			order = 13,
+			order = 15,
 			get = function()
 				return ns.db.profile.enabled
 			end,
@@ -88,6 +98,7 @@ function ns.BuildGeneralOptions()
 			name = function()
 				return GetColor("MUTED") .. L["VERSION"] .. " " .. ns.Version .. "|r"
 			end,
+			fontSize = "medium",
 			order = 999,
 		},
 	}

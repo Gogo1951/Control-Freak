@@ -1,5 +1,5 @@
 ## Title: Control Freak
-## Notes: Taunt tracking that tells you who taunted, whose taunt was resisted, and whose pet is growling, plus interrupt, fear, parry, and armor debuff callouts from the combat log. Better information = better tanking. Better tanking = better raids.
+## Notes: Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, armor debuffs, and other critical fight events. Track who taunted, what failed, who interrupted a cast, and what happened with customizable alerts.
 ## Author: Gogo1951
 
 ## IconTexture: Interface/AddOns/Control-Freak/Includes/Images/Control-Freak.tga
@@ -37,7 +37,7 @@ Includes/Libraries/AceConfig-3.0/AceConfig-3.0.lua
 Includes/Libraries/AceDBOptions-3.0/AceDBOptions-3.0.lua
 Includes/Libraries/LibDataBroker-1.1/LibDataBroker-1.1.lua
 Includes/Libraries/LibDBIcon-1.0/LibDBIcon-1.0.lua
-Includes/Libraries/LibSharedMedia-3.0/LibSharedMedia-3.0/LibSharedMedia-3.0.lua
+Includes/Libraries/LibSharedMedia-3.0/LibSharedMedia-3.0.lua
 
 # Localization
 Locales/enUS.lua
@@ -60,31 +60,41 @@ Data/Abilities.lua
 # Control Freak
 Features/Core.lua
 Features/Utilities.lua
+Features/Ability-Index.lua
+Features/Alert-Gates.lua
+Features/Enemy-Tier.lua
 Features/Announcements.lua
 Features/Whisper-Election.lua
 Features/Combat-Log.lua
 Features/Taunts.lua
 Features/Interrupts.lua
 Features/Fears.lua
-Features/Bad-Pet.lua
+Features/Incapacitated.lua
+Features/Tank-Deaths.lua
 Features/Tanking-Tools-Cold-Opener.lua
 Features/Tanking-Tools-Armor.lua
 Features/Tanking-Tools-Parry.lua
 Features/Tanking-Tools-Nova.lua
-Features/Tanking-Tools-Bubble.lua
+Features/Bad-Priests.lua
+Features/Bad-Pets.lua
 Features/Diagnostics.lua
 Features/Minimap-Button.lua
 Options/Options-Utilities.lua
+Options/Options-Alert-Section.lua
+Options/Options-Ability-Toggles.lua
 Options/Options-General.lua
-# TEMPORARY: delete the next line after 2026-12-03; see Options/Options-Apology.lua
-Options/Options-Apology.lua
 Options/Options-Taunts.lua
 Options/Options-Interrupts.lua
 Options/Options-Fears.lua
-Options/Options-Bad-Pet.lua
+Options/Options-Incapacitated.lua
+Options/Options-Tank-Deaths.lua
+Options/Options-Bad-Priests.lua
+Options/Options-Bad-Pets.lua
 Options/Options-Tanking-Tools.lua
 Options/Options-Profiles.lua
 Options/Options-Diagnostics.lua
+# TEMPORARY: delete the next line after 2026-12-03; see Options/Options-Apology.lua
+Options/Options-Apology.lua
 Options/Options.lua
 
 # Feedback Welcome! (=

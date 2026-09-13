@@ -1,5 +1,7 @@
 local _, ns = ...
 
+local UNIT_TOKENS = ns.UNIT_TOKENS
+
 --[[
     Armor Debuffs, one of the Tanking Tools.
 
@@ -25,14 +27,18 @@ for _, debuff in ipairs(ns.ARMOR_DEBUFFS) do
 	end
 end
 
--- Read by the combat-log dispatch, so an aura landing on anybody is dropped on a
--- table lookup rather than on a group scan.
+--[[
+    Read by the combat-log dispatch, so an aura landing on anybody is dropped on a
+    table lookup rather than on a group scan.
+]]
 function ns.IsArmorDebuffSpell(spellId)
 	return DEBUFF_BY_ID[spellId] ~= nil
 end
 
--- destGUID -> { started, counts, reported }. Bounded rather than pruned, the way
--- the other per-mob caches are.
+--[[
+    destGUID -> { started, counts, reported }. Bounded rather than pruned, the way
+    the other per-mob caches are.
+]]
 local runs = {}
 local runCount = 0
 local RUN_LIMIT = 200
@@ -47,6 +53,38 @@ local function Forget(destGUID)
 		runs[destGUID] = nil
 		runCount = runCount - 1
 	end
+end
+
+--[[
+    Whether anybody in the group is of this class, the player included.
+
+    Deliberately NOT filtered on alive or connected, unlike ns.GroupHasTank. That
+    one asks "is somebody tanking right now", a question about this instant; this
+    one asks "could this debuff ever land", and a druid who is dead at the moment
+    the tank pulls is still the reason to wait for Faerie Fire.
+]]
+function ns.GroupHasClass(class)
+	if select(2, UnitClass("player")) == class then
+		return true
+	end
+
+	local tokens, count
+	if IsInRaid() then
+		tokens, count = UNIT_TOKENS.raid, GetNumGroupMembers()
+	elseif IsInGroup() then
+		tokens, count = UNIT_TOKENS.party, 4
+	else
+		return false
+	end
+
+	for index = 1, count do
+		local unit = tokens[index]
+		if UnitExists(unit) and select(2, UnitClass(unit)) == class then
+			return true
+		end
+	end
+
+	return false
 end
 
 --[[
@@ -79,7 +117,11 @@ end
     Sunder count reliable: a target whose stack falls off and is re-sundered times
     from its own first stack rather than inheriting a half-finished one.
 ]]
-function ns:HandleArmorDebuffs(feature, subevent, sourceFlags, destGUID, destName, raidIconIndex, spellId)
+--[[
+    The caster's flags are not read: the report is the group's, and files under
+    the player's own affiliation (see the alert below).
+]]
+function ns:HandleArmorDebuffs(feature, subevent, _sourceFlags, destGUID, destName, raidIconIndex, spellId)
 	local debuff = DEBUFF_BY_ID[spellId]
 	if not debuff or not destGUID then
 		return
@@ -124,12 +166,19 @@ function ns:HandleArmorDebuffs(feature, subevent, sourceFlags, destGUID, destNam
 	end
 	run.reported = true
 
-	-- One decimal place. A stack-up is measured in globals, and a second's
-	-- precision would round most of the interesting range to the same number.
+	--[[
+	    One decimal place. A stack-up is measured in globals, and a second's
+	    precision would round most of the interesting range to the same number.
+	]]
 	local elapsed = string.format("%.1f", GetTime() - run.started)
 
+	--[[
+	    The report is the group's, told to the player, so it files under the
+	    section's one row whoever laid the last stack: the player's own affiliation
+	    rather than the caster's, which would pick a row by who happened to finish.
+	]]
 	ns:Alert(settings, "ARMOR_REPORT", {
 		ns.TargetPart(destName, raidIconIndex),
 		elapsed,
-	}, sourceFlags, destGUID)
+	}, COMBATLOG_OBJECT_AFFILIATION_MINE, destGUID, raidIconIndex)
 end

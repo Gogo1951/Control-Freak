@@ -33,14 +33,22 @@ local function RefreshTooltip(anchor)
 	tooltip:AddLine(GetColor("BODY") .. L["KILL_SWITCH_ENABLE_DESC"] .. "|r", 1, 1, 1, true)
 	tooltip:AddDoubleLine(GetColor("INFO") .. L["LEFT_CLICK"] .. "|r", GetColor("INFO") .. L["ACTION_TOGGLE"] .. "|r")
 
-	-- The master switch unregisters the combat log outright, so with it off Bad
-	-- Pet cannot fire whatever its own setting says. Showing the block would be
-	-- advertising a toggle that changes nothing, so it goes with everything else.
+	--[[
+	    The add-on's own switch unregisters the combat log outright, so with it off
+	    Bad Pets cannot fire whatever its own setting says. Showing the block would
+	    be advertising a toggle that changes nothing, so it goes with everything else.
+
+	    Bad Pets is the only feature with a block and a binding, and it earns
+	    them by whispering pet owners out of the box: a tank may need to hush it
+	    mid-run. Bad Priests had both until 2026-09-12 and lost them because it
+	    ships with nothing that reaches anybody else -- its whisper off and its
+	    warning printing to the player's own window -- so a quick switch here had
+	    nothing to hush, and one feature toggle keeps the tooltip short.
+	]]
 	if profile and profile.enabled then
 		tooltip:AddLine(" ")
-
-		tooltip:AddDoubleLine(GetColor("TITLE") .. L["TAB_BAD_PET"] .. "|r", StateText(profile.badPet.enabled))
-		tooltip:AddLine(GetColor("BODY") .. L["BAD_PET_SUMMARY"] .. "|r", 1, 1, 1, true)
+		tooltip:AddDoubleLine(GetColor("TITLE") .. L["TAB_BAD_PETS"] .. "|r", StateText(profile.badPets.enabled))
+		tooltip:AddLine(GetColor("BODY") .. L["BAD_PETS_SUMMARY"] .. "|r", 1, 1, 1, true)
 		tooltip:AddDoubleLine(
 			GetColor("INFO") .. L["RIGHT_CLICK"] .. "|r",
 			GetColor("INFO") .. L["ACTION_TOGGLE"] .. "|r"
@@ -64,8 +72,10 @@ ns.LDBObject = LibDataBroker:NewDataObject(ns.LOCALE_NAME, {
 	icon = ns.MINIMAP_ICON,
 
 	OnClick = function(self, button)
-		-- Shift + Middle-Click runs first, before any feature button. The combat
-		-- refusal lives inside the opener; never duplicate it here.
+		--[[
+		    Shift + Middle-Click runs first, before any feature button. The combat
+		    refusal lives inside the opener; never duplicate it here.
+		]]
 		if IsShiftKeyDown() and button == "MiddleButton" then
 			ns:OpenOptionsPanel()
 			return
@@ -83,7 +93,7 @@ ns.LDBObject = LibDataBroker:NewDataObject(ns.LOCALE_NAME, {
 		end
 
 		--[[
-		    Both buttons flip a feature's `enabled`, and both therefore go through
+		    Both bindings flip an `enabled` and therefore go through
 		    ns:ApplyProfile rather than a bare NotifyChange. That flag decides
 		    whether COMBAT_LOG_EVENT_UNFILTERED is registered at all, so setting it
 		    without re-running the registration test would leave the add-on hooked
@@ -91,12 +101,24 @@ ns.LDBObject = LibDataBroker:NewDataObject(ns.LOCALE_NAME, {
 		    unhooked from one they just switched on. ApplyProfile also notifies every
 		    panel, so the open options page follows along.
 
-		    Right-click is ignored while the master switch is off, matching the
-		    tooltip: the block is not drawn, so the binding is not on offer.
+		    Right-Click is ignored while the add-on's own switch is off, matching
+		    the tooltip: the block is not drawn, so the binding is not on offer.
+
+		    A shifted Left- or Right-Click is ignored rather than read as the plain
+		    click: the tooltip advertises three bindings, and a click that matches
+		    none of them does nothing. Shift + Left-Click used to toggle Bad
+		    Priests, so treating it as a plain Left-Click would hand anybody with
+		    that habit the add-on's own switch instead.
 		]]
+		if IsShiftKeyDown() then
+			return
+		end
+
+		local profile = ns.db.profile
+
 		if button == "RightButton" then
-			if ns.db.profile.enabled then
-				ns.db.profile.badPet.enabled = not ns.db.profile.badPet.enabled
+			if profile.enabled then
+				profile.badPets.enabled = not profile.badPets.enabled
 				ns:ApplyProfile()
 				Refresh()
 			end
@@ -104,7 +126,7 @@ ns.LDBObject = LibDataBroker:NewDataObject(ns.LOCALE_NAME, {
 		end
 
 		if button == "LeftButton" then
-			ns.db.profile.enabled = not ns.db.profile.enabled
+			profile.enabled = not profile.enabled
 			ns:ApplyProfile()
 			Refresh()
 		end
@@ -123,9 +145,11 @@ ns.LDBObject = LibDataBroker:NewDataObject(ns.LOCALE_NAME, {
 -- Registration
 --------------------------------------------------------------------------------
 
--- Called from Core once ns.db exists: LibDBIcon writes the button's angle and
--- hide flag into the subtable it is handed, so it cannot register before
--- SavedVariables load.
+--[[
+    Called from Core once ns.db exists: LibDBIcon writes the button's angle and
+    hide flag into the subtable it is handed, so it cannot register before
+    SavedVariables load.
+]]
 function ns:RegisterMinimapButton()
 	if not LibDBIcon:IsRegistered(ns.LOCALE_NAME) then
 		LibDBIcon:Register(ns.LOCALE_NAME, ns.LDBObject, ns.db.profile.minimap)

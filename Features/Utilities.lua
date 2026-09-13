@@ -4,7 +4,6 @@ local L = ns.L
 
 local bit_band = bit.band
 local string_find = string.find
-local string_gsub = string.gsub
 
 --------------------------------------------------------------------------------
 -- Colors
@@ -24,8 +23,10 @@ for class, hex in pairs(ns.CLASS_COLORS) do
 	CLASS_COLORS[class] = "|cff" .. hex
 end
 
--- A plain find rather than a substring compare: it runs on every combat-log line
--- and sub() would allocate a six-character string each time to throw away.
+--[[
+    A plain find rather than a substring compare: it runs on every combat-log line
+    and sub() would allocate a six-character string each time to throw away.
+]]
 function ns.IsPlayerGUID(guid)
 	return type(guid) == "string" and string_find(guid, "Player", 1, true) == 1
 end
@@ -51,8 +52,10 @@ end
 -- Spell API Shims
 --------------------------------------------------------------------------------
 
--- Picked by availability, never by result: a call that legitimately returns nil
--- must not fall through to the other namespace.
+--[[
+    Picked by availability, never by result: a call that legitimately returns nil
+    must not fall through to the other namespace.
+]]
 local HAS_C_SPELL_LINK = C_Spell and C_Spell.GetSpellLink and true or false
 local HAS_C_SPELL_INFO = C_Spell and C_Spell.GetSpellInfo and true or false
 
@@ -159,55 +162,6 @@ function ns.GetFlavorIndex()
 	return flavorIndex
 end
 
-function ns.GetFlavorName()
-	return ns.FLAVOR_NAMES[ns.GetFlavorIndex()] or "?"
-end
-
---------------------------------------------------------------------------------
--- Raid Icons
---------------------------------------------------------------------------------
-
-local RAID_ICON_INDEX = {
-	[COMBATLOG_OBJECT_RAIDTARGET1] = 1,
-	[COMBATLOG_OBJECT_RAIDTARGET2] = 2,
-	[COMBATLOG_OBJECT_RAIDTARGET3] = 3,
-	[COMBATLOG_OBJECT_RAIDTARGET4] = 4,
-	[COMBATLOG_OBJECT_RAIDTARGET5] = 5,
-	[COMBATLOG_OBJECT_RAIDTARGET6] = 6,
-	[COMBATLOG_OBJECT_RAIDTARGET7] = 7,
-	[COMBATLOG_OBJECT_RAIDTARGET8] = 8,
-}
-
---[[
-    Both renderings, built from ns.RAID_ICONS so the paths live in one place.
-    The texture escape is what a LOCAL PRINT uses, so the player sees the actual
-    mark. Its size argument is 0, which sizes the icon to the line height rather
-    than forcing a pixel count. The {rtN} token is for SENT chat only: texture
-    escapes do not survive SendChatMessage, and the client renders the token into
-    the mark on the receiving end.
-]]
-local RAID_ICON_TEXTURES = {}
-local RAID_ICON_TOKENS = {}
-for index, texture in ipairs(ns.RAID_ICONS) do
-	RAID_ICON_TEXTURES[index] = "|T" .. texture .. ":0|t"
-	RAID_ICON_TOKENS[index] = "{rt" .. index .. "}"
-end
-
-function ns.GetRaidIconIndex(destRaidFlags)
-	if not destRaidFlags then
-		return nil
-	end
-	return RAID_ICON_INDEX[bit_band(destRaidFlags, COMBATLOG_OBJECT_RAIDTARGET_MASK)]
-end
-
-function ns.GetRaidIconTexture(index)
-	return index and RAID_ICON_TEXTURES[index] or ""
-end
-
-function ns.GetRaidIconToken(index)
-	return index and RAID_ICON_TOKENS[index] or ""
-end
-
 --------------------------------------------------------------------------------
 -- Names
 --------------------------------------------------------------------------------
@@ -223,9 +177,11 @@ end
 -- Combat Log Flags
 --------------------------------------------------------------------------------
 
--- Affiliation runs MINE (1), PARTY (2), RAID (4), OUTSIDER (8), so anything
--- below OUTSIDER is us or someone grouped with us. Reading the flags beats
--- UnitInParty/UnitInRaid: no API call, and it is correct for pets too.
+--[[
+    Affiliation runs MINE (1), PARTY (2), RAID (4), OUTSIDER (8), so anything
+    below OUTSIDER is us or someone grouped with us. Reading the flags beats
+    UnitInParty/UnitInRaid: no API call, and it is correct for pets too.
+]]
 function ns.IsGroupSource(sourceFlags)
 	if not sourceFlags then
 		return false
@@ -243,9 +199,12 @@ function ns.IsPetSource(sourceFlags)
 	return bit_band(sourceFlags, COMBATLOG_OBJECT_TYPE_GUARDIAN) ~= 0
 end
 
--- Whether a cast is the player's own, which is what the two announce toggles
--- split on. MINE covers the player and the player's own pet -- that is exactly
--- what the log's MINE affiliation means -- so the pet case needs no handling.
+--[[
+    Whether a cast is the player's own, which is what picks between a section's
+    My and Others' rows. MINE covers the player and the player's own pet -- that
+    is exactly what the log's MINE affiliation means -- so the pet case needs no
+    handling.
+]]
 function ns.IsMineSource(sourceFlags)
 	if not sourceFlags then
 		return false
@@ -257,34 +216,19 @@ end
 -- Group Lookups
 --------------------------------------------------------------------------------
 
--- The owner's pet is addressed as "partypetN" / "raidpetN", never "partyNpet".
-function ns.FindPetOwner(petGUID)
-	if not petGUID then
-		return nil
-	end
-
-	if UnitGUID("pet") == petGUID then
-		return "player", GetUnitName("player", true), UnitGUID("player")
-	end
-
-	if IsInRaid() then
-		for i = 1, GetNumGroupMembers() do
-			if UnitGUID("raidpet" .. i) == petGUID then
-				local unit = "raid" .. i
-				return unit, GetUnitName(unit, true), UnitGUID(unit)
-			end
-		end
-	elseif IsInGroup() then
-		for i = 1, 4 do
-			if UnitGUID("partypet" .. i) == petGUID then
-				local unit = "party" .. i
-				return unit, GetUnitName(unit, true), UnitGUID(unit)
-			end
-		end
-	end
-
-	return nil
+-- Built once: a group walk on a combat path indexes these rather than allocating a token per member.
+local UNIT_TOKENS = { raid = {}, party = {}, raidpet = {}, partypet = {}, raidTarget = {}, partyTarget = {} }
+for index = 1, 40 do
+	UNIT_TOKENS.raid[index] = "raid" .. index
+	UNIT_TOKENS.raidpet[index] = "raidpet" .. index
+	UNIT_TOKENS.raidTarget[index] = "raid" .. index .. "target"
 end
+for index = 1, 4 do
+	UNIT_TOKENS.party[index] = "party" .. index
+	UNIT_TOKENS.partypet[index] = "partypet" .. index
+	UNIT_TOKENS.partyTarget[index] = "party" .. index .. "target"
+end
+ns.UNIT_TOKENS = UNIT_TOKENS
 
 --[[
     A unit counts as a tank two ways, because the game offers two: the raid's
@@ -315,35 +259,70 @@ function ns.IsPlayerTank()
 end
 
 --[[
-    Whether anybody in the group is of this class, the player included.
-
-    Deliberately NOT filtered on alive or connected, unlike ns.GroupHasTank. That
-    one asks "is somebody tanking right now", a question about this instant; this
-    one asks "could this debuff ever land", and a druid who is dead at the moment
-    the tank pulls is still the reason to wait for Faerie Fire.
+    The healer half of the same question, and it is thinner than the tank half on
+    purpose: there is no raid assignment for healing the way MAINTANK exists for
+    tanking, so the group finder's role is the only signal there is. A player who
+    never sets one is not a healer as far as this add-on can tell, so a tab
+    narrowed to healers stays quiet for them.
 ]]
-function ns.GroupHasClass(class)
-	if select(2, UnitClass("player")) == class then
-		return true
+function ns.IsPlayerHealer()
+	return ns.IsUnitHealer("player")
+end
+
+-- The per-unit form, kept as the pair to ns.IsUnitTank.
+function ns.IsUnitHealer(unit)
+	return HAS_ROLES and UnitGroupRolesAssigned(unit) == "HEALER"
+end
+
+--[[
+    The group unit token for a GUID, or nil if that GUID is not somebody in the
+    group. Players only: the raid and party tokens are walked and the pet ones
+    are not, so a dying pet answers nil rather than resolving to its owner.
+
+    "player" is checked first and without a walk, since it is the one GUID that
+    is always in the group and the loops below never contain it -- raid1..N do
+    include the player in a raid, but a five-man's party1..4 do not.
+]]
+function ns.FindGroupUnit(guid)
+	if not guid then
+		return nil
 	end
 
-	local unitPrefix, count
+	if UnitGUID("player") == guid then
+		return "player"
+	end
+
+	local tokens, count
 	if IsInRaid() then
-		unitPrefix, count = "raid", GetNumGroupMembers()
+		tokens, count = UNIT_TOKENS.raid, GetNumGroupMembers()
 	elseif IsInGroup() then
-		unitPrefix, count = "party", 4
+		tokens, count = UNIT_TOKENS.party, 4
 	else
-		return false
+		return nil
 	end
 
 	for index = 1, count do
-		local unit = unitPrefix .. index
-		if UnitExists(unit) and select(2, UnitClass(unit)) == class then
-			return true
+		local unit = tokens[index]
+		if UnitGUID(unit) == guid then
+			return unit
 		end
 	end
 
-	return false
+	return nil
+end
+
+--[[
+    A class's name in the player's own language, from the client rather than from
+    the locale files: the client already ships all eleven, and a translation of
+    our own could disagree with the tooltip a player is reading beside it. Falls
+    back to the token so a client missing the table shows WARRIOR rather than
+    nothing.
+
+    The Tank Deaths panel sorts its class rows on this, which is what makes that
+    list alphabetical in every language instead of only in English.
+]]
+function ns.ClassName(class)
+	return LOCALIZED_CLASS_NAMES_MALE and LOCALIZED_CLASS_NAMES_MALE[class] or class
 end
 
 --[[
@@ -370,16 +349,16 @@ function ns.GroupHasTank()
 	if ns.IsUnitTank("player") and not UnitIsDeadOrGhost("player") then
 		answer = true
 	else
-		local unitPrefix, count
+		local tokens, count
 		if IsInRaid() then
-			unitPrefix, count = "raid", GetNumGroupMembers()
+			tokens, count = UNIT_TOKENS.raid, GetNumGroupMembers()
 		elseif IsInGroup() then
-			unitPrefix, count = "party", 4
+			tokens, count = UNIT_TOKENS.party, 4
 		end
 
-		if unitPrefix then
+		if tokens then
 			for index = 1, count do
-				local unit = unitPrefix .. index
+				local unit = tokens[index]
 				if ns.IsUnitTank(unit) and UnitIsConnected(unit) and not UnitIsDeadOrGhost(unit) then
 					answer = true
 					break
@@ -392,31 +371,16 @@ function ns.GroupHasTank()
 	return answer
 end
 
+--[[
+    The unit token for a GUID, but only if that unit is tanking. The walk itself
+    is ns.FindGroupUnit's, so the two cannot disagree about who counts as being
+    in the group.
+]]
 function ns.FindTankUnit(guid)
-	if not guid then
-		return nil
+	local unit = ns.FindGroupUnit(guid)
+	if unit and ns.IsUnitTank(unit) then
+		return unit
 	end
-
-	if UnitGUID("player") == guid then
-		return ns.IsUnitTank("player") and "player" or nil
-	end
-
-	if IsInRaid() then
-		for i = 1, GetNumGroupMembers() do
-			local unit = "raid" .. i
-			if UnitGUID(unit) == guid then
-				return ns.IsUnitTank(unit) and unit or nil
-			end
-		end
-	elseif IsInGroup() then
-		for i = 1, 4 do
-			local unit = "party" .. i
-			if UnitGUID(unit) == guid then
-				return ns.IsUnitTank(unit) and unit or nil
-			end
-		end
-	end
-
 	return nil
 end
 
@@ -440,165 +404,4 @@ function ns.ResolveChoice(value, ladder, default)
 		end
 	end
 	return default
-end
-
---------------------------------------------------------------------------------
--- Enemy Lookups
---------------------------------------------------------------------------------
-
---[[
-    The combat log names a mob with a guid and nothing else -- no level, no
-    classification, no elite bit -- so "Only Against Bosses & Elites" has to find a
-    unit token pointing at the same mob and read it from there.
-
-    Candidates are ordered by how likely they are to be the mob in question. Your
-    own target leads, because a single-target taunt needs one and the taunt just
-    landed; then the frames a fight puts up, then every name plate on screen, and
-    last the group's own targets -- the taunter's target IS the mob they taunted,
-    which is what answers for somebody else's taunt across the room.
-
-    focus and boss1-5 do not exist on every client. UnitGUID answers nil for a
-    unit token the client does not have, so an absent frame costs one nil compare
-    rather than needing a capability probe.
-]]
-local ENEMY_UNIT_CANDIDATES = {
-	"target",
-	"focus",
-	"mouseover",
-	"boss1",
-	"boss2",
-	"boss3",
-	"boss4",
-	"boss5",
-}
-
-local function FindEnemyUnit(guid)
-	for _, unit in ipairs(ENEMY_UNIT_CANDIDATES) do
-		if UnitGUID(unit) == guid then
-			return unit
-		end
-	end
-
-	if C_NamePlate and C_NamePlate.GetNamePlates then
-		for _, plate in ipairs(C_NamePlate.GetNamePlates()) do
-			local unit = plate.namePlateUnitToken
-			if unit and UnitGUID(unit) == guid then
-				return unit
-			end
-		end
-	end
-
-	local unitPrefix, count
-	if IsInRaid() then
-		unitPrefix, count = "raid", GetNumGroupMembers()
-	elseif IsInGroup() then
-		unitPrefix, count = "party", 4
-	else
-		return nil
-	end
-
-	for index = 1, count do
-		local unit = unitPrefix .. index .. "target"
-		if UnitGUID(unit) == guid then
-			return unit
-		end
-	end
-
-	return nil
-end
-
---[[
-    Three tiers count, and between them they are what "worth the attention" means:
-    a raid boss (worldboss classification), a "??" mob (level -1, which reads as a
-    skull in game and is above the player by definition), and any elite ABOVE the
-    player's own level -- which is what brings dungeon bosses in, so a player gets
-    the habit in a five-man before they ever take it into a raid.
-
-    Strictly above, not at-or-above, and the difference is the whole filter. A
-    level 60 clearing a level 60 dungeon meets elite TRASH at 58-60 and elite
-    BOSSES at 61-63; at-or-above would let every trash pack through and leave the
-    filter reporting the exact thing it exists to suppress.
-
-    THREE answers, not two. nil means the question could not be asked -- no unit
-    token pointed at the mob, or the guid is a player's because the ability was cast
-    on a group member -- and ns:Alert treats that as a pass. Failing closed would
-    trade a little trash noise for silently swallowing the one boss taunt the filter
-    was turned on for, which is the worse of the two.
-
-    The answer is kept per guid because a mob's level and classification never
-    change. Emptied whole when it fills, the way the enemy-target cache is: what it
-    costs is one lookup again, and a raid night is a lot of corpses.
-]]
-local ELITE_CLASSIFICATIONS = { elite = true, rareelite = true }
-local BOSS_CACHE_LIMIT = 500
-
-local bossByGUID = {}
-local bossCacheCount = 0
-
-ns.stateResets[#ns.stateResets + 1] = function()
-	wipe(bossByGUID)
-	bossCacheCount = 0
-end
-
-function ns.IsBossEnemy(guid)
-	if not guid then
-		return nil
-	end
-
-	-- An ability cast on a group member (Righteous Defense) hands us a player
-	-- rather than the mob. Unanswerable, which ns:Alert lets through.
-	if ns.IsPlayerGUID(guid) then
-		return nil
-	end
-
-	local cached = bossByGUID[guid]
-	if cached ~= nil then
-		return cached
-	end
-
-	local unit = FindEnemyUnit(guid)
-	if not unit then
-		return nil
-	end
-
-	local classification = UnitClassification(unit)
-	local level = UnitLevel(unit)
-
-	local answer = false
-	if classification == "worldboss" or level == -1 then
-		answer = true
-	elseif ELITE_CLASSIFICATIONS[classification] and level > UnitLevel("player") then
-		answer = true
-	end
-
-	if bossCacheCount >= BOSS_CACHE_LIMIT then
-		wipe(bossByGUID)
-		bossCacheCount = 0
-	end
-	bossByGUID[guid] = answer
-	bossCacheCount = bossCacheCount + 1
-
-	return answer
-end
-
---------------------------------------------------------------------------------
--- Chat Formatting
---------------------------------------------------------------------------------
-
---[[
-    Texture escapes never survive SendChatMessage, so a sent body swaps its
-    raid-icon texture for the {rtN} token, which the receiving client renders as
-    the mark.
-
-    Colors are left alone, and that is load-bearing. A spell link is
-    |cff...|Hspell:id:0|h[Name]|h|r, one escape sequence: strip the color wrapper
-    and what is left is a malformed link, which the client refuses to send. It
-    drops the whole message with no error, so the alert simply never arrives.
-    Never strip pipes here, wholesale or by escape.
-]]
-function ns.StripChatFormatting(text)
-	if not text then
-		return nil
-	end
-	return (string_gsub(text, "|T[Ii]nterface[\\/]TargetingFrame[\\/]UI%-RaidTargetingIcon_(%d)[^|]*|t", "{rt%1}"))
 end

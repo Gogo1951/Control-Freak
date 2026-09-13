@@ -21,6 +21,10 @@ local _, ns = ...
     every other player's miss is either the tank's opener or a DPS going early and
     nothing on the wire tells them apart. Answering only for our own cast is the
     one case where the missing swing does not matter.
+
+    Tracked taunts are left out. A resisted opening taunt is already the Failed
+    Taunts section's line, and the same swing told twice in two different words
+    is worse than told once.
 ]]
 
 --[[
@@ -56,8 +60,10 @@ function ns.RememberEnemyFirstSeen(guid)
 	if ns.IsPlayerGUID(guid) then
 		return
 	end
-	-- Emptied whole when it fills, the way the enemy-target cache is: what is lost
-	-- is opener windows that had already expired.
+	--[[
+	    Emptied whole when it fills, the way the enemy-target cache is: what is lost
+	    is opener windows that had already expired.
+	]]
 	if firstSeenCount >= FIRST_SEEN_LIMIT then
 		wipe(firstSeen)
 		firstSeenCount = 0
@@ -88,14 +94,22 @@ function ns:HandleColdOpener(
 		return
 	end
 
+	-- A taunt's outcome is the Taunts tab's line, not this one's.
+	local ability = ns.ABILITY_MAP[spellId]
+	if ability and ability.category == "TAUNT" then
+		return
+	end
+
 	-- Our own cast only. See the note at the top of the file.
 	if sourceGUID ~= ns.playerGUID then
 		return
 	end
 
-	-- Inside the window, measured from the first time anything involving this mob
-	-- reached the combat log. A mob we have somehow never seen is not mid-pull, so
-	-- it reports nothing rather than treating "unknown" as "just started".
+	--[[
+	    Inside the window, measured from the first time anything involving this mob
+	    reached the combat log. A mob we have somehow never seen is not mid-pull, so
+	    it reports nothing rather than treating "unknown" as "just started".
+	]]
 	local started = firstSeen[destGUID]
 	if not started then
 		return
@@ -105,8 +119,10 @@ function ns:HandleColdOpener(
 		return
 	end
 
-	-- The mob has to be ours, or not yet anybody's. Being dodged by something the
-	-- log has already shown on another player is not a cold opener.
+	--[[
+	    The mob has to be ours, or not yet anybody's. Being dodged by something the
+	    log has already shown on another player is not a cold opener.
+	]]
 	if ns.EnemyIsOnSomeoneElse(destGUID, ns.playerGUID) then
 		return
 	end
@@ -115,5 +131,5 @@ function ns:HandleColdOpener(
 		ns.PlayerPart(sourceName, sourceGUID),
 		ns.SpellPart(spellId, spellName),
 		ns.TargetPart(destName, raidIconIndex),
-	}, sourceFlags, destGUID)
+	}, sourceFlags, destGUID, raidIconIndex)
 end

@@ -43,9 +43,11 @@ function ns.BuildApologyOptions()
 	local args = {}
 	local order = 1
 
-	-- No header. AceConfigDialog already draws "Apology" at the top of the page,
-	-- and one repeating it reads as the title printed twice -- the same reason
-	-- every feature tab opens on its summary instead.
+	--[[
+	    No header. AceConfigDialog already draws "Apology" at the top of the page,
+	    and one repeating it reads as the title printed twice -- the same reason
+	    every feature tab opens on its summary instead.
+	]]
 	for index, text in ipairs(PARAGRAPHS) do
 		args["paragraph" .. index] = ns.OptionsDesc(text, order)
 		args["paragraphSpace" .. index] = ns.OptionsSpacer(order + 1)
