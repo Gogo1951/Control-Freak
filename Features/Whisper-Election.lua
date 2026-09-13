@@ -82,9 +82,17 @@ function ns:QueueGroupWhisper(kind, id, target, formatKey, args)
 	end)
 end
 
-function ns:CHAT_MSG_ADDON(prefix, message)
+function ns:CHAT_MSG_ADDON(prefix, message, channel, sender)
 	if prefix ~= ns.ADDON_MESSAGE_PREFIX then
 		return
+	end
+
+	--[[
+	    Written in by hand because CHAT_MSG_ADDON is excluded from the log: it
+	    carries every add-on's traffic, and only this prefix is Control Freak's.
+	]]
+	if ns.diagnostics and ns.diagnostics.logging and ns.LogEventNow then
+		ns:LogEventNow("CHAT_MSG_ADDON", prefix, message, channel, sender)
 	end
 
 	local kind, id, priority, senderGUID = strsplit(":", message)
@@ -102,8 +110,10 @@ function ns:CHAT_MSG_ADDON(prefix, message)
 		return
 	end
 
-	-- Equal bids break on the sender's guid, so both clients stand down the same
-	-- way and exactly one whisper goes out.
+	--[[
+	    Equal bids break on the sender's guid, so both clients stand down the same
+	    way and exactly one whisper goes out.
+	]]
 	if priority > bid.priority or (priority == bid.priority and senderGUID > (ns.playerGUID or "")) then
 		pending[kind .. ":" .. id] = nil
 		ns.LogWhisperStep("stand down (theirs, ours)", priority, bid.priority)

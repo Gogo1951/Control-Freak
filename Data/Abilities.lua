@@ -1,10 +1,6 @@
 local _, ns = ...
 
 --[[
-    -- TODO: Add SQL Query
-]]
-
---[[
     Every ability Control Freak watches, across every flavor, in one array.
 
     One entry == one checkbox in the options panel. StyLua owns the formatting;
@@ -12,11 +8,13 @@ local _, ns = ...
     tune its digits.
 
       class       class bucket for the options panel. ITEM is its own bucket.
-      category    TAUNT | FEAR | NOVA | BUBBLE | PET_TAUNT. Features/Combat-Log
+      category    TAUNT | FEAR | NOVA | SHIELD | PET_TAUNT. Features/Combat-Log
                   maps each to the feature that owns it.
       detection   how a success is recognised.
-                    AURA  lands a debuff on its target, so success is the aura
-                          applying and a resist produces exactly one failure line.
+                    AURA  lands an aura on its target, so success is that aura
+                          applying and a resist produces exactly one failure
+                          line. Usually a debuff; Power Word: Shield is the one
+                          entry where it is a buff on a friendly target.
                     CAST  lands nothing to observe, so the cast itself is success.
                           Pet taunts are CAST: on these clients Growl, Torment and
                           Suffering apply no debuff, and watching for an aura
@@ -25,8 +23,8 @@ local _, ns = ...
                   and suppresses failure lines: an AoE taunt fires one miss per
                   immune mob, which is noise rather than information.
       flavors     { Era, SoD, TBC, Wrath }
-                    1   exists on this flavor, tracked, checkbox on by default
-                    0   exists, tracked, checkbox off by default
+                    1   exists on this flavor: tracked, and drawn as a checkbox
+                        the player can untick
                     "-" does not exist on this flavor: never registered, no
                         checkbox, can never fire
                   Anything past Wrath reads the Wrath column. "-" exists because
@@ -47,6 +45,7 @@ local _, ns = ...
     so both ids ride the same row and the panel shows whichever name the client
     gives the highest rank the character has.
 ]]
+-- TODO: Add SQL Query
 ns.ABILITIES = {
 	-- DRUID
 	{
@@ -55,8 +54,8 @@ ns.ABILITIES = {
 		detection = "AURA",
 		isAoe = false,
 		flavors = { 1, 1, 1, 1 },
-		triggers = { 6795 },
-	}, -- Growl
+		triggers = { 6795, 1218506 },
+	}, -- Growl. 1218506 is Season of Discovery's own copy, same level and the same bear form requirement
 	{
 		class = "DRUID",
 		category = "TAUNT",
@@ -117,25 +116,25 @@ ns.ABILITIES = {
 		category = "TAUNT",
 		detection = "AURA",
 		isAoe = false,
-		flavors = { "-", "-", "-", 1 },
-		triggers = { 62124 },
-	}, -- Hand of Reckoning, the Wrath single-target paladin taunt
+		flavors = { "-", 1, "-", 1 },
+		triggers = { 62124, 407631, 1219206 },
+	}, -- Hand of Reckoning, the single-target paladin taunt. Wrath trains it; Season of Discovery grants it from a glove rune, which is why the two SoD copies carry a Righteous Fury rider the Wrath one has no trace of. Its rune spells are not ranks and are deliberately absent: 409911 is the "Gain the Hand of Reckoning ability" passive, 410001 the engraving itself, 407774 a stub with no text at all
 	--[[
-	    PARKED: the three paladin bubbles were the whole BUBBLE category, and they
-	    come back with the Bubble Warnings section on the Tanking Tools tab. With no
-	    entry carrying the category, nothing registers and ns:HandleBubble is
-	    unreachable, so the machinery behind it -- the Main-Tank and
-	    health-threshold checks in Features/Tanking-Tools-Bubble.lua, the
-	    SPELL_AURA_APPLIED-only rule in Features/Combat-Log.lua,
-	    ns.BUBBLE_HEALTH_THRESHOLD, the ANNOYANCE_BUBBLE string, and BUBBLE in the
-	    Tanking Tools panel's category set -- is dormant rather than gone. Restoring
-	    them is pasting these three rows back:
+	    PARKED: the three paladin bubbles. A bubble on a tank drops every mob on
+	    them, which lands the whole pull on whoever is second on threat -- a
+	    different problem from the rage denial the SHIELD category reports, so
+	    they want a section of their own rather than a place in that one.
+
+	    Nothing of theirs is left standing: the machinery that used to be held
+	    for them was taken over by Bad Shields, so bringing them back means a new
+	    category, a handler, defaults, copy and a panel section, not just pasting
+	    these three rows back:
 
 	      Divine Shield          AURA  { 642, 1020 }
 	      Blessing of Protection AURA  { 1022, 5599, 10278 }  Hand of Protection from Wrath on
 	      Divine Protection      AURA  { 498, 5573 }
 
-	    all { 1, 1, 1, 1 }, isAoe false, class PALADIN, category BUBBLE.
+	    all { 1, 1, 1, 1 }, isAoe false, class PALADIN, and a category of their own.
 	]]
 
 	-- PRIEST
@@ -147,6 +146,44 @@ ns.ABILITIES = {
 		flavors = { 1, 1, 1, 1 },
 		triggers = { 8122, 8124, 10888, 10890 },
 	}, -- Psychic Scream
+	--[[
+	    VERIFIED: the absorb aura is applied by the castable rank itself -- Effect
+	    #1 on every rank is Apply Aura: Absorb Damage, with no triggered spell in
+	    the chain -- so the id the combat log reports on SPELL_AURA_APPLIED is the
+	    id in this list. Confirmed against a captured combat log and against two
+	    shipping absorb-tracking libraries keyed on exactly these ids.
+
+	    Weakened Soul (6788) is deliberately absent. The priest applies it to the
+	    same target in the same instant as its OWN SPELL_AURA_APPLIED line, so
+	    listing it here would report every shield twice.
+
+	    DECOYS, all named "Power Word: Shield" and none of them a castable rank.
+	    Never add one, and never harvest these ids by name:
+	      10902  the trainer's Learn Spell trigger. No mana cost, 100 yd range.
+	      27607  a duplicate rank 10 with no training cost and no priest skill
+	             line. Present on Era and TBC both.
+	      20697  an NPC self-shield absorbing 5000, no rank, no class requirement.
+	      20706  "Power Word: Shield 500", an NPC spell wearing a rank 7 label.
+
+	    Wrath's two ranks (48065, 48066) are left off: the flavors column below
+	    turns the whole entry off there, so listing them would only add rows the
+	    Validate Data report flags as absent on this client.
+
+	    SoD is "-" rather than 1, and this is a judgement call rather than a fact
+	    about the ids. The Strength of Soul rune (passive 415739) makes a shielded
+	    target generate rage from absorbed damage anyway, which turns the whole
+	    premise off for that priest -- and no add-on can read another player's
+	    runes, so the warning would accuse healers who are playing correctly.
+	    Silence is the safer error there.
+	]]
+	{
+		class = "PRIEST",
+		category = "SHIELD",
+		detection = "AURA",
+		isAoe = false,
+		flavors = { 1, "-", 1, "-" },
+		triggers = { 17, 592, 600, 3747, 6065, 6066, 10898, 10899, 10900, 10901, 25217, 25218 },
+	}, -- Power Word: Shield. Ranks 1-10 are Era, 11-12 (25217, 25218) are TBC
 
 	-- ROGUE
 	{
@@ -219,6 +256,15 @@ ns.ABILITIES = {
 	{
 		class = "WARLOCK",
 		category = "TAUNT",
+		detection = "AURA",
+		isAoe = false,
+		flavors = { "-", 1, "-", "-" },
+		renamed = true,
+		triggers = { 403828, 433672, 442226, 442233, 1219475 },
+	}, -- Menace, the single-target taunt the Metamorphosis rune puts in place of Fear, and the partner to Demonic Howl below. Phase 2 shipped it as Loathing (433672) -- same class, same icon, same two effects -- and the name went back to Menace afterwards, which is what renamed is for
+	{
+		class = "WARLOCK",
+		category = "TAUNT",
 		detection = "CAST",
 		isAoe = true,
 		flavors = { "-", 1, "-", "-" },
@@ -232,8 +278,8 @@ ns.ABILITIES = {
 		detection = "AURA",
 		isAoe = false,
 		flavors = { 1, 1, 1, 1 },
-		triggers = { 355 },
-	}, -- Taunt
+		triggers = { 355, 473701, 1219541 },
+	}, -- Taunt. 473701 and 1219541 are Season of Discovery's own copies; 1219541 keeps the Defensive Stance requirement, 473701 drops it
 	{
 		class = "WARRIOR",
 		category = "TAUNT",
@@ -266,8 +312,8 @@ ns.ABILITIES = {
 		detection = "CAST",
 		isAoe = false,
 		flavors = { 1, 1, 1, 1 },
-		triggers = { 2649, 14916, 14917, 14918, 14919, 14920, 14921, 27047 },
-	}, -- Growl
+		triggers = { 2649, 14916, 14917, 14918, 14919, 14920, 14921, 27047, 409372 },
+	}, -- Growl. 409372 is Season of Discovery's own copy, the one the Beast Mastery rune grants, and the only Growl on this list that taunts rather than just holding threat
 	{
 		class = "WARLOCK",
 		category = "PET_TAUNT",
@@ -286,6 +332,7 @@ ns.ABILITIES = {
 	}, -- Torment. Era stops at rank 6 (11775); 11776 and 11777 are the effect ids, not castable ranks
 
 	-- ITEMS
+
 	-- These are the summon spells the item's Use casts, not the item ids.
 	{
 		class = "ITEM",

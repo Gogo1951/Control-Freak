@@ -59,6 +59,10 @@ function ns:HandleInterrupt(
 
 	if not interruptedSpellId or interruptedSpellId == 0 then
 		interruptedSpellId = RecallInterruptedSpell(destGUID)
+		-- UNIT_SPELLCAST_INTERRUPTED is excluded from the log, so the id it lent is written in here.
+		if interruptedSpellId and ns.diagnostics and ns.diagnostics.logging and ns.LogEventNow then
+			ns:LogEventNow("UNIT_SPELLCAST_INTERRUPTED", destGUID, interruptedSpellId)
+		end
 	end
 
 	ns:Alert(settings, "INTERRUPT", {
@@ -66,5 +70,5 @@ function ns:HandleInterrupt(
 		ns.SpellPart(spellId, spellName),
 		ns.TargetPart(destName, raidIconIndex),
 		ns.SpellPart(interruptedSpellId, interruptedSpellName),
-	}, sourceFlags, destGUID)
+	}, sourceFlags, destGUID, raidIconIndex)
 end

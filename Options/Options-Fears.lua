@@ -14,12 +14,18 @@ function ns.BuildFearsOptions()
 	local args = {}
 	local hidden = ns.AddFeatureScope(args, Feature, "FEARS_SUMMARY", "FEARS_ENABLE", 1, "fears")
 
-	ns.AddAlertSection(args, "alert", Section, 20, hidden, {
+	--[[
+	    The whose shape as AOE Taunts draws it: no target filter, because a fear is
+	    somebody scattering the pull and which mob it landed on is not the point.
+	    The My row ships announcing on purpose; Data/Default-Settings.lua says why.
+	]]
+	ns.AddWhoseAlertSection(args, "alert", Section, 20, hidden, {
 		headerKey = "FEARS_ALERT_HEADER",
 		enableKey = "FEARS_ALERT_ENABLE",
 		descKey = "FEARS_ALERT_DESC",
-		-- Nobody turns this on to hear about their own; it is a report on the group.
-		noScope = true,
+		mineKey = "FEARS_ALERT_MINE",
+		othersKey = "FEARS_ALERT_OTHERS",
+		noTarget = true,
 		sample = {
 			key = "FEAR_SUCCESS",
 			args = { ns.SAMPLE_OTHER, ns.SampleSpell(8122, "Psychic Scream"), ns.SampleBoss() },

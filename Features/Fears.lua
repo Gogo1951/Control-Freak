@@ -16,8 +16,13 @@ function ns:HandleFear(
 	local sourcePart = ns.PlayerPart(sourceName, sourceGUID)
 	local spellPart = ns.SpellPart(spellId, spellName)
 
+	--[[
+	    The section draws no target filter (noTarget in Options-Fears.lua), so the
+	    gate reads neither argument today. They are still passed the way the event
+	    carries them: an AOE fear has no single target, a landed one does.
+	]]
 	if ability.isAoe then
-		ns:Alert(settings, "FEAR_AOE", { sourcePart, spellPart }, sourceFlags, destGUID)
+		ns:Alert(settings, "FEAR_AOE", { sourcePart, spellPart }, sourceFlags, nil, nil)
 		return
 	end
 
@@ -26,6 +31,7 @@ function ns:HandleFear(
 		"FEAR_SUCCESS",
 		{ sourcePart, spellPart, ns.TargetPart(destName, raidIconIndex) },
 		sourceFlags,
-		destGUID
+		destGUID,
+		raidIconIndex
 	)
 end

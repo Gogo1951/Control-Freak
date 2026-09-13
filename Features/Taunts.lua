@@ -1,16 +1,6 @@
 local _, ns = ...
 
-local L = ns.L
-
--- destGUID -> expiry time of our own taunt on that mob. The claim ends on that
--- timer alone: a taunt debuff is shorter than the window a taunt-over is worth
--- reporting in, so clearing on SPELL_AURA_REMOVED would silence the late steal
--- this section exists to catch.
-local myTaunts = {}
-
-ns.stateResets[#ns.stateResets + 1] = function()
-	wipe(myTaunts)
-end
+-- No steal detection: a planned taunt swap and a stolen mob are the same combat-log lines (README-Technical.md, Taunts).
 
 local MISS_FORMATS = {
 	MISS = "TAUNT_MISSED",
@@ -38,42 +28,44 @@ function ns:HandleTaunt(
 
 	if outcome == "FAIL" then
 		local formatKey = MISS_FORMATS[missType] or "TAUNT_FAILED"
+		--[[
+		    The immune line is the one failure format that leads with the MOB:
+		    the immunity is what happened, where the other three have nothing to
+		    say beyond "it did not land". So its parts run mob, taunter, taunt
+		    rather than the taunter-first order the rest share, and naming the
+		    mob in the subject is also what let the old wording's second copy of
+		    it go.
+		]]
 		if formatKey == "TAUNT_IMMUNE" then
 			ns:Alert(
 				feature.failed,
 				formatKey,
-				{ sourcePart, spellPart, targetPart, destName or L["UNKNOWN_TARGET"] },
+				{ targetPart, sourcePart, spellPart },
 				sourceFlags,
-				destGUID
+				destGUID,
+				raidIconIndex
 			)
 		else
-			ns:Alert(feature.failed, formatKey, { sourcePart, spellPart, targetPart }, sourceFlags, destGUID)
+			ns:Alert(
+				feature.failed,
+				formatKey,
+				{ sourcePart, spellPart, targetPart },
+				sourceFlags,
+				destGUID,
+				raidIconIndex
+			)
 		end
 		return
 	end
 
+	--[[
+	    No target: an AOE taunt reports the cast, not a mob, so the section draws
+	    no target filter and the gate is handed nothing to filter on. The destGUID
+	    the log happened to report first would only ever have been one mob of many.
+	]]
 	if ability.isAoe then
-		ns:Alert(feature.aoe, "TAUNT_AOE", { sourcePart, spellPart }, sourceFlags, destGUID)
+		ns:Alert(feature.aoe, "TAUNT_AOE", { sourcePart, spellPart }, sourceFlags, nil, nil)
 		return
-	end
-
-	-- Only an aura-detected taunt proves the mob actually changed hands, so only
-	-- those claim it.
-	--
-	-- PARKED: the section this feeds draws no controls yet and ships off, so the
-	-- alert below cannot fire. The bookkeeping is left running because it is the
-	-- part that cannot be reconstructed after the fact -- a claim has to be
-	-- recorded at the moment of the taunt or the steal is unprovable.
-	if ability.detection == "AURA" and destGUID then
-		if sourceGUID == ns.playerGUID then
-			myTaunts[destGUID] = GetTime() + ns.TAUNT_STOLEN_WINDOW
-		else
-			local expiry = myTaunts[destGUID]
-			if expiry and expiry > GetTime() then
-				myTaunts[destGUID] = nil
-				ns:Alert(feature.stolen, "TAUNT_STOLEN", { sourcePart, spellPart, targetPart }, sourceFlags, destGUID)
-			end
-		end
 	end
 
 	--[[
@@ -89,6 +81,13 @@ function ns:HandleTaunt(
 	ns.RememberEnemyTarget(destGUID, sourceGUID)
 
 	if not alreadyTheirs then
-		ns:Alert(feature.success, "TAUNT_SUCCESS", { sourcePart, spellPart, targetPart }, sourceFlags, destGUID)
+		ns:Alert(
+			feature.success,
+			"TAUNT_SUCCESS",
+			{ sourcePart, spellPart, targetPart },
+			sourceFlags,
+			destGUID,
+			raidIconIndex
+		)
 	end
 end

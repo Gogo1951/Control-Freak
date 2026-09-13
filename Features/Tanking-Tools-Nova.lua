@@ -25,10 +25,23 @@ function ns:HandleNova(
 	local sourcePart = ns.PlayerPart(sourceName, sourceGUID)
 	local spellPart = ns.SpellPart(spellId, spellName)
 
+	--[[
+	    The section draws no target filter (noTarget in Options-Tanking-Tools.lua):
+	    a nova is a ring. The one member of the category is AOE, so the branch
+	    below is the shape of the call for a single-target nova that does not
+	    exist yet, passed the way the event would carry it.
+	]]
 	if ability.isAoe then
-		ns:Alert(settings, "NOVA_AOE", { sourcePart, spellPart }, sourceFlags, destGUID)
+		ns:Alert(settings, "NOVA_AOE", { sourcePart, spellPart }, sourceFlags, nil, nil)
 		return
 	end
 
-	ns:Alert(settings, "NOVA", { sourcePart, spellPart, ns.TargetPart(destName, raidIconIndex) }, sourceFlags, destGUID)
+	ns:Alert(
+		settings,
+		"NOVA",
+		{ sourcePart, spellPart, ns.TargetPart(destName, raidIconIndex) },
+		sourceFlags,
+		destGUID,
+		raidIconIndex
+	)
 end

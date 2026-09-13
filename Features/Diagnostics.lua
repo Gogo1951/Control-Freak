@@ -45,7 +45,7 @@ ns.DiagnosticsStrings = {
 	EVENT_LOG_START = "Start Event Log",
 	EVENT_LOG_STOP = "Stop Event Log",
 	EVENT_LOG_SHOW = "Show Captured Events",
-	EVENT_LOG_HINT = "Captures events the add-on registered for, with arguments, in order fired. The raw combat log is excluded; the alerts it matched are written in as they happen.",
+	EVENT_LOG_HINT = "Captures events the add-on registered for, with arguments, in order fired. The raw combat log, other add-ons' messages and other units' interrupted casts are excluded; the ones Control Freak acted on are written in as they happen. The capture includes other players' names and Control Freak's own messages between clients, so look it over before pasting it anywhere.",
 	EVENTS_TITLE = "Event Registration",
 	EVENTS_BUTTON = "Test Event Registration",
 	API_TITLE = "API Endpoints",
@@ -87,6 +87,10 @@ end
 -- Report Header
 --------------------------------------------------------------------------------
 
+function ns.GetFlavorName()
+	return ns.FLAVOR_NAMES[ns.GetFlavorIndex()] or "?"
+end
+
 local function GetClientHeader()
 	local version, build, _, tocVersion = GetBuildInfo()
 	return string.format(
@@ -111,14 +115,24 @@ local EVENT_LOG_MAX_ARGS = 8
 local EVENT_LOG_MAX_ARG_LENGTH = 255
 
 --[[
-    COMBAT_LOG_EVENT_UNFILTERED is the one firehose Control Freak registers, and
-    it is pure noise raw: it fires on every swing in the zone and would evict the
-    whole buffer between two taunts. It is dropped here, and Features/Combat-Log
-    writes the firings it actually matched back through ns:LogEventNow, so the log
-    still separates "the event never fired" from "it fired and nothing happened".
+    The firehoses Control Freak registers, dropped here because raw they would
+    evict the whole buffer between two taunts. Each one's signal is written back
+    through ns:LogEventNow by the handler that decided it mattered, so the log
+    still separates "the event never fired" from "it fired and nothing happened":
+
+      COMBAT_LOG_EVENT_UNFILTERED  every swing in the zone; Features/Combat-Log.lua
+                                   writes back the lines it matched
+      CHAT_MSG_ADDON               every add-on's messages in the group and guild;
+                                   Features/Whisper-Election.lua writes back
+                                   Control Freak's own
+      UNIT_SPELLCAST_INTERRUPTED   every interrupted or cancelled cast of every
+                                   unit; Features/Interrupts.lua writes back the id
+                                   it recovers for an interrupt
 ]]
 ns.DIAGNOSTIC_EVENT_EXCLUDE = {
 	COMBAT_LOG_EVENT_UNFILTERED = true,
+	CHAT_MSG_ADDON = true,
+	UNIT_SPELLCAST_INTERRUPTED = true,
 }
 
 --[[
@@ -203,8 +217,10 @@ function ns:LogEvent(event, ...)
 	AppendEntry(event, ...)
 end
 
--- The escape hatch for an excluded firehose: a handler that decided a firing was
--- signal writes it in directly, bypassing the exclude list.
+--[[
+    The escape hatch for an excluded firehose: a handler that decided a firing was
+    signal writes it in directly, bypassing the exclude list.
+]]
 function ns:LogEventNow(event, ...)
 	if not ns.diagnostics.logging or not ns.diagnostics.log then
 		return
@@ -339,6 +355,26 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		end,
 	},
 	{
+		"C_Spell.GetSpellSubtext (Validate Data CLIENT_SUBTEXT column)",
+		function()
+			return type(C_Spell) == "table" and type(C_Spell.GetSpellSubtext) == "function"
+		end,
+	},
+	{
+		"C_UnitAuras.GetDebuffDataByIndex (Incapacitated dispel types)",
+		function()
+			return type(C_UnitAuras) == "table" and type(C_UnitAuras.GetDebuffDataByIndex) == "function"
+		end,
+	},
+	{
+		"C_LossOfControl (Incapacitated)",
+		function()
+			return type(C_LossOfControl) == "table"
+				and type(C_LossOfControl.GetActiveLossOfControlDataCount) == "function"
+				and type(C_LossOfControl.GetActiveLossOfControlData) == "function"
+		end,
+	},
+	{
 		"C_AddOns.GetAddOnMetadata",
 		function()
 			return type(C_AddOns) == "table" and type(C_AddOns.GetAddOnMetadata) == "function"
@@ -357,7 +393,7 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		end,
 	},
 	{
-		"C_NamePlate.GetNamePlates (boss filter fallback)",
+		"C_NamePlate.GetNamePlates (Against ladder enemy lookup)",
 		function()
 			return type(C_NamePlate) == "table" and type(C_NamePlate.GetNamePlates) == "function"
 		end,
@@ -372,6 +408,18 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		"UnitGroupRolesAssigned (group finder role)",
 		function()
 			return type(UnitGroupRolesAssigned) == "function"
+		end,
+	},
+	{
+		"UnitIsFeignDeath (Tank Deaths feign check)",
+		function()
+			return type(UnitIsFeignDeath) == "function"
+		end,
+	},
+	{
+		"LOCALIZED_CLASS_NAMES_MALE (localized class names)",
+		function()
+			return type(LOCALIZED_CLASS_NAMES_MALE) == "table"
 		end,
 	},
 	{
@@ -455,12 +503,12 @@ end
 
 --[[
     Control Freak's own context probe, and the first thing to read on a "nothing
-    ever fires" report. Scope is per feature, so this prints all four scope
-    settings and the resulting verdict for each one, then the live world state
-    they were measured against and whether COMBAT_LOG_EVENT_UNFILTERED is actually
-    on the frame. Main Tank assignments ride along because "Only When Playing a
-    Tank" and "Only When Group Has a Tank" both read them, and a tab with either
-    set goes silent with nobody assigned. All reads.
+    ever fires" report. Scope is per feature, so this prints each feature's own
+    scope settings, only the questions its tab asks, and the resulting verdict,
+    then the live world state they were measured against and whether
+    COMBAT_LOG_EVENT_UNFILTERED is actually on the frame. The tanks ride along
+    because the role dropdown's tank rungs and When Group Has a Tank both read
+    them, and a tab narrowed by either goes silent without one. All reads.
 ]]
 function ns:BuildAlertGateReport()
 	local lines = { GetClientHeader(), "" }
@@ -472,16 +520,18 @@ function ns:BuildAlertGateReport()
 	end
 
 	local inInstance, instanceType = IsInInstance()
-	lines[#lines + 1] = string.format("enabled (master) = %s", tostring(profile.enabled))
+	lines[#lines + 1] = string.format("enabled (all alerts) = %s", tostring(profile.enabled))
 	lines[#lines + 1] = ""
 	for _, key in ipairs(ns.FEATURE_KEYS) do
 		local feature = profile[key]
 		if type(feature) ~= "table" then
 			lines[#lines + 1] = string.format("%s: missing from the profile", key)
 		else
-			-- Only the scope questions this feature actually asks, in the order its
-			-- tab draws them. A key printed for a tab that never shows it reads as
-			-- a setting the player could not find.
+			--[[
+			    Only the scope questions this feature actually asks, in the order its
+			    tab draws them. A key printed for a tab that never shows it reads as
+			    a setting the player could not find.
+			]]
 			local scope = {}
 			for _, option in ipairs(ns.FEATURE_SCOPE_OPTIONS[key]) do
 				scope[#scope + 1] = option .. "=" .. tostring(feature[option])
@@ -499,6 +549,24 @@ function ns:BuildAlertGateReport()
 	lines[#lines + 1] = string.format("IsInGroup() = %s", tostring(IsInGroup()))
 	lines[#lines + 1] = string.format("IsInRaid() = %s", tostring(IsInRaid()))
 	lines[#lines + 1] = string.format("IsInInstance() = %s, %s", tostring(inInstance), tostring(instanceType))
+	lines[#lines + 1] = ""
+
+	--[[
+	    The player's current target on the Against ladder, which is the cheapest way
+	    to see which rung a given mob lands on before a section is set to it.
+	]]
+	if UnitExists("target") then
+		local tier = ns.GetEnemyTier(UnitGUID("target"))
+		lines[#lines + 1] = string.format(
+			"target = %s (%s, level %s) -> Against rung %s",
+			tostring(GetUnitName("target")),
+			tostring(UnitClassification("target")),
+			tostring(UnitLevel("target")),
+			tier and ns.TARGET_RUNGS[tier] or "nil (not an enemy, or unanswerable)"
+		)
+	else
+		lines[#lines + 1] = "target = none"
+	end
 	lines[#lines + 1] = ""
 	lines[#lines + 1] = string.format("ns:IsAlertGateOpen() = %s", tostring(ns:IsAlertGateOpen()))
 	lines[#lines + 1] = string.format(
@@ -649,8 +717,10 @@ local function OrderRange(low, high)
 	return low, high
 end
 
--- Everything the client will hand back for one ID. Deliberately wider than the
--- display shim in Utilities: more columns always beat fewer in a bug report.
+--[[
+    Everything the client will hand back for one ID. Deliberately wider than the
+    display shim in Utilities: more columns always beat fewer in a bug report.
+]]
 local function GetFullSpellInfo(spellId)
 	if C_Spell and C_Spell.GetSpellInfo then
 		local info = C_Spell.GetSpellInfo(spellId)
