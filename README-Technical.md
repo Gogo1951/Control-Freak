@@ -21,7 +21,7 @@ Control-Freak/
 ├── Features/
 │   ├── Core.lua                       Version, ns.EVENT_NAMES, the dispatcher, AceDB init, the login sequence
 │   ├── Utilities.lua                  Colors, spell shims, flavor probe, combat-log flag tests, group and tank lookups
-│   ├── Ability-Index.lua              Builds ns.ABILITY_MAP and ns.ABILITY_GROUPS at login; ns.CATEGORY_FEATURE
+│   ├── Ability-Index.lua              Builds ns.ABILITY_MAP and ns.ABILITY_GROUPS at login, and maps each category to its tab
 │   ├── Alert-Gates.lua                Per-feature scope gates and the combat-log registration test
 │   ├── Enemy-Tier.lua                 Against-ladder classification and its per-mob cache
 │   ├── Announcements.lua              Sound registration, prints, sent chat, ns:Alert and its message parts
@@ -50,7 +50,7 @@ Control-Freak/
 │   └── deDE.lua … zhTW.lua            Ten translations
 ├── Options/
 │   ├── Options-Utilities.lua          Panel helpers, sub-option rows, the sound list, cooldown values
-│   ├── Options-Alert-Section.lua      The feature scope block and the alert block every tab draws
+│   ├── Options-Alert-Section.lua      The feature scope block, the alert block, whisper rows, sample lines
 │   ├── Options-Ability-Toggles.lua    Spell-toggle widget and the per-class ability lists
 │   ├── Options-General.lua            Root panel
 │   ├── Options-Taunts.lua
@@ -71,7 +71,11 @@ Control-Freak/
 └── README-Testing.md                  Manual test plan
 ```
 
-`Options/Options-Apology.lua` is a dated letter to players of the versions before the rebuild. It is plain English rather than locale strings and registers after Diagnostic Tools, both deliberately. Its header comment lists the four edits that delete it; it holds no state and nothing reads it, so build nothing on it.
+`.github/`, `.gitattributes`, `.gitignore`, `.luacheckrc`, `.pkgmeta` and `LICENSE` are repo-only: the packager strips them, so an installed copy does not carry them. One TOC serves both flavors. `Data/`, `Features/` and `Options/` are listed in TOC load order rather than alphabetically, because files read at load what an earlier file built: `Features/Combat-Log.lua` aliases the `ns.ABILITY_MAP` that `Features/Ability-Index.lua` creates, `Features/Enemy-Tier.lua` walks the unit tokens `Features/Utilities.lua` builds, and every file with per-fight state appends to the `ns.stateResets` list `Features/Core.lua` creates. `Includes/Libraries/` is rewritten from `.pkgmeta` by the release workflow on every tag, so a hand edit there is lost at the next release.
+
+`Options/Options-Apology.lua` is the one file with an expiry: a dated letter to players of the versions before the rebuild, plain English rather than locale strings and registered after Diagnostic Tools, both deliberately. Its header comment lists the four edits that delete it; it holds no state and nothing reads it, so build nothing on it.
+
+Files that must stay gone: `Features/Tanking-Tools-Bubble.lua`, since the paladin bubbles are parked (see Bad Priests); `Features/Bad-Pet.lua` and `Options/Options-Bad-Pet.lua`, replaced by the plural `Bad-Pets` pair and its `badPets` key; `.mp3` copies of the sounds, which ship as `.ogg` only (see Adding a New Sound); and the pre-rebuild `Core.lua` and `Options.lua` at the repo root, with `Data/Vanilla.lua`.
 
 ## Architecture
 
@@ -91,11 +95,11 @@ frame:SetScript("OnEvent", function(_, event, ...)
 end)
 ```
 
-No feature file registers an event for handling: `Features/Alert-Gates.lua` toggles the combat log on Core's frame, and the Diagnostics registration probe uses a throwaway frame with no handler. That single tap point is what lets the Diagnostics event log capture everything, and it is why a new event goes into `ns.EVENT_NAMES` rather than into a `RegisterEvent` call in a feature file.
+No feature file registers an event for handling: `Features/Alert-Gates.lua` toggles the combat log on Core's frame (`ns.eventFrame`), and the Diagnostics registration probe uses a throwaway frame with no handler. That single tap point is what lets the Diagnostics event log capture everything, and it is why a new event goes into `ns.EVENT_NAMES` rather than into a `RegisterEvent` call in a feature file.
 
 | Event | Handled in | What it drives |
 |---|---|---|
-| `PLAYER_LOGIN` | `Features/Core.lua` | AceDB, the ability index, the panels, the mini-map button, the welcome |
+| `PLAYER_LOGIN` | `Features/Core.lua` | AceDB, the player GUID, the add-on message prefix, the ability index, the panels, the mini-map button, the welcome |
 | `PLAYER_ENTERING_WORLD` | `Features/Core.lua` | Clears per-fight state and re-tests combat-log registration |
 | `ZONE_CHANGED_NEW_AREA` | `Features/Core.lua` | Re-tests combat-log registration |
 | `CHAT_MSG_ADDON` | `Features/Whisper-Election.lua` | Other clients' whisper bids |
@@ -103,7 +107,7 @@ No feature file registers an event for handling: `Features/Alert-Gates.lua` togg
 | `LOSS_OF_CONTROL_ADDED` | `Features/Incapacitated.lua` | The Incapacitated alert |
 | `COMBAT_LOG_EVENT_UNFILTERED` | `Features/Combat-Log.lua` | Every other alert |
 
-**`COMBAT_LOG_EVENT_UNFILTERED` is the one event not registered at load.** `ns:UpdateCombatLogRegistration` in `Features/Alert-Gates.lua` registers and unregisters it, so a client with every feature off, or with every enabled feature limited to instances while it is outside one, is not woken for every combat line in the zone. `ns:ApplyProfile`, `PLAYER_ENTERING_WORLD` and `ZONE_CHANGED_NEW_AREA` re-run the test, and between them they cover everything it reads: the settings and the zone. Every control that changes one of those settings (a feature's enable, **While in Instances**, **All Alerts**, the mini-map toggles) calls `ns:ApplyProfile` for that reason.
+**`COMBAT_LOG_EVENT_UNFILTERED` is the one event not registered at load.** `ns:UpdateCombatLogRegistration` in `Features/Alert-Gates.lua` registers and unregisters it, so a client with All Alerts off, every feature off, or every enabled feature limited to instances while it is outside one, is not woken for every combat line in the zone. `ns:ApplyProfile`, `PLAYER_ENTERING_WORLD` and `ZONE_CHANGED_NEW_AREA` re-run the test, and between them they cover everything it reads: the settings and the zone. Every control that changes one of those settings calls `ns:ApplyProfile` for that reason: **All Alerts**, a feature's enable, **While in Instances**, and both mini-map button clicks. **When Group Has a Tank** and the role dropdown write without it, because the test never reads them (see Scope Gates).
 
 **`LOSS_OF_CONTROL_ADDED` is registered flat.** It fires only while the player is crowd controlled, so gating its registration would cost more bookkeeping than it saves. It is not on the combat-log path, so its handler checks All Alerts and the Incapacitated tab's scope gates itself. The alerts that fire from combat-log branches ahead of the ability lookup (Interrupts, the Tanking Tools misses and armor, and `ns:HandleUnitDeath` for Tank Deaths) ask their own feature's gates the same way, because the lookup path is where the gates are otherwise applied.
 
@@ -115,7 +119,7 @@ Control Freak writes no macros and drives no protected frames, so there is exact
 
 The gate lives inside the opener and nowhere else: `/freak` and the mini-map button's Shift + Middle-Click both call the opener and add no check of their own.
 
-Everything else is a read followed by a print, a sound, a chat message or an add-on message, all of which work in combat. Nothing is deferred, so there is no dirty flag and nothing to replay.
+Everything else is a read followed by a print, a sound, a chat message or an add-on message, all of which work in combat. Nothing waits for combat to end, so there is no dirty flag and nothing to replay; the one timer in the add-on is the whisper election's hold (see Whisper Election), and combat has no bearing on it.
 
 ### Classify, Gate, Dispatch, Render
 
@@ -131,7 +135,7 @@ One combat-log line takes the same path every time, ordered so the cheap tests r
 2. **Classifies.** Swings stop here. `ns.ABILITY_MAP` turns the spell ID into an ability entry, or the line is dropped.
 3. **Gates.** The ignore list (`ignoredSpells`), `ns.IsGroupSource`, the pet-source test for `PET_TAUNT`, then `ns:IsFeatureGateOpen` for the feature that `ns.CATEGORY_FEATURE` maps the category to.
 4. **Decides the outcome.** An `AURA` ability succeeds on `SPELL_AURA_APPLIED` or `SPELL_AURA_REFRESH`, a `CAST` ability on `SPELL_CAST_SUCCESS`, and a single-target taunt's `SPELL_MISSED` is a failure. `SHIELD` counts only `SPELL_AURA_APPLIED`: a shield kept rolling reapplies constantly, and every refresh is the mistake already reported. The dedupe key runs last (see State Encoding).
-5. **Dispatches** to the owning file's `ns:HandleXxx`, which picks the section and the message format.
+5. **Dispatches** to the owning file's handler (`ns:HandleTaunt`, `ns:HandleFear`, `ns:HandleNova`, `ns:HandleBadPriest` or `ns:HandleBadPets`), which picks the section and the message format.
 6. **Renders** through `ns:Alert` in `Features/Announcements.lua` (see Alert Sections).
 
 The handler signatures are long and positional on purpose. Everything a handler needs came out of that one call, and packing it into a table would allocate on the hottest path in the add-on.
@@ -147,7 +151,7 @@ Scope is per feature. Every tab answers "when does this fire" for itself, so a p
 | `groupHasTank` | Only while somebody in the group is tanking, connected and alive |
 | `instanceOnly` | Only inside dungeons and raids |
 
-`ns.FEATURE_SCOPE_OPTIONS` in `Data/Data.lua` names the questions each tab asks, and it is read twice: `Data/Default-Settings.lua` builds each feature's stored scope keys from it, and `ns.AddFeatureScope` draws one control per entry. A tab therefore cannot store a setting it never shows or draw a control with nothing behind it. A question a tab does not ask has no key, the gate reads nothing there, and the check is skipped without a per-feature branch.
+`ns.FEATURE_SCOPE_OPTIONS` in `Data/Data.lua` names the questions each tab asks, and it is read twice: `FeatureDefaults` in `Data/Default-Settings.lua` builds each feature's stored scope keys from it, and `ns.AddFeatureScope` draws one control per entry. A tab therefore cannot store a setting it never shows or draw a control with nothing behind it. A question a tab does not ask has no key, the gate reads nothing there, and the check is skipped without a per-feature branch.
 
 **`roleScope` and `instanceOnly` are on every tab; `groupHasTank` is the one that varies.** The first two ask about the player, so there is no alert they cannot sensibly narrow. `groupHasTank` is the only question about somebody else, and it belongs to alerts about a mob a tank should be holding: Taunts, Tanking Tools, Bad Priests and Bad Pets. Interrupts, Fears and Incapacitated are worth hearing whether or not the party has a tank, and Tank Deaths must not ask, because a tank dying is the moment the group stops having one.
 
@@ -158,7 +162,7 @@ Two functions in `Features/Alert-Gates.lua` read these settings, and the split i
 
 The seat questions stay out of the registration test because they read the raid's Main Tank assignment and the group finder's role. The role has `PLAYER_ROLES_ASSIGNED` behind it, but the assignment fires nothing reliable, so a registration keyed on them could leave the combat log unhooked with no event to put it right. Zone changes do fire events, so zone can gate registration.
 
-**`roleScope` is a ladder, not a pair of boxes.** `ns.ROLE_SCOPES` runs narrowest first, and `PassesRoleFilter` treats `TANK_HEALER` as an OR, since nobody tanks and heals at once and an AND would mean "never". Tanking is the raid's Main Tank assignment or the group finder's TANK role (`ns.IsUnitTank`, never Main Assist); healing is the HEALER role alone, because the game has no raid assignment for healing. `ALWAYS` ships on every tab but two: Incapacitated ships at `TANK_HEALER` and Bad Priests at `TANK`. A stored rung a later version drops resolves through `ns.ResolveChoice` to `ns.ROLE_SCOPE_DEFAULT`, which is `ALWAYS` so that falling off the ladder widens a tab rather than silencing it. A missing `roleScope` still means "this tab does not ask", so it must stay distinguishable from a stored rung and never be folded into that default.
+**`roleScope` is a ladder, not a pair of boxes.** `ns.ROLE_SCOPES` runs narrowest first, and `PassesRoleFilter` treats `TANK_HEALER` as an OR, since nobody tanks and heals at once and an AND would mean "never". Tanking is `ns.IsUnitTank`: the Main Tank assignment in a raid and the group finder's TANK role in a party, never Main Assist. In a raid the role is ignored: it is a tag that sticks to the character from a dungeon queue, and counting it would report a healer's death as `Tank Down!`, so the maintainer's rule is that a player not set up as a tank in the raid frames is not a tank in a raid. A raid with nobody assigned Main Tank therefore has no tank as far as the add-on can tell, and every tab gated on `groupHasTank` stays quiet there until somebody assigns one, a cost the maintainer accepted rather than an oversight to fix. Healing is the HEALER role alone, in a raid too, because the game has no raid assignment for healing. `ALWAYS` ships on every tab but two: Incapacitated ships at `TANK_HEALER` and Bad Priests at `TANK`. A stored rung a later version drops resolves through `ns.ResolveChoice` to `ns.ROLE_SCOPE_DEFAULT`, which is `ALWAYS`, so falling off the ladder widens a tab rather than silencing it. A missing `roleScope` still means "this tab does not ask", so it must stay distinguishable from a stored rung and never be folded into that default.
 
 A ladder-shaped scope question goes in the slot beside the feature's enable rather than on a row under it (`SCOPE_CHOICES` in `Options/Options-Alert-Section.lua`), and it takes its default from `SCOPE_DEFAULTS` in `Data/Default-Settings.lua` rather than the blanket `false` the switches get: a ladder has no off state, and a falsy value is what the gate reads as "not asked". The slot holds one widget, so a tab can ask at most one such question.
 
@@ -235,7 +239,7 @@ Both are wiped and refilled rather than replaced, so a file-scope alias, such as
 
 **Triggers hold castable ranks, never effect IDs.** Several abilities have same-named spells with no resource cost, no class requirement and no description, often at 100 yard range: the effect the real spell applies, a trainer's learn trigger, or an NPC's copy. Torment's castable ranks stop at 11775 on Era, while 11776 and 11777 are effects, and the comment above Power Word: Shield lists four same-named decoys. A castable rank has both a cost and ability text.
 
-**A rename across flavors is one entry.** Turn Undead's third rank is Turn Evil from TBC on, so both names ride one row and the panel shows whichever this client uses. The entry sets `renamed`, which is what makes Validate Data report `RENAMED` rather than the typo signal `NAME MISMATCH`.
+**A rename is one entry.** Turn Undead's third rank is Turn Evil from TBC on, so both names ride one row and the panel shows whichever this client uses; Menace, which one Season of Discovery phase shipped as Loathing, rides one row the same way. The entry sets `renamed`, which is what makes Validate Data report `RENAMED` rather than the typo signal `NAME MISMATCH`.
 
 **The column is per entry, not per ID, because Season of Discovery tanking runs on runes** that repurpose abilities under new spell IDs:
 
@@ -265,7 +269,7 @@ Every alert on every tab is the same block of settings, drawn by `ns.AddWhoseAle
 
 **Where a line goes.** An `output` is one of `ns.ALERT_OUTPUTS`: `PRINT` to the player's own window or `ANNOUNCE` to group chat, one place and never both, because both would put the same sentence on screen twice. The row is picked from the combat log's `AFFILIATION_MINE` bit, which already covers the player's pet.
 
-**What ships loud.** Both rows print by default, so a fresh install is close to silent in group chat. The exceptions announce only the player's own line, because each is news the group needs the moment it happens and the player is the one person who already knows: Failed Taunts, AOE Taunts, Fears, My Death, and Incapacitated's Long row. Cold Openers' one row announces too, but that section ships off.
+**What ships loud.** Both rows print by default, so a fresh install is close to silent in group chat. The exceptions announce only the player's own line, because each is news the group needs the moment it happens and the player is the one person who already knows: Failed Taunts, AOE Taunts, Fears, and Incapacitated's Long row. Cold Openers' one row announces too, but that section ships off. Both Tank Deaths rows print (see Tank Deaths).
 
 **What ships narrowed.** Successful and Failed Taunts at `ELITE`, Cold Openers at `ELITE_0`, Armor Debuffs and Parries at `BOSS`, and every other targeted section at `ALL`. `alwaysWhenMarked` ships on wherever it exists, so on the narrowed sections a marked mob below the rung fires from the first pull. That is the override doing its job, and also the one place it pulls against the reason those sections are narrowed; read the note in `Data/Default-Settings.lua` before changing either.
 
@@ -278,11 +282,12 @@ Every alert on every tab is the same block of settings, drawn by `ns.AddWhoseAle
 **Bends.** The block's shape is fixed, but a section can bend it through builder options:
 
 - **`rows`** replaces My and Others' with a list of `{ key, labelKey, descKey }`. Incapacitated passes Short and Long, because the game reports only the player's own losses of control, so the question with two answers is how long the effect lasts. The `key` is the settings key, the widget key and the `rowKey` the handler passes as `ns:Alert`'s seventh argument, so the three must match.
-- **One row.** Cold Openers omits `othersKey`, since only the player's own opener is readable. Armor Debuffs and Bad Shields report a problem of the group's to the player, so each draws one row with a tooltip of its own (`mineDescKey`), and its handler passes the player's own affiliation, which files every report under that row. Tank Deaths keeps both rows, but neither reports a cast, so it passes `othersDescKey` as well.
+- **One row.** Cold Openers omits `othersKey`, since only the player's own opener is readable. Armor Debuffs and Bad Shields report a problem of the group's to the player, so each draws one row, and its handler passes the player's own affiliation, which files every report under that row.
+- **`mineDescKey` and `othersDescKey`** replace the shared row tooltips (the player's own casts, pet included, and everybody else's) wherever those would be wrong: Cold Openers never counts a pet, Armor Debuffs and Bad Shields report the group's problem rather than a cast, and Tank Deaths and Parries pass both, because their rows report a death or a parry.
 - **`control`** fills the slot beside the switch, which belongs to the Against ladder. Only a `noTarget` section can use it, and Bad Shields puts its health line there; on a targeted section the builder overwrites it with the ladder.
 - **`captionRow`** draws a caption and a dropdown under the rows for a parameter of the detection, such as Cold Openers' "Within [5 Seconds of Fight]". `captionRowFirst` draws it above them instead, for Incapacitated, whose threshold is the definition the Short and Long rows branch on.
-- **`extraRow`** adds rows between the filters and the sound: Armor Debuffs' two Include rows, Parries' Ignore Other Tanks, Bad Shields' When Playing a Druid or Warrior Tank, and Incapacitated's nine effects.
-- **`afterSample`** adds a row below the Example for something that is not the alert's own output, which is every whisper.
+- **`extraRow`** adds rows between the filters and the sound: Armor Debuffs' two Include rows, Parries' Ignore Tanks and Ignore Pets, Bad Shields' When Playing a Druid or Warrior Tank, and Incapacitated's nine effects.
+- **`afterSample`** adds a row below the Example for something that is not the alert's own output, which is every whisper. Bad Pets, Bad Shields and Parries all draw theirs through `ns.AddWhisperRow`: the whisper toggle, the cooldown beside it, and the whisper's own Example. The cooldown stays up when the whisper is off, because it covers the whole alert.
 - **`noSound`** drops the sound row. Armor Debuffs uses it, so its defaults ship silent: there would be no control to switch a sound off.
 
 **A sound plays only with a line.** `ns:Alert` resolves the row and the channel first, and plays nothing unless the line is going somewhere the player reads, so somebody else's resisted taunt with `others` off makes no sound.
@@ -300,7 +305,7 @@ An alert's arguments reach `ns:Alert` as **parts**, so one locale format renders
 - **Rich**, for the local print: the name in its class color, the spell as a clickable link, the target behind its raid-icon texture. A pet's GUID carries no class, so it takes the color of the class whose ability it cast.
 - **Plain**, for chat: the same content with the `{rtN}` token in place of the texture, which the receiving client renders as the mark.
 
-Both put the information first and the brand last, `body // Control Freak`, with no target marker in front, because the body already carries its target's own mark. `ns:PrintAlert` applies that shape locally and `ns:BuildAnnounceMessage` applies it for chat, and the options panel's Example lines go through `ns:BuildAnnounceMessage` too.
+Both put the information first and the brand last, `body // Control Freak`, with no target marker in front, because the body already carries its target's own mark. `ns:PrintAlert` applies that shape locally and `ns:BuildAnnounceMessage` applies it for chat, and the options panel's Example lines go through `ns:BuildAnnounceMessage` too. `ns:PrintLine` is the print-only path for a line with no business in group chat; Tank Deaths' class log is its one caller.
 
 **Never strip color escapes from a sent body.** A spell link is `|cff...|Hspell:id:0|h[Name]|h|r`, one escape sequence. Remove the color wrapper and the malformed link makes the client refuse the message: it is dropped whole with no Lua error, while the local print of the same content keeps working. `ns.StripChatFormatting` converts the raid-icon texture and touches nothing else.
 
@@ -384,13 +389,13 @@ Both APIs are checked once at file scope. Without `C_LossOfControl` the section 
 One alert section and one list, and the split between them is the design.
 
 - **Tank Deaths is the alert**, drawn like Fears: a death names no mob, so the section is `noTarget`. It keeps the whose pair as **My Death** and **Others' Tank Deaths**, because a tank's death has two audiences: the tank looking at a release button already knows, and the players who must now pick up the mob do not. Its line opens `Tank Down!`.
-- **Deaths by Class is the log**: nine rows, all shipping off, with no sound and no destination. Its line opens the same way on the class, `Mage Down! Joe has died.`, so the two read as one family with the answer in the first two words. It prints through `ns:PrintLine`, the print-only path, which has no output rows to resolve, no alert gates (a death has no caster and no mob), and no sound, because nine classes with a sound each turns a wipe into a drum solo.
+- **Deaths by Class is the log**: nine rows, all shipping off, with no sound and no destination. Its line opens the same way on the class, `Mage Down! Joe has died.`, so the two read as one family with the answer in the first two words. It prints through `ns:PrintLine`, the print-only path, which has no output rows to resolve, no alert gates (a death has no caster and no mob), and no sound, because nine classes with a sound each turns a wipe into a drum solo. The rows are plain sub-option rows under a header rather than a section, so the log has no switch of its own, and its Example comes from the exported `ns.RenderSample`.
 
-**`UNIT_DIED` is the only event that reports somebody else's death as it happens.** `UNIT_HEALTH` arrives late and not for every unit, and raid frames are a picture rather than an event. `UNIT_DIED` names no source, so `Features/Combat-Log.lua` hands over the dead player's own `destFlags`, which `ns:Alert` reads for its group test. The handler finds the player with `ns.FindGroupUnit(destGUID)`, which both proves they were in the group (a dying mob or pet answers `nil`, and that is most of what `UNIT_DIED` carries) and hands over the unit token the seat test needs. `ns.FindTankUnit` is built on the same walk, so the two cannot disagree about who is in the group. Feign Death also arrives as `UNIT_DIED`, so `UnitIsFeignDeath` filters it out.
+**`UNIT_DIED` is the only event that reports somebody else's death as it happens.** `UNIT_HEALTH` arrives late and not for every unit, and raid frames are a picture rather than an event. Most of what `UNIT_DIED` carries is mobs and pets, so `ns:HandleUnitDeath` drops any GUID that is not a player's on a string test before anything else. `UNIT_DIED` names no source, so `Features/Combat-Log.lua` hands over the dead player's own `destFlags`, which `ns:Alert` reads for its group test. The handler finds the player with `ns.FindGroupUnit(destGUID)`, which both proves they were in the group and hands over the unit token the seat test needs. The seat test is `ns.IsUnitTank`, so in a raid only an assigned Main Tank's death is a tank death, and a healer still wearing the group finder's Tank tag from a dungeon queue is not a tank. `ns.FindTankUnit` is built on the same walk, so the two cannot disagree about who is in the group. Feign Death also arrives as `UNIT_DIED`, so `UnitIsFeignDeath` filters it out.
 
 **The seat beats the class, and a death sends one line.** A warrior tank dying with Warrior ticked reports `Tank Down!` only. The handler picks the row itself and reads the section's switch and that row's switch **before** calling `ns:Alert`, because a tank death the section will not report falls through to the log: a player who switched Others' Tank Deaths off and ticked Warrior still hears about a warrior who was tanking. Calling `ns:Alert` first and guessing whether it spoke would report that death twice or not at all.
 
-**My Death reports only while the player is tanking**, since the line says `Tank Down!`, and the log never reports the player. My Death ships announcing and Others' Tank Deaths printing, so on a fresh install exactly one client announces any given death, the dead tank's own; every Control Freak in the raid announcing it would be a wall of the same sentence. The section's sound ships on, and that does not break the one-announcer rule: a sound stays on the client that plays it.
+**My Death reports only while the player is tanking**, since the line says `Tank Down!`, and the log never reports the player. Both rows ship printing by the maintainer's decision, so a fresh install keeps tank deaths out of group chat: every Control Freak in the raid sees the line in its own window, and whoever wants it announced flips one dropdown. Mind the duplicates before changing either default. Every client that sees a tank die files it under Others' Tank Deaths except the dead tank's own, which files it under My Death, so an announcing Others' row puts one copy of the line in raid chat per Control Freak in the group, while My Death is the one row only a single client can ever fire. The section's sound ships on, playing Game Over, and a sound stays on the client that plays it.
 
 **There is no `groupHasTank` question and no healer row.** Gating the tab on a living tank would suppress the case it exists for. A healer row would need a signal the game does not give: healing has no raid assignment, few Classic Era players set the Healer role, and inferring healers from heals means testing every heal in the raid and guessing.
 
@@ -401,19 +406,19 @@ One alert section and one list, and the split between them is the design.
 One section, **Bad Shields**: a Power Word: Shield landing on a druid or warrior who is tanking. Rage comes from damage taken, an absorb generates none, and the shield starves the tank of the resource they hold threat with.
 
 - **The `flavors` column scopes it.** The entry is `"-"` on Wrath, where the mechanic does not apply, and on Season of Discovery, where a priest rune gives the rage back (see Ability Data). The tab still shows on every flavor, and its summary says where it stays quiet.
-- **Three gates, cheapest first**: the target's class (`ns.RAGE_TANK_CLASSES`, read through `GetPlayerInfoByGUID`), then tanking (`ns.FindTankUnit`, the same Main Tank or TANK role signal the scope gates read, never inferred from class or form), then health. `selfOnly`, When Playing a Druid or Warrior Tank, ships on and narrows all three to shields landing on the player.
+- **Three gates, cheapest first**: the target's class (`ns.RAGE_TANK_CLASSES`, read through `GetPlayerInfoByGUID`), then tanking (`ns.FindTankUnit`, the same seat test the scope gates read, Main Tank in a raid and the TANK role in a party, never inferred from class or form), then health. `selfOnly`, When Playing a Druid or Warrior Tank, ships on and narrows all three to shields landing on the player.
 - **The health line.** A shield on a tank about to die is the right call, so the warning goes quiet below the chosen `health` (`ns.SHIELD_HEALTH_THRESHOLDS`, whole percentages, since the label prints the number). Zero is Always, and the shipped 30 reads "Except Under 30% Health". It takes the slot beside the switch, which is free because the section is `noTarget`.
 - **Only the first application counts**, never a refresh, and a player shielding themselves is never reported.
 
 It is the only section that reads a **friendly** target, so it has no Against ladder and no mark, and it files every report under its one row with the player's own affiliation, as Armor Debuffs does.
 
-**The paladin bubbles are deliberately not `SHIELD` abilities.** A bubble on a tank drops every mob onto whoever is next on threat, which is a different problem from rage denial and does not belong in this section. `Data/Abilities.lua` keeps their IDs in a comment.
+**The paladin bubbles are deliberately not `SHIELD` abilities.** A bubble on a tank drops every mob onto whoever is next on threat, which is a different problem from rage denial and does not belong in this section. `Data/Abilities.lua` keeps their IDs in a comment, and bringing them back means a category, a handler, defaults, copy and a panel section of their own.
 
 ## Bad Pets
 
 Hunter and warlock pets with an auto-cast taunt left on: every `PET_TAUNT` ability, detected as `CAST` and required to come from a pet or guardian (`ns.IsPetSource`). The tab ships gated on `groupHasTank`, since a hunter soloing with Growl on is playing correctly.
 
-`ns.FindPetOwner` names the owner by walking `partypetN` and `raidpetN` (the tokens are never `partyNpet`), and the format follows what it finds: `BAD_PET_OWN` for the player's own pet, `BAD_PET` naming another owner, and `BAD_PET_UNKNOWN_OWNER` when no owner resolves, each with an `_AOE` form for Suffering. The whisper goes to a resolved owner and never to the player. This tab's whisper and cooldown live on the feature table (`badPets.whisper`, `badPets.cooldown`) rather than on its alert section.
+`ns.FindPetOwner` names the owner by walking `partypetN` and `raidpetN` (the tokens are never `partyNpet`), and the format follows what it finds: `BAD_PET` naming the owner, or `BAD_PET_UNKNOWN_OWNER` when no owner resolves, each with an `_AOE` form for Suffering. The player's own pet gets the same owner-naming line as anybody's, because the My row can announce, and a line saying "your pet" in group chat would hand the pet to whoever reads it. The whisper goes to a resolved owner and never to the player. This tab's whisper and cooldown live on the feature table (`badPets.whisper`, `badPets.cooldown`) rather than on its alert section.
 
 ## Tanking Tools
 
@@ -421,7 +426,7 @@ Four warnings that share a tab, not an implementation. The tab ships off while i
 
 - **Cold Openers** (`Features/Tanking-Tools-Cold-Opener.lua`) reports the player's own ability avoided in the first seconds of a pull: threat that never happened, when it matters most. It follows the reference aura at [wago.io/KVtFqses5](https://wago.io/KVtFqses5), whose stated filters are bosses only, aggro only, abilities only and early only. **Abilities only is load-bearing**: it reads `SPELL_MISSED` and never `SWING_MISSED`, since auto-attacks are avoided constantly. It reports only the player's casts, because the first seconds of somebody else's pull are unreadable: no swing has named a holder yet, and a DPS going early looks exactly like the tank. The pull clock is per mob, stamped by `ns.RememberEnemyFirstSeen` from **either** side of an event (a boss opening on the tank is a source before it is a destination), and only while this section is on. A mob already on somebody else does not count, a mob never seen does not count, and tracked taunts are skipped, so a resisted opening taunt prints once, as a Failed Taunt. `ns.COLD_OPENER_MISS_FORMATS` leaves out `ABSORB`, `REFLECT` and `EVADE`, none of which is the target avoiding the hit.
 - **Armor Debuffs** (`Features/Tanking-Tools-Armor.lua`) times how long the group took to strip a target's armor. `ns.ARMOR_DEBUFFS` describes the set: five Sunders **or** one Expose Armor answers the armor question, and Faerie Fire and Curse of Recklessness are extras the player can require. An extra is waited on only when `ns.GroupHasClass` finds somebody who could cast it, or the line would never print; that test ignores whether they are alive, since a dead druid is still a reason to wait. Timing runs from the first component to land, and a run resets when an armor component drops, not an extra. **Stacks are counted rather than read from the log's dose field**, because the amount sits in a different return slot per sub-event, and one wrong slot reports a number that is silently wrong.
-- **Parries** (`Features/Tanking-Tools-Parry.lua`) inverts the reference aura at [wago.io/yJAzyvcvw](https://wago.io/yJAzyvcvw). A mob parries only attacks from its front, and every parry speeds up its next swing at whoever is tanking it, so a parry is the tank's problem. Being parried by a mob you are holding is tanking; being parried by a mob somebody else holds means you are standing in front of it, which `ns.EnemyIsOnSomeoneElse` answers from swings already seen, with no unit token. **A mob with no holder on record reports nothing**, the opposite of the taunt rule, or every pull's opening exchange would name the tank. It reads **both** `SWING_MISSED` and `SPELL_MISSED`, since a melee player in front generates parries mostly from auto-attacks. Ignore Other Tanks, shipping on, drops a group member who is a tank through `ns.FindTankUnit` before the cooldown; the player's own parries still report.
+- **Parries** (`Features/Tanking-Tools-Parry.lua`) inverts the reference aura at [wago.io/yJAzyvcvw](https://wago.io/yJAzyvcvw). A mob parries only attacks from its front, and every parry speeds up its next swing at whoever is tanking it, so a parry is the tank's problem. Being parried by a mob you are holding is tanking; being parried by a mob somebody else holds means you are standing in front of it, which `ns.EnemyIsOnSomeoneElse` answers from swings already seen, with no unit token. **A mob with no holder on record reports nothing**, the opposite of the taunt rule, or every pull's opening exchange would name the tank. It reads **both** `SWING_MISSED` and `SPELL_MISSED`, since a melee player in front generates parries mostly from auto-attacks. Ignore Tanks, shipping on, drops a group member who is a tank through `ns.FindTankUnit` before the cooldown; the player's own parries still report. Ignore Pets, also shipping on, drops a pet or guardian through `ns.IsPetSource`, the test Bad Pets uses, because the line would name the pet and nobody in the group can act on that; a pet is never whispered whichever way the row is set.
 - **Novas** (`Features/Tanking-Tools-Nova.lua`) is the only tool driven by the ability table: the `NOVA` category has one member, Frost Nova.
 
 **The miss type arrives in a different return slot per sub-event**, which is the easiest thing here to get wrong. `SWING_MISSED` has no spell, so its twelfth return is the miss type; `SPELL_MISSED` keeps the spell in the twelfth and puts the miss type in the fifteenth. `ns:COMBAT_LOG_EVENT_UNFILTERED` normalizes both before calling `ns:DispatchTankingToolMiss`. Read the wrong slot and a number is compared to `"PARRY"`, and nothing ever fires.
@@ -437,7 +442,7 @@ Every feature tab is built the same way. `ns.AddFeatureScope` draws the optional
 
 One or two sentences on what it is and why it is worth having.
 
-[ ] Enable Notifications for <thing> On   [ Everything          v]
+[ ] Enable Alerts for <thing> On          [ Everything          v]
     [ ] My <thing>                        [ Print (Self Only)   v]
     [ ] Others' <thing>                   [ Print (Self Only)   v]
         <caption>                         [ ...                 v]  captionRow
@@ -460,9 +465,11 @@ The header, description, switch and Example are mandatory, so a new alert cannot
 
 **Orders are budgeted.** A section owns 20 of order: the frame runs to +6, the rows to +9, extras from +11, the sound at +14, the Example at +15 and +16, and a whisper from +17 to +19 in half steps. A section needing more extra rows than that holds steps by tenths, as Incapacitated's nine effects and Tank Deaths' nine class rows do. Ability lists start well clear of the sections.
 
+**Args keys share one flat table per panel.** Two builders writing the same key overwrite each other with no error, so `ns.AddGatedHeader` suffixes its keys `Header...` apart from the `Head...` keys a section frame uses, and `ns.BuildAbilityToggles` takes a `keyPrefix` for a panel that calls it twice, as Taunts does for its single-target and AoE lists.
+
 **Sub-options are marked twice**, indented and captioned in silver, so the dependency reads by shape or by color. `ns.OptionsSubRow` makes one unnamed inline group per sub-option, which pins one row each; laid out flat, the next pair packs onto whatever space is left and the indent stops indenting. The indent is a real widget, since AceConfig pins a checkbox to the left edge of its own widget, and `hidden` goes on the group, never on its members. `ns.OptionsSpacer` takes no `hidden` argument, so every gated blank line is its own description widget; otherwise a switched-off feature collapses to a column of empty rows.
 
-**The grid lives in `Data/Data.lua`.** The label half, `ns.OPTIONS_LABEL_WIDTH`, is wide because it carries the longest label in the add-on, "Enable Notifications for Successful Interrupts On", with the Against ladder beside it; a longer string clips with an ellipsis, which is why translations are worded short. Sub-option widths are **derived** from the section widths rather than typed, and the sub-rows that pair a caption with a dropdown fill the row exactly, which is what puts every dropdown in a block in one column (verified in-game on both flavors, with no wrapping). The sound row's speaker preview is the one thing past `ns.OPTIONS_ROW_WIDTH`, in the right margin, since taking its room from the label would push the sound dropdown out of that column. A caption with no box sits behind a blank cell of `ns.OPTIONS_SUB_CAPTION_INDENT_WIDTH`, a checkbox's width, so its first letter lines up with the captions beside boxes.
+**The grid lives in `Data/Data.lua`.** The label half, `ns.OPTIONS_LABEL_WIDTH`, is wide because it carries the longest labels in the add-on, the alert switches such as "Enable Alerts for Successful Interrupts On", with the Against ladder beside them; a longer string clips with an ellipsis, which is why translations are worded short. Sub-option widths are **derived** from the section widths rather than typed, and the sub-rows that pair a caption with a dropdown fill the row exactly, which is what puts every dropdown in a block in one column (verified in-game on both flavors, with no wrapping). The sound row's speaker preview is the one thing past `ns.OPTIONS_ROW_WIDTH`, in the right margin, since taking its room from the label would push the sound dropdown out of that column. A caption with no box sits behind a blank cell of `ns.OPTIONS_SUB_CAPTION_INDENT_WIDTH`, a checkbox's width, so its first letter lines up with the captions beside boxes.
 
 **Ability rows use their own AceGUI widget**, `ns.SPELL_TOGGLE_WIDGET_TYPE` in `Options/Options-Ability-Toggles.lua`. AceGUI's stock CheckBox sends its `OnEnter` to AceConfigDialog, which draws the name-and-description tooltip and leaves no room for the spell's own, so the row opens `GameTooltip:SetHyperlink` on the spell in the option's `arg` field, which AceConfig passes through untouched. Unchecking a row writes **every** trigger ID into `ns.db.profile.ignoredSpells`, including ranks this client cannot see, so levelling or changing flavor keeps the choice. The ignore list is keyed by spell ID and shared by every feature.
 
@@ -472,17 +479,19 @@ Registration is deferred into `ns.RegisterOptionsPanels`, which Core calls on `P
 
 ## Mini-map Button
 
-A launcher LDB object registered with LibDBIcon under `ns.LOCALE_NAME`. Its icon is the game's own Taunt icon (`ns.MINIMAP_ICON`), so it reads as a taunt at a glance; the TOC's `IconTexture` is the add-on list's branding.
+A launcher LDB object registered with LibDBIcon under `ns.LOCALE_NAME`. Its icon is the game's own Taunt icon (`ns.MINIMAP_ICON`), so it reads as a taunt at a glance; the TOC's `IconTexture` is the add-on list's branding. `ns.MINIMAP_ICON_COORDS` crops the frame the game draws into its stock icons: LibDBIcon's own 5% inset clears the thin frame of an add-on's art but leaves this one showing inside the button's ring, where it makes the icon read as undersized.
 
 | Click | Action |
 |---|---|
 | Left-Click | Toggles All Alerts |
-| Right-Click | Toggles Bad Pets |
+| Right-Click | Toggles Tanking Tools |
 | Shift + Middle-Click | Opens the Options Interface, checked before any other binding |
 
-Right-Click does nothing while All Alerts is off, matching the tooltip, which draws the Bad Pets block only while the add-on is on: a binding the tooltip does not advertise does nothing. Every other button and modifier combination is unbound, and a shifted Left- or Right-Click is ignored rather than read as the plain click. Bad Pets is the only feature with a binding, and it earns one by whispering pet owners out of the box, so a tank may need to hush it mid-run. Bad Priests had Shift + Left-Click until 2026-09-12 and lost it because it ships with nothing that reaches anybody else: its whisper is off and its warning prints to the player's own window, so a quick switch had nothing to hush. The combat refusal lives inside `ns:OpenOptionsPanel` and is never repeated in `OnClick`.
+**The tooltip lists only what a click on the button changes**: an All Alerts block, a Tanking Tools block and the options line, so no other tab appears in it. The All Alerts block takes its title from `KILL_SWITCH`, the General panel's header for the same switch, and its description from `KILL_SWITCH_ENABLE_DESC`, the panel toggle's own tooltip, so the button and the panel cannot name or describe the switch differently. The Tanking Tools block draws only while All Alerts is on, and Right-Click does nothing while it is off: with the combat log unregistered the tab cannot fire, and a binding the tooltip does not advertise does nothing. Every other button and modifier combination is unbound, and a shifted Left- or Right-Click is ignored rather than read as the plain click. The combat refusal lives inside `ns:OpenOptionsPanel` and is never repeated in `OnClick`.
 
-**Every toggle goes through `ns:ApplyProfile`**, not a bare `NotifyChange`, because each flips an `enabled` flag that decides whether the combat log is registered. Without the registration test, the add-on stays hooked into every combat line for a feature just switched off, or unhooked from one just switched on. After a toggle the tooltip re-renders in place while `GameTooltip:GetOwner()` is still the button.
+**A tab earns a binding by shipping switched off.** Tanking Tools is the opt-in tab, so Right-Click is the way in and out mid-run without opening the panel. Its block's description is `TANKING_TOOLS_MINIMAP_SUMMARY`, a two-line list of its four sections, because the tab itself has no summary. The tabs that ship on are reached through the panel.
+
+**Every click toggle goes through `ns:ApplyProfile`**, not a bare `NotifyChange`, because each flips an `enabled` flag that decides whether the combat log is registered. Without the registration test, the add-on stays hooked into every combat line for a feature just switched off, or unhooked from one just switched on. After a toggle the tooltip re-renders in place while `GameTooltip:GetOwner()` is still the button. The General panel's **Enable Mini-map Button** writes the inverted `minimap.hide` and calls `ns:ApplyMinimapButton` directly, since the button's visibility is nothing the registration test reads.
 
 **Always `LibDBIcon:Refresh(name, db)`, never `Show` or `Hide`.** LibDBIcon keeps a direct reference to the subtable it was registered with, and AceDB's `ResetProfile` replaces `profile.minimap` with a fresh table, so a button still pointing at the old one writes its position where nothing reads it. `ns:ApplyMinimapButton` passes the current subtable to `Refresh` and runs inside `ns:ApplyProfile`, so every profile switch, reset and copy re-points the button. It registers on `PLAYER_LOGIN`, after `AceDB:New`, since the subtable does not exist until SavedVariables load.
 
@@ -505,7 +514,7 @@ Control Freak's own manifests:
 - **`ns.DIAGNOSTIC_API_CHECKS`** has rows for the APIs the add-on reaches through availability guards (the spell shims, the engraving probe, the role and class-name lookups, the loss-of-control and aura calls, the Feign Death check, name plates and `Settings.OpenToCategory`) and for the load-bearing calls and libraries the core loop depends on.
 - **`ns.DIAGNOSTIC_DATA_SOURCES`** has one row per static data file, naming its table, the field its IDs live in, and a test for whether this client watches an ID: `Data/Abilities.lua` answers through `ns.ABILITY_MAP`, and `ns.ARMOR_DEBUFFS` in `Data/Data.lua` through `ns.IsArmorDebuffSpell`. The panel builds one Validate Data section per row. Each ID reports `OK`, `OFF FLAVOR` for a `"-"` column, `NOT ON CLIENT`, `RENAMED`, or `NAME MISMATCH` for a trigger that resolves to a different name than the rest of its entry.
 
-**Read Alert Gate State** (`ns:BuildAlertGateReport`) is the add-on's context probe and the first thing to read on a "nothing ever fires" report. It prints All Alerts; each feature's scope settings, only the questions its tab asks, with the `ns:IsFeatureGateOpen` verdict; the group and instance state; the current target's Against rung; whether the combat log is actually registered; who counts as a tank and whether one is alive; and how many abilities are ignored. **Read Display Context** answers mini-map button reports with the screen size, UI scale, saved button state and whether the live button is shown. The Saved Variables dump summarizes `ignoredSpells` by count.
+**Read Alert Gate State** (`ns:BuildAlertGateReport`) is the add-on's context probe and the first thing to read on a "nothing ever fires" report. It prints All Alerts; each feature's scope settings, only the questions its tab asks, with the `ns:IsFeatureGateOpen` verdict; the group and instance state; the current target's Against rung; whether the combat log is actually registered; who counts as a tank, which Tank role tags a raid is ignoring, and whether a tank is alive; how many sounds LibSharedMedia offers; and how many abilities are ignored. **Read Display Context** answers mini-map button reports with the screen size, UI scale, saved button state and whether the live button is shown. The Saved Variables dump summarizes `ignoredSpells` by count.
 
 Two client quirks are handled inside Validate Data:
 
@@ -516,21 +525,21 @@ Diagnostics strings live in `ns.DiagnosticsStrings` as plain English and are nev
 
 ## Saved Variables
 
-One SavedVariables global, `ControlFreakDB`, managed by AceDB-3.0 and created on `PLAYER_LOGIN` in `Features/Core.lua`. It holds every setting the player can change.
+One SavedVariables global, `ControlFreakDB`, managed by AceDB-3.0 and created on `PLAYER_LOGIN` in `Features/Core.lua`. It holds every setting the player can change, and nothing else.
 
-**Model: Simple.** `AceDB:New("ControlFreakDB", ns.DATABASE_DEFAULTS, true)` gives every character the one shared `Default` profile, so everything lives in `ns.db.profile` and `ns.db.global` is unused. Nothing Control Freak stores differs from character to character: every setting describes how the add-on behaves. **Reset Profile therefore clears everything back to install defaults**, the mini-map position and the ignored abilities included. A new setting belongs in `ns.db.profile`.
+**Model: Simple.** `AceDB:New("ControlFreakDB", ns.DATABASE_DEFAULTS, true)` gives every character the one shared `Default` profile, so everything lives in `ns.db.profile` and `ns.db.global` is unused. Nothing Control Freak stores differs from character to character: every key describes how the add-on behaves, and `ignoredSpells` is a choice about abilities rather than a record of what one character knows. **Reset Profile therefore clears everything back to install defaults**, the mini-map position and the ignored abilities included. A new setting belongs in `ns.db.profile`.
 
-The profile's shape, from `Data/Default-Settings.lua`:
+The profile's shape, from `ns.DATABASE_DEFAULTS` in `Data/Default-Settings.lua`:
 
 - `showWelcome`, `enabled` (All Alerts), and `minimap`, which LibDBIcon owns.
-- One table per key in `ns.FEATURE_KEYS`: `taunts`, `interrupts`, `fears`, `incapacitated`, `tankDeaths`, `badPriests`, `badPets` and `tankingTools`. `FeatureDefaults` gives each one `enabled` and the scope keys its `ns.FEATURE_SCOPE_OPTIONS` entry names; each also holds its alert sections, built by `WhoseAlertDefaults`, and any settings the feature owns outright, such as `tankDeaths.classes`.
+- One table per key in `ns.FEATURE_KEYS`. `FeatureDefaults` gives each `enabled` and the scope keys its `ns.FEATURE_SCOPE_OPTIONS` entry names; `WhoseAlertDefaults` builds its alert sections (see Alert Sections); and any setting the feature owns outright sits beside them, such as `tankDeaths.classes` and `badPets.whisper` and `badPets.cooldown`.
 - `ignoredSpells`, a set of spell IDs shared by every feature.
 
 Defaults come from `ns.DATABASE_DEFAULTS` and are applied by AceDB-3.0 when a scope is first accessed, and explicit user values, including `false`, are never overridden. Note that scalar and table defaults are physically copied into the saved table (`copyDefaults` via `rawset`); only `*`/`**` wildcard defaults resolve through metatables. Control Freak defines no wildcard defaults.
 
 **There is no refill-on-empty logic**, because the add-on ships no default item or spell list. `ignoredSpells` is a settings map rather than a list: a player who unticked every ability meant it, and re-seeding it on login would undo the choice. The ability data is static Lua in `Data/Abilities.lua` and is never saved.
 
-**There is no migration chain.** Profiles saved under earlier shapes of the data, including the schema before the rebuild and the older print-and-announce alert block, carry no bridge by the maintainer's decision: those settings reset to defaults once, and their stale keys stay in the file unread until a profile reset clears them. What a future change to saved data owes is under Contributing.
+**There is no migration chain.** Profiles saved under earlier shapes of the data carry no bridge, by the maintainer's decision: those settings fall back to their defaults, and their stale keys (`badPet`, `taunts.stolen`, and an alert section's old `print`, `announce` and `bossOnly`, among others) stay in the file unread until a profile reset clears them. What a future change to saved data owes is under Contributing, and why a retired key name is never reused is under Common Pitfalls.
 
 `ns:ApplyProfile`, wired to `OnProfileChanged`, `OnProfileReset` and `OnProfileCopied`, makes a switch, reset or copy apply live: it re-runs the combat-log registration test, re-points the mini-map button, and notifies every registered panel so an open Options Interface follows along.
 
@@ -541,23 +550,23 @@ Defaults come from `ns.DATABASE_DEFAULTS` and are applied by AceDB-3.0 when a sc
 3. Set `detection`: `AURA` only if the ability applies an aura on every flavor it is live on, otherwise `CAST`.
 4. List every castable rank in `triggers`, in rank order, with no effect IDs or learn triggers.
 5. Set `renamed = true` only for a verified rename across the entry's ranks or flavors.
-6. For a new category, map it in `ns.CATEGORY_FEATURE` in `Features/Ability-Index.lua`, add its branch at the end of `ns:COMBAT_LOG_EVENT_UNFILTERED`, and pass it to the owning tab's `ns.BuildAbilityToggles` call.
+6. For a new category, map it in `ns.CATEGORY_FEATURE` in `Features/Ability-Index.lua`, add its branch at the end of `ns:COMBAT_LOG_EVENT_UNFILTERED`, pass it to the owning tab's `ns.BuildAbilityToggles` call, and add it to the category list in the header comment of `Data/Abilities.lua`.
 7. On a live client of each flavor, run Diagnostic Tools → Validate Data: Data/Abilities.lua, and check that the new rows read `OK`, or `OFF FLAVOR` where the column says `"-"`.
 
 ## Adding a New Alert Section
 
 1. Add the section's defaults to its feature's table in `Data/Default-Settings.lua` through `WhoseAlertDefaults(soundName, overrides, noTarget, rowKeys)`, with the reason beside any override. Pass `true` for `noTarget` when the line names no single mob.
-2. Add its strings to `Locales/enUS.lua`: a `_HEADER`; an `_ENABLE` reading "Enable Notifications for <thing> On", so the Against ladder finishes the sentence (a `noTarget` section drops "On"); a `_DESC` of one or two sentences; and a `_MINE` and `_OTHERS` pair, per section rather than a template, because "My" and "Others'" agree with the noun in some languages.
+2. Add its strings to `Locales/enUS.lua`: a `_HEADER`; an `_ENABLE` reading "Enable Alerts for <thing> On", so the Against ladder finishes the sentence (a `noTarget` section drops "On"); a `_DESC` of one or two sentences; and a `_MINE` and `_OTHERS` pair, per section rather than a template, because "My" and "Others'" agree with the noun in some languages.
 3. Add the message format, and measure it: it has to fit 255 bytes in ruRU with a real spell link and a real boss name substituted.
 4. Call `ns.AddWhoseAlertSection` in the tab's builder, 20 of order after the previous section, with `sample = { key, args }` naming that format.
 5. Call `ns:Alert` from the handler with the section, the format key, its parts, the source flags, and the mob's GUID and raid-icon index.
-6. If the section whispers, call `ns:PassesAlertGates` before the cooldown, and send through `ns:QueueGroupWhisper` with a new `kind`.
+6. If the section whispers, draw the row through `afterSample` and `ns.AddWhisperRow`; in the handler, call `ns:PassesAlertGates` before the cooldown, and send through `ns:QueueGroupWhisper` with a new `kind`.
 
 ## Adding a New Feature Tab
 
 1. In `Data/Data.lua`, add the key to `ns.FEATURE_KEYS` in tab order, its scope questions to `ns.FEATURE_SCOPE_OPTIONS`, and its registry name to `ns.OPTIONS_REGISTRY`.
 2. Add its defaults to `Data/Default-Settings.lua` through `FeatureDefaults`.
-3. Add `Features/<Name>.lua` with the handler. If the tab owns an ability category, map it in `ns.CATEGORY_FEATURE`. If its trigger is not the ability path, the handler checks All Alerts and asks `ns:IsFeatureGateOpen` itself, as Incapacitated and Tank Deaths do.
+3. Add `Features/<Name>.lua` with the handler, appending any per-fight state's reset to `ns.stateResets`. If the tab owns an ability category, map it in `ns.CATEGORY_FEATURE`. If its trigger is not the ability path, the handler checks All Alerts and asks `ns:IsFeatureGateOpen` itself, as Incapacitated and Tank Deaths do.
 4. Add `Options/Options-<Name>.lua` with a builder that opens on `ns.AddFeatureScope`.
 5. Add both files to `Control-Freak.toc`: the feature file among the feature modules, before `Features/Diagnostics.lua`, and the panel file in tab order, before `Options/Options-Profiles.lua`.
 6. Register the panel in `ns.RegisterOptionsPanels` in tab order, ahead of Profiles and Diagnostic Tools.
@@ -591,7 +600,7 @@ The combat-log registration test and Read Alert Gate State both loop over `ns.FE
 - `TAUNT_IMMUNE` runs mob, taunter, taunt; every other taunt format opens on the taunter.
 - The four `INCAPACITATED` formats run role, length, player, spell, dispel type, caster, each dropping its optional parts.
 - `TANK_DEATHS_CLASS_LINE` takes the class name first and the player second.
-- `ALERT_AGAINST_DESC` quotes `TARGET_RUNG_ELITE_0` by name, so the two must match or the tooltip explains a choice the player cannot find.
+- `ALERT_AGAINST_DESC` quotes `TARGET_RUNG_ELITE_0` and `ALERT_MARKED_ALWAYS` by name, so all three must match or the tooltip explains a choice the player cannot find.
 
 Class names come from the client through `ns.ClassName`, never from the locale files, so they match the tooltips beside them. The sample boss names are locale keys (`SAMPLE_BOSS_*`), written exactly as each client names them. Not localized: `ns.DiagnosticsStrings`, which is developer-facing, and the Apology panel, which is one person's dated letter.
 
@@ -611,8 +620,10 @@ Everything else, including the Spanish file pairing and the overflow canary, is 
 - **Passing `control` to a section that has a target**: the builder overwrites it with the Against ladder, and the control silently disappears. A parameter of the detection goes in `captionRow`.
 - **A `rows` key the defaults do not build**: the key is the settings key, the widget key and the `rowKey` at once, so the panel's `rows`, `WhoseAlertDefaults`' fourth argument and the handler must all use the same words, or the panel writes to a row `ns:Alert` never reads.
 - **Adding a `groupHasTank` default to a tab that does not ask it**: `ns:IsFeatureGateOpen` still reads the key, so the tab would be gated by a switch nobody can see. `ns.FEATURE_SCOPE_OPTIONS` decides which keys exist.
+- **Reusing a retired saved-variables key**: profiles still carry keys from earlier data shapes, and AceDB fills a table default only into a slot that is empty or already a table. A new table under an old key that a profile holds as `true`, a number or a string never receives its defaults, and the first read into it errors. Give new data a fresh key.
 - **Capturing `ns.db.profile` in a panel closure**: a profile switch replaces the table, and the panel keeps writing into the old one. Every builder takes a getter.
-- **Flipping an `enabled` flag without `ns:ApplyProfile`**: the combat log stays registered for a feature just switched off, or unregistered for one just switched on.
+- **Flipping an `enabled` or `instanceOnly` flag without `ns:ApplyProfile`**: the combat log stays registered for a feature just switched off, or unregistered for one just switched on.
+- **Two builders writing the same args key**: AceConfig args are one flat table per panel, so the later write silently replaces the earlier widget. `ns.AddGatedHeader` suffixes its keys, and a panel calling `ns.BuildAbilityToggles` twice passes each call its own `keyPrefix`.
 - **`LibDBIcon:Show` or `Hide` after a profile reset**: the button keeps writing to the detached old `minimap` table. Always go through `ns:ApplyMinimapButton`.
 - **Registering an event in a feature file**: the dispatcher never routes it and the Diagnostics probe never tests it. Add it to `ns.EVENT_NAMES`.
 - **Reading `spellId` from a `LossOfControlData`**: it is `spellID` there and `spellId` on an `AuraData`, and the wrong case compares `nil` and never matches.
