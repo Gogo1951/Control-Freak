@@ -43,7 +43,7 @@ L["OPTIONS_COMMAND_DESCRIPTION"] = "Apre il pannello delle opzioni di questo add
 ]]
 L["KILL_SWITCH"] = "Tutti gli avvisi"
 L["KILL_SWITCH_SUMMARY"] =
-	"Un unico interruttore per ogni avviso di ogni scheda: spegnerlo azzittisce l'add-on senza cambiare una sola impostazione, e un clic sinistro sul pulsante della minimappa fa lo stesso da qualunque punto."
+	"Un unico interruttore per ogni avviso di ogni scheda: spegnerlo azzittisce l'add-on senza cambiare una sola impostazione, e un clic col pulsante sinistro sul pulsante della minimappa fa lo stesso da qualunque punto."
 L["KILL_SWITCH_ENABLE"] = "Attiva Control Freak"
 L["KILL_SWITCH_ENABLE_DESC"] = "Attiva o disattiva tutti gli avvisi di Control Freak."
 
@@ -105,10 +105,10 @@ L["SCOPE_ROLE_HEALER"] = "Come guaritore"
 L["SCOPE_ROLE_TANK_HEALER"] = "Come difensore o guaritore"
 L["SCOPE_ROLE_ALWAYS"] = "Sempre"
 L["SCOPE_ROLE_DESC"] =
-	"Il ruolo che devi ricoprire perché questa funzione dica qualcosa. Conti come difensore se sei il difensore principale dell'incursione o hai selezionato il ruolo di difensore nella Ricerca gruppi, e come guaritore solo se hai selezionato il ruolo di guaritore, perché per chi cura non esiste un incarico d'incursione. Sempre mette da parte la domanda e scatta qualunque ruolo tu abbia."
+	"Il ruolo che devi ricoprire perché questa funzione dica qualcosa. Conti come difensore se in un'incursione sei incaricato come difensore principale, o se in un gruppo hai selezionato il ruolo di difensore nella Ricerca gruppi. In un'incursione il ruolo di difensore non conta nulla. Conti come guaritore solo se hai selezionato il ruolo di guaritore nella Ricerca gruppi, perché per chi cura non esiste un incarico d'incursione. \"Sempre\" mette da parte la domanda e scatta qualunque ruolo tu abbia."
 L["SCOPE_GROUP_HAS_TANK"] = "Quando il gruppo ha un difensore"
 L["SCOPE_GROUP_HAS_TANK_DESC"] =
-	"Scatta solo mentre qualcuno del tuo gruppo fa da difensore ed è ancora vivo. Un difensore a terra conta come nessun difensore, perché è proprio allora che chiunque altro tenga la minaccia sta dando una mano."
+	"Scatta solo mentre qualcuno del tuo gruppo fa da difensore ed è ancora vivo. In un'incursione questo significa un difensore principale incaricato, quindi per Control Freak un'incursione senza nessuno incaricato non ha difensori. Un difensore a terra conta come nessun difensore, perché è proprio allora che chiunque altro tenga la minaccia sta dando una mano."
 L["SCOPE_INSTANCE_ONLY"] = "Quando sei in un'istanza"
 L["SCOPE_INSTANCE_ONLY_DESC"] = "Scatta solo nelle spedizioni e nelle incursioni."
 
@@ -119,8 +119,8 @@ L["SCOPE_INSTANCE_ONLY_DESC"] = "Scatta solo nelle spedizioni e nelle incursioni
 --[[
     Every alert on every tab is drawn as the same block, so each one owns five
     strings: a HEADER naming the thing that happened; an ENABLE reading "Enable
-    Notifications for <that thing> On" -- the switch turns the telling on, not
-    the event, and the target dropdown beside it finishes the sentence, so the
+    Alerts for <that thing> On" -- the switch turns the telling on, not the
+    event, and the target dropdown beside it finishes the sentence, so the
     string ENDS on the preposition (a section with no target drops the word); a
     DESC of one or two sentences; and a MINE and an OTHERS naming the two rows.
     ns.AddWhoseAlertSection in Options-Alert-Section.lua is where that shape
@@ -144,9 +144,9 @@ L["SOUND_NONE"] = "Nessuno"
     TAUNTS_SUCCESS_MINE below -- because "My" and "Others'" agree with the noun
     in some languages and a shared "%s" template could not.
 
-    TRANSLATORS: ALERT_AGAINST_DESC quotes one rung by name; that wording must
-    match your TARGET_RUNG_ELITE_0, or the tooltip explains a choice the player
-    cannot find in the list. The four rungs are a threshold, widest first: each
+    TRANSLATORS: ALERT_AGAINST_DESC quotes one rung and one row by name; that
+    wording must match your TARGET_RUNG_ELITE_0 and ALERT_MARKED_ALWAYS, or the
+    tooltip explains a choice the player cannot find. The four rungs are a threshold, widest first: each
     one counts itself and the ones after it, which is why every rung that
     includes bosses says so. Keep that in your translations -- a rung reading
     only "Elites" beside a separate "Bosses" reads as two disjoint sets.
@@ -165,14 +165,14 @@ L["ALERT_OUTPUT_ANNOUNCE"] = "Annuncia"
 L["ALERT_OUTPUT_DESC"] =
 	"Dove va questa riga: in un posto solo, mai in entrambi. Mostra (solo a me) la scrive nella tua finestra e non costa niente a nessuno. Annuncia invece la manda nella chat di gruppo o d'incursione, e raccontare a tutta l'incursione quello che fanno gli altri è il modo in cui un add-on si rende antipatico, quindi pensaci bene. Annuncia resta in silenzio quando non sei in un gruppo, e nei campi di battaglia e nelle arene."
 L["ALERT_AGAINST_DESC"] =
-	'Quali nemici contano: ogni scelta include anche quelle che la seguono. I boss sono i nemici di livello teschio (??). Un boss di spedizione non ha un teschio suo, quindi conta come élite: "Élite del tuo livello+ e boss" è la scelta che lo tiene scartando la marmaglia di livello inferiore che lo circonda. Un\'icona del bersaglio prevale su tutto questo finché la riga qui sotto è spuntata.'
+	'Quali nemici contano: ogni scelta include anche quelle che la seguono. I boss sono i nemici di livello teschio (??). Un boss di spedizione non ha un teschio suo, quindi conta come élite: "Élite del tuo livello+ e boss" è la scelta che lo tiene scartando la marmaglia di livello inferiore che lo circonda. Un\'icona del bersaglio prevale su tutto questo finché la casella "Avvisa sempre sui bersagli contrassegnati" è spuntata.'
 L["TARGET_RUNG_ALL"] = "Tutti i nemici"
 L["TARGET_RUNG_ELITE"] = "Élite e boss"
 L["TARGET_RUNG_ELITE_0"] = "Élite del tuo livello+ e boss"
 L["TARGET_RUNG_BOSS"] = "Boss"
 L["ALERT_MARKED_ALWAYS"] = "Avvisa sempre sui bersagli contrassegnati"
 L["ALERT_MARKED_ALWAYS_DESC"] =
-	"Un bersaglio contrassegnato con un'icona conta a prescindere da quello che dice il menu a tendina accanto all'interruttore: teschio, croce, una qualsiasi delle otto. Le icone sono il modo in cui un gruppo indica i nemici che contano, quindi un bersaglio che qualcuno ha contrassegnato non viene mai scartato per rango o livello sbagliato."
+	"Un bersaglio contrassegnato con un'icona (teschio, croce, una qualsiasi delle otto) conta a prescindere da quello che dice il menu a tendina accanto all'interruttore. Le icone sono il modo in cui un gruppo indica i nemici che contano, quindi un bersaglio che qualcuno ha contrassegnato non viene mai scartato per rango o livello sbagliato."
 
 --[[
     The cooldown dropdown's own entries, built by ns.BuildCooldownValues from a
@@ -375,7 +375,7 @@ L["TANK_DEATHS_ENABLE"] = "Attiva il monitoraggio delle morti del difensore"
 
 L["TANK_DEATHS_ALERT_HEADER"] = "Morti del difensore"
 L["TANK_DEATHS_ALERT_DESC"] =
-	"Conta il difensore principale dell'incursione e chiunque abbia selezionato il ruolo di difensore nella Ricerca gruppi, te compreso. Sono gli unici due modi in cui il gioco indica chi fa da difensore, quindi un difensore senza nessuno dei due muore senza essere segnalato."
+	"In un'incursione conta solo i giocatori incaricati come difensore principale, te compreso, e lì un ruolo della Ricerca gruppi non conta nulla. In un gruppo conta chiunque abbia selezionato il ruolo di difensore nella Ricerca gruppi. Un difensore senza nessuno dei due muore senza essere segnalato."
 L["TANK_DEATHS_ALERT_ENABLE"] = "Segnala le morti del difensore"
 L["TANK_DEATHS_ALERT_MINE"] = "La mia morte"
 L["TANK_DEATHS_ALERT_MINE_DESC"] =
@@ -415,13 +415,12 @@ L["BAD_PRIESTS_WHISPER"] = "Sussurra all'incantatore"
 L["BAD_PRIESTS_WHISPER_DESC"] =
 	"Manda a chi ha lanciato lo scudo un messaggio che spiega perché è controproducente. Ne parte uno solo anche quando più persone nel tuo gruppo usano Control Freak."
 L["BAD_PRIESTS_COOLDOWN_DESC"] =
-	"Per quanto tempo lo stesso incantatore non viene più segnalato dopo aver fatto scattare un avviso di scudo. Vale per il messaggio, il suono, l'annuncio e il sussurro, perché un guaritore che lancia lo scudo appena è pronto non deve riempirti la finestra."
+	"Per quanto tempo lo stesso incantatore non viene più segnalato dopo aver fatto scattare un avviso di scudo. Vale per la riga mostrata, il suono, l'annuncio e il sussurro, perché un guaritore che lancia lo scudo appena è pronto non deve riempirti la finestra."
 
 --------------------------------------------------------------------------------
 -- Bad Pets
 --------------------------------------------------------------------------------
 
--- Doubles as the mini-map button's Bad Pets line, so the two cannot differ.
 L["BAD_PETS_SUMMARY"] = "Famigli di cacciatori e stregoni con abilità di minaccia lasciate in lancio automatico."
 L["BAD_PETS_ENABLE"] = "Attiva il monitoraggio dei famigli cattivi"
 
@@ -435,7 +434,7 @@ L["BAD_PETS_WHISPER_ENABLE"] = "Sussurra al padrone del famiglio"
 L["BAD_PETS_WHISPER_ENABLE_DESC"] =
 	"Manda al padrone del famiglio un messaggio che spiega come disattivare il lancio automatico. Ne parte uno solo anche quando più persone nel tuo gruppo usano Control Freak."
 L["BAD_PETS_COOLDOWN_DESC"] =
-	"Per quanto tempo lo stesso famiglio non viene più segnalato dopo aver fatto scattare un avviso. Vale per il messaggio, il suono, l'annuncio e il sussurro, così un famiglio con il lancio automatico attivo non ti riempie la finestra e il suo padrone non riceve un sussurro ogni pochi secondi."
+	"Per quanto tempo lo stesso famiglio non viene più segnalato dopo aver fatto scattare un avviso. Vale per la riga mostrata, il suono, l'annuncio e il sussurro, così un famiglio con il lancio automatico attivo non ti riempie la finestra e il suo padrone non riceve un sussurro ogni pochi secondi."
 
 L["BAD_PETS_ABILITIES_HEADER"] = "Abilità dei famigli cattivi"
 
@@ -444,17 +443,25 @@ L["BAD_PETS_ABILITIES_HEADER"] = "Abilità dei famigli cattivi"
 --------------------------------------------------------------------------------
 
 --[[
-    No summary line: the Tanking Tools tab opens on its enable, because the tab is
-    a collection of unrelated warnings rather than one idea a sentence can cover.
-    Each section introduces itself instead.
+    No summary line on the tab: Tanking Tools opens on its enable, because the
+    tab is a collection of unrelated warnings rather than one idea a sentence
+    can cover. Each section introduces itself instead.
+
+    The mini-map tooltip carries a short one anyway, because the button's
+    Right-Click toggles this tab and the tooltip has to say what it is turning
+    on. TRANSLATORS: it lists the four section headers below in your own words
+    for them; keep it to two lines in the tooltip.
 ]]
 L["TANKING_TOOLS_ENABLE"] = "Attiva gli strumenti di difesa"
+L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "Aperture a vuoto, penalità all'armatura, parate ed esplosioni gelide."
 
 L["TANKING_TOOLS_COLD_OPENER_HEADER"] = "Aperture a vuoto"
 L["TANKING_TOOLS_COLD_OPENER_DESC"] =
 	"Segnala i tuoi attacchi d'apertura che non sono andati a segno: un colpo mancato, una schivata, una parata, un blocco, una resistenza o un'immunità nei primi secondi di uno scontro. Minaccia mai generata, proprio nel momento in cui conta di più."
 L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "Segnala le aperture a vuoto contro"
 L["TANKING_TOOLS_COLD_OPENER_MINE"] = "Le mie aperture a vuoto"
+L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] =
+	"Segnala le tue abilità d'apertura che non sono andate a segno. Il menu a tendina accanto indica dove va la riga."
 -- The caption before the window dropdown: "Within [10 Seconds of Fight]".
 L["TANKING_TOOLS_COLD_OPENER_WITHIN"] = "Entro i primi"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "%d secondi di scontro"
@@ -481,19 +488,26 @@ L["TANKING_TOOLS_PARRY_DESC"] =
 	"Chi si fa parare un colpo da un nemico che non sta tenendo gli sta davanti. Ogni parata accelera il colpo successivo di quel nemico contro chi lo sta tenendo."
 L["TANKING_TOOLS_PARRY_ENABLE"] = "Segnala le parate contro"
 L["TANKING_TOOLS_PARRY_MINE"] = "Le mie parate"
+L["TANKING_TOOLS_PARRY_MINE_DESC"] =
+	"Segnala un nemico che para i tuoi attacchi. Il menu a tendina accanto indica dove va la riga."
 L["TANKING_TOOLS_PARRY_OTHERS"] = "Parate degli altri"
-L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "Ignora gli altri difensori"
+L["TANKING_TOOLS_PARRY_OTHERS_DESC"] =
+	"Segnala un nemico che para gli attacchi di chiunque altro nel tuo gruppo. Il menu a tendina accanto indica dove va la riga."
+L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "Ignora i difensori"
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"] =
-	"Resta in silenzio quando chi si fa parare è un difensore: il difensore principale dell'incursione o qualcuno con il ruolo di difensore. Un secondo difensore sta davanti al boss per uno scambio di provocazione, e non è un errore su cui mandargli un sussurro. Le tue parate vengono comunque segnalate."
+	"Resta in silenzio quando chi si fa parare è un difensore: incaricato come difensore principale in un'incursione, o con il ruolo di difensore della Ricerca gruppi in un gruppo. Un secondo difensore sta davanti al boss per uno scambio di provocazione, e non è un errore su cui mandargli un sussurro. Le tue parate vengono comunque segnalate."
+L["TANKING_TOOLS_PARRY_IGNORE_PETS"] = "Ignora i famigli"
+L["TANKING_TOOLS_PARRY_IGNORE_PETS_DESC"] =
+	"Resta in silenzio quando l'attacco parato viene da un famiglio, il tuo compreso. Un famiglio sta dove il suo padrone l'ha mandato, e una riga che nomina il famiglio non dà niente da fare a nessuno del gruppo. A un famiglio non viene mai mandato un sussurro, in ogni caso."
 L["TANKING_TOOLS_PARRY_WHISPER"] = "Sussurra al colpevole"
 L["TANKING_TOOLS_PARRY_WHISPER_DESC"] =
 	"Manda al colpevole un messaggio che gli chiede di spostarsi dietro al nemico. Ne parte uno solo anche quando più persone nel tuo gruppo usano Control Freak."
 L["TANKING_TOOLS_PARRY_COOLDOWN_DESC"] =
-	"Per quanto tempo lo stesso colpevole non viene più segnalato dopo aver fatto scattare un avviso di parata. Vale per il messaggio, il suono, l'annuncio e il sussurro, perché a chi non si è ancora spostato non serve sentirselo dire a ogni colpo."
+	"Per quanto tempo lo stesso colpevole non viene più segnalato dopo aver fatto scattare un avviso di parata. Vale per la riga mostrata, il suono, l'annuncio e il sussurro, perché a chi non si è ancora spostato non serve sentirselo dire a ogni colpo."
 
 L["TANKING_TOOLS_NOVA_HEADER"] = "Esplosioni gelide"
 L["TANKING_TOOLS_NOVA_DESC"] =
-	"Segnala un'Esplosione Gelida, che lascia i nemici sparsi fuori dalla portata del difensore."
+	"Segnala un'Esplosione Gelida, che blocca i nemici sul posto, fuori dalla portata del difensore."
 L["TANKING_TOOLS_NOVA_ENABLE"] = "Segnala le esplosioni gelide"
 L["TANKING_TOOLS_NOVA_MINE"] = "Le mie esplosioni gelide"
 L["TANKING_TOOLS_NOVA_OTHERS"] = "Esplosioni gelide degli altri"
@@ -608,8 +622,8 @@ L["DISPEL_POISON"] = "Veleno"
     the client rather than from this file, and it has to read as the subject of
     "Down!" in your language, so word the line around that order.
 ]]
-L["TANK_DEATHS_TANK_LINE"] = "Difensore a terra! %s è morto."
-L["TANK_DEATHS_CLASS_LINE"] = "%s a terra! %s è morto."
+L["TANK_DEATHS_TANK_LINE"] = "Difensore a terra! %s muore."
+L["TANK_DEATHS_CLASS_LINE"] = "%s a terra! %s muore."
 
 --[[
     Kept short on purpose: they render with a real spell link and two real names
@@ -627,16 +641,16 @@ L["SHIELD_WHISPER"] =
 
 L["BAD_PET"] = "Famiglio cattivo! Il famiglio di %s, %s, ha usato %s su %s."
 L["BAD_PET_AOE"] = "Famiglio cattivo! Il famiglio di %s, %s, ha usato %s."
-L["BAD_PET_OWN"] = "Famiglio cattivo! Il tuo famiglio %s ha usato %s su %s."
-L["BAD_PET_OWN_AOE"] = "Famiglio cattivo! Il tuo famiglio %s ha usato %s."
 L["BAD_PET_UNKNOWN_OWNER"] = "Famiglio cattivo! %s ha usato %s su %s."
 L["BAD_PET_UNKNOWN_OWNER_AOE"] = "Famiglio cattivo! %s ha usato %s."
 --[[
-    Kept short on purpose. It renders with a spell link and two names inside a 255
-    byte chat limit, and the widest locale runs close to twice the English.
+    Kept short on purpose. They render with a spell link and up to two names inside
+    a 255 byte chat limit, and the widest locale runs close to twice the English.
 ]]
 L["BAD_PET_WHISPER"] =
 	"Il tuo famiglio %s ha usato %s su %s. Clicca col destro sull'abilità per disattivarne il lancio automatico."
+L["BAD_PET_WHISPER_AOE"] =
+	"Il tuo famiglio %s ha usato %s. Clicca col destro sull'abilità per disattivarne il lancio automatico."
 
 L["COLD_OPENER_MISS"] = "Attenzione! %s ha usato %s, ma ha mancato %s."
 L["COLD_OPENER_DODGE"] = "Attenzione! %s ha usato %s, ma %s ha schivato."
@@ -645,7 +659,7 @@ L["COLD_OPENER_BLOCK"] = "Attenzione! %s ha usato %s, ma %s ha bloccato."
 L["COLD_OPENER_IMMUNE"] = "Attenzione! %s ha usato %s, ma %s è immune."
 L["COLD_OPENER_RESIST"] = "Attenzione! %s ha usato %s, ma %s ha resistito."
 
-L["ARMOR_REPORT"] = "Armatura abbattuta! %s è vulnerabile dopo %s secondi."
+L["ARMOR_REPORT"] = "Armatura abbattuta! %s: vulnerabile in %s secondi."
 
 L["PARRY_WARNING"] = "Celerità da parata! %s sta davanti a %s."
 L["PARRY_WHISPER"] =

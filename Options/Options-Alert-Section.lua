@@ -10,7 +10,7 @@ local L = ns.L
 
         One or two sentences on what it is and why it is worth having.
 
-        [ ] Enable Notifications for Name of the alert On  [ Everything v]
+        [ ] Enable Alerts for Name of the alert On  [ Everything v]
             [ ] My Name of the alert            [ Print (Self Only) v]
             [ ] Others' Name of the alert       [ Print (Self Only) v]
             [ ] Always Alert on Marked Targets
@@ -522,7 +522,7 @@ end
 
 --[[
     The Against ladder, drawn beside the section's own switch rather than on a
-    row of its own, so the two read as one sentence: "Enable Notifications for
+    row of its own, so the two read as one sentence: "Enable Alerts for
     Successful Taunts On [Everything]". It is a choice, not a switch, and it
     borrows the section's switch rather than carrying a box of its own. It goes
     in the control slot AddSectionFrame already offers, which narrows the switch
@@ -550,7 +550,7 @@ end
     One alert's worth of controls: the frame above, with the target ladder in
     the slot beside the switch, then the rows under it
 
-        [ ] Enable Notifications for <thing> On       [ Everything v]
+        [ ] Enable Alerts for <thing> On              [ Everything v]
             [ ] My <thing>              [ Print (Self Only)  v]
             [ ] Others' <thing>         [ Print (Self Only)  v]
                 <caption>               [ ...                v]   (captionRow)
@@ -567,7 +567,7 @@ end
 
     options:
       headerKey  the block's own gold header, naming the alert
-      enableKey  the switch, "Enable Notifications for <thing> On" -- it ends
+      enableKey  the switch, "Enable Alerts for <thing> On" -- it ends
                  on the preposition the ladder completes; a noTarget section
                  drops the word
       descKey    one or two sentences between them
@@ -575,16 +575,18 @@ end
                  arguments, rendered once through ns:BuildAnnounceMessage
       mineKey    the caption of the player's own row, "My <thing>"
       mineDescKey
-                 optional. The tooltip of that row, for a section whose one row
-                 is not the player's own casts: Armor Debuffs reports the
-                 group's work, so "My" would be wrong and the row says what it is
+                 optional. The tooltip of that row, for a section whose row is
+                 not simply the player's own casts, pet included: Armor Debuffs
+                 reports the group's work, Cold Openers never counts a pet, and
+                 a parry is not a cast
       othersKey  the caption of the others' row, "Others' <thing>". Optional: a
                  section that only ever reports the player's own casts leaves
                  it out and draws one row
       othersDescKey
                  optional. The tooltip of that row, the pair to mineDescKey,
                  for a section whose rows are whose but not about a cast: Tank
-                 Deaths passes both, because what either row reports is a death
+                 Deaths and Parries pass both, because what their rows report is
+                 a death or a parry
       captionRow optional. { labelKey, control } for a parameter of the
                  detection -- Cold Openers' window -- drawn as a caption and a
                  dropdown under the whose rows, through ns.OptionsSubCaptionRow
@@ -694,7 +696,7 @@ function ns.AddWhoseAlertSection(args, prefix, getSettings, order, hidden, optio
 
 	--[[
 	    Extras before the sound: what a section adds under the indent changes
-	    what counts -- Include Faerie Fire, Ignore Other Tanks -- and
+	    what counts -- Include Faerie Fire, Ignore Tanks -- and
 	    belongs with the filters above it, not after the one row that is about
 	    noise. Extras run from +11; the sound sits at +14, the sample at +15.
 	]]

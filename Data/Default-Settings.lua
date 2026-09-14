@@ -189,9 +189,11 @@ ns.DATABASE_DEFAULTS = {
 			    subject is the player: a tank who has been feared and a healer who
 			    has been silenced are the two people who need to say so, and a
 			    rogue who has been feared is not news. Either seat, since nobody is
-			    in both. A player with no group finder role and no Main Tank
-			    assignment is in neither and hears nothing, because those are the
-			    only signals there are -- they can pick Always if they want it
+			    in both. A player in neither seat hears nothing: in a raid that is
+			    anybody not assigned Main Tank and not holding the group finder's
+			    Healer role, since the Tank role is ignored there
+			    (Features/Utilities.lua says why), and in a party anybody with no
+			    group finder role at all. They can pick Always if they want it
 			    anyway.
 
 			    Do NOT re-add a groupHasTank default here. This tab does not draw
@@ -226,12 +228,12 @@ ns.DATABASE_DEFAULTS = {
 			    that DID it is named in the line, but that comes from the combat
 			    log rather than from anything a filter could read.
 
-			    Points at Failure 2, the sound Tank Deaths plays, so ticking Play
-			    Sound does something immediately, and ships silent: a tank who has
-			    just been feared is watching their character run, and a sound
-			    explaining it is news the player already has.
+			    Points at Negative Beeps, so ticking Play Sound does something
+			    immediately, and ships silent: a tank who has just been feared is
+			    watching their character run, and a sound explaining it is news the
+			    player already has.
 			]]
-			alert = WhoseAlertDefaults("Control Freak: Failure 2", {
+			alert = WhoseAlertDefaults("Control Freak: Negative Beeps", {
 				short = { enabled = true, output = "PRINT" },
 				long = { enabled = true, output = "ANNOUNCE" },
 				sound = false,
@@ -244,23 +246,20 @@ ns.DATABASE_DEFAULTS = {
 		    no mob, so noTarget. The class log beside it is a list rather than a
 		    section and carries no row, no destination and no sound.
 
-		    The player's own death ANNOUNCES, for the reason Failed Taunts' My
-		    row does: the tank looking at a release button is the one person in
-		    the group who does not need telling, and everybody who has to pick
-		    the mob up does. Somebody else's tank death prints locally, which
-		    also means a fresh install has exactly one client announcing any
-		    given death -- the dead tank's own. Every Control Freak in the raid
-		    saying it at once would be a wall of the same sentence.
+		    Both rows ship PRINTING, so a fresh install keeps tank deaths out of
+		    group chat: every Control Freak in the group sees the line in its own
+		    window, and a player who wants it announced changes one dropdown. My
+		    Death printing is a recorded maintainer decision, so do not switch it
+		    back to Announce without asking.
 
 		    All nine class rows ship OFF, and that is the same judgement from the
 		    other end: the class list is for somebody watching one particular
 		    class, so every row is a deliberate choice. Nine of them on by default
 		    would be a running commentary on every wipe.
 
-		    Its sound ships ON, playing Failure 2 rather than the Tank Death file
-		    named for this tab. That does not undo the announce rule above: a
-		    sound stays on the client that plays it, so the group's chat still
-		    carries one line per death.
+		    Its sound ships ON, playing Game Over rather than the Tank Death file
+		    named for this tab. A sound stays on the client that plays it, so it
+		    makes no noise in anybody else's game whatever the rows say.
 
 		    The role ladder stays on ALWAYS. Which seat the DEAD player was in is
 		    what the tab is about; which seat the reader is in is a separate
@@ -268,9 +267,7 @@ ns.DATABASE_DEFAULTS = {
 		    reason as the tank's co-tank.
 		]]
 		tankDeaths = FeatureDefaults("tankDeaths", {
-			alert = WhoseAlertDefaults("Control Freak: Failure 2", {
-				mine = { enabled = true, output = "ANNOUNCE" },
-			}, true),
+			alert = WhoseAlertDefaults("Control Freak: Game Over", nil, true),
 			classes = DeathClassDefaults(),
 		}),
 		badPriests = FeatureDefaults("badPriests", {
@@ -288,9 +285,8 @@ ns.DATABASE_DEFAULTS = {
 			    business, and a mage who installed a taunt add-on should not be
 			    told about the priest's healing.
 
-			    Its own feature and its own tab as of the Bad tabs split, so the
-			    scope questions above it are this alert's rather than borrowed
-			    from a tab full of unrelated warnings.
+			    Its own feature and its own tab, so the scope questions above it
+			    are this alert's own.
 
 			    The whisper ships OFF. Switched on, it goes to whoever cast the
 			    shield, and with selfOnly ticked that is only ever somebody who
@@ -409,13 +405,17 @@ ns.DATABASE_DEFAULTS = {
 			    the boss is the point of the section, and a player who switched the
 			    tab on has already opted in to it. It only goes where the warning
 			    itself would -- past the section's switch, its target filters and
-			    ignoreTanks below -- never to the player or a pet, and once per
+			    the ignore rows below -- never to the player or a pet, and once per
 			    group however many people in it run Control Freak. The cooldown
 			    covers it along with the print, so a culprit who has not moved yet
 			    is not whispered every swing.
 
 			    ignoreTanks ships ON: an off-tank in front of the boss is there for a
 			    taunt swap, and a warning about it is wrong, not merely noisy.
+
+			    ignorePets ships ON: a pet in front of the boss is where its owner
+			    sent it, and a line naming the pet gives nobody in the group anything
+			    to do.
 
 			    Narrowed to BOSS: parry haste only matters on something that hits
 			    hard enough for the extra swing to count.
@@ -425,6 +425,7 @@ ns.DATABASE_DEFAULTS = {
 				whisper = true,
 				whisperCooldown = ns.PARRY_COOLDOWN_DEFAULT,
 				ignoreTanks = true,
+				ignorePets = true,
 			}),
 			-- A frost nova is a ring, not a target: drawn like AOE Taunts.
 			nova = WhoseAlertDefaults("Control Freak: Nova", nil, true),

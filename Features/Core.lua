@@ -78,6 +78,10 @@ function ns:ApplyProfile()
 	end
 end
 
+--------------------------------------------------------------------------------
+-- PLAYER_LOGIN
+--------------------------------------------------------------------------------
+
 function ns:PLAYER_LOGIN()
 	ns.db = LibStub("AceDB-3.0"):New("ControlFreakDB", ns.DATABASE_DEFAULTS, true)
 
@@ -99,7 +103,7 @@ function ns:PLAYER_LOGIN()
 end
 
 --------------------------------------------------------------------------------
--- World State
+-- PLAYER_ENTERING_WORLD, ZONE_CHANGED_NEW_AREA
 --------------------------------------------------------------------------------
 
 function ns:PLAYER_ENTERING_WORLD()

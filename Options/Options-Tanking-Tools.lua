@@ -44,6 +44,7 @@ function ns.BuildTankingToolsOptions()
 		enableKey = "TANKING_TOOLS_COLD_OPENER_ENABLE",
 		descKey = "TANKING_TOOLS_COLD_OPENER_DESC",
 		mineKey = "TANKING_TOOLS_COLD_OPENER_MINE",
+		mineDescKey = "TANKING_TOOLS_COLD_OPENER_MINE_DESC",
 		-- BLOCK of the six outcomes: the one a tank meets most often on a pull.
 		sample = {
 			key = "COLD_OPENER_BLOCK",
@@ -124,28 +125,38 @@ function ns.BuildTankingToolsOptions()
 		enableKey = "TANKING_TOOLS_PARRY_ENABLE",
 		descKey = "TANKING_TOOLS_PARRY_DESC",
 		mineKey = "TANKING_TOOLS_PARRY_MINE",
+		mineDescKey = "TANKING_TOOLS_PARRY_MINE_DESC",
 		othersKey = "TANKING_TOOLS_PARRY_OTHERS",
+		othersDescKey = "TANKING_TOOLS_PARRY_OTHERS_DESC",
 		sample = { key = "PARRY_WARNING", args = { ns.SAMPLE_OTHER, PARRY_BOSS } },
 		--[[
-		    Under the indent because it narrows who counts: an off-tank in front of
-		    the boss for a taunt swap is not a mistake to whisper about.
+		    Under the indent because both narrow who counts: an off-tank in front
+		    of the boss for a taunt swap is not a mistake to whisper about, and a
+		    pet in front of it is where its owner sent it, so the line would name
+		    somebody nobody can act on.
 		]]
 		extraRow = function(rowArgs, order, rowsHidden)
-			rowArgs.parryIgnoreTanks = ns.OptionsSubRow(order + 1, rowsHidden, {
-				ignoreTanks = {
-					type = "toggle",
-					name = ns.OptionsSubLabel(L["TANKING_TOOLS_PARRY_IGNORE_TANKS"]),
-					desc = L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"],
-					width = ns.OPTIONS_SUB_LABEL_WIDTH,
-					order = 1,
-					get = function()
-						return Section("parry")().ignoreTanks
-					end,
-					set = function(_, value)
-						Section("parry")().ignoreTanks = value
-					end,
-				},
-			})
+			local extras = {
+				{ key = "ignoreTanks", label = "TANKING_TOOLS_PARRY_IGNORE_TANKS" },
+				{ key = "ignorePets", label = "TANKING_TOOLS_PARRY_IGNORE_PETS" },
+			}
+			for index, extra in ipairs(extras) do
+				rowArgs["parry" .. extra.key] = ns.OptionsSubRow(order + index, rowsHidden, {
+					[extra.key] = {
+						type = "toggle",
+						name = ns.OptionsSubLabel(L[extra.label]),
+						desc = L[extra.label .. "_DESC"],
+						width = ns.OPTIONS_SUB_LABEL_WIDTH,
+						order = 1,
+						get = function()
+							return Section("parry")()[extra.key]
+						end,
+						set = function(_, value)
+							Section("parry")()[extra.key] = value
+						end,
+					},
+				})
+			end
 		end,
 		--[[
 		    The whisper goes to the culprit rather than into the player's own window
@@ -202,7 +213,7 @@ function ns.BuildTankingToolsOptions()
 	    category a player might want to thin out -- a dozen taunts, half of which
 	    they do not care about. Here each warning IS one thing, and the section's own
 	    enable already says whether it fires: a list holding the single Frost Nova
-	    row was the Nova switch printed a second time.
+	    row would be the Nova switch printed a second time.
 	]]
 
 	return {

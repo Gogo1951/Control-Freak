@@ -23,9 +23,9 @@ function ns.BuildBadPetsOptions()
 
 	--[[
 	    The whose shape with the full block: a pet's growl lands on one mob, so the
-	    target ladder and the mark apply. The My row is the player's own pet, which
-	    the locale already has lines for (BAD_PET_OWN); the whisper below never goes
-	    to yourself, whatever that row says.
+	    target ladder and the mark apply. The My row is the player's own pet, named
+	    in the same line as anybody else's; the whisper below never goes to
+	    yourself, whatever that row says.
 	]]
 	ns.AddWhoseAlertSection(args, "alert", Section, 20, hidden, {
 		headerKey = "BAD_PETS_ALERT_HEADER",

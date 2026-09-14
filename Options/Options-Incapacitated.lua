@@ -18,12 +18,11 @@ for _, seconds in ipairs(ns.INCAPACITATED_LONG_THRESHOLDS) do
 end
 
 --[[
-    One alert, its own tab, sitting between Fears and Tank Deaths. It was a
-    fifth Tanking Tool first, and what moved it out is that the tab's scope
-    questions are not its: the Tanking Tools gate is "is anybody tanking", asked
-    once for four warnings that are all about a mob, while this one is about the
-    PLAYER and wants to ask whether the player is the tank. A section cannot
-    answer a scope question of its own -- only a feature can -- so it became one.
+    One alert, its own tab, sitting between Fears and Tank Deaths. It is a
+    feature rather than a Tanking Tools section because its scope question is
+    about the PLAYER's own seat, where the Tanking Tools gate asks "is anybody
+    tanking" for four warnings that are all about a mob, and a section cannot
+    answer a scope question of its own -- only a feature can.
 
     It bends the alert block three ways, and the middle one is the interesting
     one:

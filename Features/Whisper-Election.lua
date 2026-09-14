@@ -49,7 +49,9 @@ end
 --[[
     kind      a bare word naming the feature, so two features never collide
     id        the guid the whisper is about, which is what the election is keyed on
-    target    who receives it, as a full "Name-Realm"
+    target    who receives it, as the caller has the name: the combat log's, or
+              GetUnitName(unit, true) in Bad Pets, carrying a realm only for a
+              player from another realm
     formatKey the locale line to send
     args      that line's arguments, already rendered to plain strings
 ]]

@@ -27,8 +27,8 @@ function ns.BuildFearsOptions()
 		othersKey = "FEARS_ALERT_OTHERS",
 		noTarget = true,
 		sample = {
-			key = "FEAR_SUCCESS",
-			args = { ns.SAMPLE_OTHER, ns.SampleSpell(8122, "Psychic Scream"), ns.SampleBoss() },
+			key = "FEAR_AOE",
+			args = { ns.SAMPLE_OTHER, ns.SampleSpell(8122, "Psychic Scream") },
 		},
 	})
 

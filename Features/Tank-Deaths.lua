@@ -12,8 +12,7 @@ local _, ns = ...
     So the tab is the tank death, plus a LOG beside it: nine class rows, no
     sounds, for the player who wants to watch one class go down and nothing
     else. The distinction is the whole design, and it is why the class rows have
-    no sound picker -- nine sounds on a wipe is a drum solo, and the maintainer
-    said so.
+    no sound picker -- nine sounds on a wipe is a drum solo.
 
     The tank death is an alert like any other, so it goes through ns:Alert and
     its My and Others' rows decide print or announce. The log goes through
@@ -36,9 +35,10 @@ end
 
 --[[
     Whether the dead player was the tank, which is the one seat this tab reports.
-    Main Tank first for the same reason Features/Incapacitated.lua picks tank
-    first: it is an assignment somebody made on purpose, and it outranks a role
-    tag left set from a dungeon three days ago. ns.IsUnitTank asks both.
+    ns.IsUnitTank decides, and in a raid that means the Main Tank assignment
+    alone: a healer still wearing a Tank tag from a dungeon queue would otherwise
+    be reported as "Tank Down!", and Features/Utilities.lua says why the tag
+    counts only in a party.
 ]]
 local function IsTank(unit)
 	return unit and ns.IsUnitTank(unit) or false
@@ -50,16 +50,21 @@ end
     arrives late and not for everybody, and the raid frames are a picture rather
     than an event.
 
-    The dead player is found by walking the group for their GUID, which does
+    A mob or a pet dying is most of what UNIT_DIED carries in a fight, so a GUID
+    that is not a player's is dropped on a string test before the group walk.
+    A player is then found by walking the group for their GUID, which does
     double duty: it establishes they were in the group at all, and it hands over
-    the unit token the seat test needs. A mob or a pet dying answers nil and
-    stops here, which is most of what UNIT_DIED carries in a fight.
+    the unit token the seat test needs.
 
     destFlags are the dead player's affiliation. A death has no caster, and
     ns:Alert reads these where it would read a caster's: to check the line is
     about somebody in the group.
 ]]
 function ns:HandleUnitDeath(destGUID, destName, destFlags)
+	if not ns.IsPlayerGUID(destGUID) then
+		return
+	end
+
 	local profile = ns.db and ns.db.profile
 	if not profile or not profile.enabled then
 		return
@@ -117,8 +122,8 @@ function ns:HandleUnitDeath(destGUID, destName, destFlags)
 	--[[
 	    Your own death never reaches the log. You are looking at a release
 	    button, and a list kept for watching other people go down has nothing to
-	    tell you about yourself. The one place your own death goes is the My row
-	    above, and only because the people it is for are everybody else.
+	    tell you about yourself. Your own death reaches only the My row above,
+	    and only while you are tanking.
 	]]
 	if isMine then
 		return

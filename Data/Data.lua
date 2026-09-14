@@ -76,12 +76,10 @@ ns.OPTIONS_REGISTRY = {
     -- both on reading as "narrowed twice" while it actually widens, and both
     off leaving a question about seats with no seat named.
 
-    ALWAYS is the widest rung and the one every tab but two ships on. It is what
-    an unticked "When Playing a Tank" box used to mean, said out loud: the
-    question is still there, and the player can see the answer without having to
-    work out what an empty box implies. It is also why the ladder can be the same
-    four rungs everywhere -- a tab that does not care about the seat picks the
-    rung that says so, rather than the panel dropping the control.
+    ALWAYS is the widest rung and the one every tab but two ships on. It is why
+    the ladder can be the same four rungs everywhere -- a tab that does not care
+    about the seat picks the rung that says so, rather than the panel dropping
+    the control.
 
     Narrowest first, which is the opposite of ns.TARGET_RUNGS. The target ladder
     reads as a widening scale of enemies; this one reads as a list of seats with
@@ -142,12 +140,12 @@ ns.FEATURE_KEYS =
 
 --[[
     A label-plus-control row. The label half is wide because it carries the longest
-    string in the add-on -- "Enable Notifications for Successful Interrupts On",
-    which sits beside the target ladder and fits with little to spare. A label
-    half any narrower clips that string with an ellipsis, and widening it
-    pushes every paired dropdown right, which is the trade: a little dead space
-    beside a short label like "Whisper Pet Owner", in exchange for no clipped
-    text anywhere.
+    labels in the add-on, the alert switches ("Enable Alerts for Successful
+    Interrupts On"), which sit beside the target ladder and in the longer
+    translations fit with little to spare. A label half any narrower clips them
+    with an ellipsis, and widening it pushes every paired dropdown right, which
+    is the trade: a little dead space beside a short label like "Whisper the Pet
+    Owner", in exchange for no clipped text anywhere.
 
     The two must still total OPTIONS_ROW_WIDTH, and that has to stay inside the
     panel: a pair that overflows does not clip, it wraps the control onto its own
@@ -560,8 +558,14 @@ ns.SOUND_NONE = "None"
     The game's own Taunt icon (warrior Taunt, spell 355). The mini-map button
     reads as a taunt at a glance, which the add-on art does not. The TOC's
     IconTexture is separate on purpose: that one is the add-on list branding.
+
+    The coords trim the frame the game draws into its stock icons. LibDBIcon
+    only insets 5% on its own, which clears the thin frame of an add-on's own
+    art but leaves this one showing inside the button's ring, so the icon read
+    as undersized next to other buttons.
 ]]
 ns.MINIMAP_ICON = "Interface\\Icons\\Spell_Nature_Reincarnation"
+ns.MINIMAP_ICON_COORDS = { 0.05, 0.95, 0.05, 0.95 }
 
 --[[
     Raid target icons, indexed by the raid target index the combat log reports.
@@ -630,9 +634,7 @@ ns.URL_WAGO = "https://addons.wago.io/addons/control-freak"
     these -- so nothing here limits the choice.
 
     A sound can also ship as a SPARE, made for no alert in particular, and that
-    is the one case where the name says what it sounds like. Failure is the
-    original Taunt Resist sound, kept on after that alert got a new one so nobody
-    who liked it loses it; Magic arrived the same way, as the original Nova sound.
+    is the one case where the name says what it sounds like.
 
     Which sound an alert PLAYS out of the box is Data/Default-Settings.lua's
     call, not the name's, and the two can part ways: an alert can default to a
@@ -674,34 +676,34 @@ ns.SOUNDS = {
 	--[[
 	    Spares that became defaults, keeping the names they arrived under: a
 	    name here is a promise, still what the picker shows after the sound has
-	    a job. Failure 4 is Failed Taunts', Failure 2 is Tank Deaths' (and
-	    Incapacitated's picker points at it too, though that alert's sound ships
-	    off), and Magic 2 is Bad Shields'.
+	    a job. Failure 4 is Failed Taunts', Magic 2 is Bad Shields', and Game
+	    Over is Tank Deaths'.
 	]]
 	{ "Control Freak: Failure 4", "cf-failure-4.ogg" },
-	{ "Control Freak: Failure 2", "cf-failure-2.ogg" },
 	{ "Control Freak: Magic 2", "cf-magic-2.ogg" },
+	{ "Control Freak: Game Over", "cf-game-over.ogg" },
 	--[[
 	    Nothing from here down plays out of the box. All of it is in the picker,
 	    and it is the bank an alert draws from when it gets a sound of its own --
 	    until then, what a player reaches for to tell two alerts apart by ear.
 
 	    Taunt Resist and Tank Death were made for Failed Taunts and Tank Deaths,
-	    which play spares above instead. Magic was Bad Shields' default before
-	    Magic 2, and a spare before that. All three keep their names, because a
-	    profile that picked one by hand stores it, and a rename would leave that
-	    alert silent behind a blank picker.
+	    which play spares above instead, and both keep their names: a profile
+	    that picked one by hand stores it, and a rename would leave that alert
+	    silent behind a blank picker.
 
-	    Failure is the original Taunt Resist sound, and Failure 2 to 4 are
-	    alternates for the same job.
+	    Failure, Failure 2 and Failure 3 are alternates for Failed Taunts, which
+	    plays Failure 4 above. Negative Beeps is what Incapacitated's picker
+	    points at, though that alert's sound ships off, so it plays nothing out
+	    of the box either.
 	]]
 	{ "Control Freak: Taunt Resist", "cf-taunt-resist.ogg" },
 	{ "Control Freak: Tank Death", "cf-tank-death.ogg" },
 	{ "Control Freak: Magic", "cf-magic.ogg" },
 	{ "Control Freak: Failure", "cf-failure.ogg" },
+	{ "Control Freak: Failure 2", "cf-failure-2.ogg" },
 	{ "Control Freak: Failure 3", "cf-failure-3.ogg" },
 	{ "Control Freak: Defeat", "cf-defeat.ogg" },
-	{ "Control Freak: Game Over", "cf-game-over.ogg" },
 	{ "Control Freak: Negative Beeps", "cf-negative-beeps.ogg" },
 	{ "Control Freak: Sad Trumpet", "cf-sad-trumpet.ogg" },
 }

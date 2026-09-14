@@ -231,9 +231,23 @@ end
 ns.UNIT_TOKENS = UNIT_TOKENS
 
 --[[
-    A unit counts as a tank two ways, because the game offers two: the raid's
-    Main Tank assignment, and the TANK role a player picks in the group finder.
-    Either one is the player saying "I am tanking this", so both count.
+    Who counts as a tank depends on the kind of group, because the game offers
+    two signals and only one of them was set for THIS group.
+
+    In a raid, only the Main Tank assignment counts. The raid leader set it in
+    the raid frames for this raid, and it is the one signal that means "this
+    person is tanking here". The group finder's TANK role is ignored in a raid
+    on purpose: it is a tag the player picked for a dungeon queue, it sticks to
+    the character until they change it, and a healer who last queued as a tank
+    walks into the raid still wearing it, so counting it would report that
+    healer's death as "Tank Down!". Not set up as a tank in the raid frames
+    means not a tank in a raid. So a raid where nobody is assigned Main Tank
+    has no tank as far as this add-on can tell, and every tab gated on one
+    stays quiet there until somebody assigns it.
+
+    In a party there is no Main Tank assignment, so the TANK role is the only
+    signal there is, and a player who picked it for this dungeon is saying "I
+    am tanking this".
 
     Main Assist is deliberately not one of them. It marks the kill-order lead,
     which is a different job.
@@ -248,6 +262,9 @@ function ns.IsUnitTank(unit)
 	if GetPartyAssignment("MAINTANK", unit) then
 		return true
 	end
+	if IsInRaid() then
+		return false
+	end
 	if HAS_ROLES and UnitGroupRolesAssigned(unit) == "TANK" then
 		return true
 	end
@@ -261,9 +278,10 @@ end
 --[[
     The healer half of the same question, and it is thinner than the tank half on
     purpose: there is no raid assignment for healing the way MAINTANK exists for
-    tanking, so the group finder's role is the only signal there is. A player who
-    never sets one is not a healer as far as this add-on can tell, so a tab
-    narrowed to healers stays quiet for them.
+    tanking, so the group finder's role is the only signal there is, and it
+    counts in a raid too, unlike the TANK role above, because there is nothing
+    better to read there. A player who never sets one is not a healer as far as
+    this add-on can tell, so a tab narrowed to healers stays quiet for them.
 ]]
 function ns.IsPlayerHealer()
 	return ns.IsUnitHealer("player")
@@ -326,8 +344,9 @@ function ns.ClassName(class)
 end
 
 --[[
-    Whether anybody is tanking for this group right now: a Main Tank assignment or
-    the group finder's TANK role, connected, and alive.
+    Whether anybody is tanking for this group right now: somebody ns.IsUnitTank
+    says is tanking (Main Tank in a raid, the group finder's TANK role in a
+    party), connected, and alive.
 
     Alive is the load-bearing word. A dead tank is the moment a pet holding a mob
     is doing the group a favor, so a feature gated on this has to go quiet then

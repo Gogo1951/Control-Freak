@@ -29,26 +29,29 @@ local function RefreshTooltip(anchor)
 
 	local profile = ns.db and ns.db.profile
 
-	tooltip:AddDoubleLine(GetColor("TITLE") .. L["ADDON_TITLE"] .. "|r", StateText(profile and profile.enabled))
+	tooltip:AddDoubleLine(GetColor("TITLE") .. L["KILL_SWITCH"] .. "|r", StateText(profile and profile.enabled))
 	tooltip:AddLine(GetColor("BODY") .. L["KILL_SWITCH_ENABLE_DESC"] .. "|r", 1, 1, 1, true)
 	tooltip:AddDoubleLine(GetColor("INFO") .. L["LEFT_CLICK"] .. "|r", GetColor("INFO") .. L["ACTION_TOGGLE"] .. "|r")
 
 	--[[
 	    The add-on's own switch unregisters the combat log outright, so with it off
-	    Bad Pets cannot fire whatever its own setting says. Showing the block would
-	    be advertising a toggle that changes nothing, so it goes with everything else.
+	    Tanking Tools cannot fire whatever its own setting says. Its block would
+	    then advertise a toggle that changes nothing, so it goes with everything
+	    else.
 
-	    Bad Pets is the only feature with a block and a binding, and it earns
-	    them by whispering pet owners out of the box: a tank may need to hush it
-	    mid-run. Bad Priests had both until 2026-09-12 and lost them because it
-	    ships with nothing that reaches anybody else -- its whisper off and its
-	    warning printing to the player's own window -- so a quick switch here had
-	    nothing to hush, and one feature toggle keeps the tooltip short.
+	    The tooltip lists only what a click on the button changes, so no other tab
+	    appears. Tanking Tools is the one tab with a block and a binding, and it
+	    earns them by shipping switched off as an opt-in: Right-Click is the way in
+	    and out mid-run without opening the panel. Its summary is the mini-map's
+	    own two-line one, since the tab itself has none.
 	]]
 	if profile and profile.enabled then
 		tooltip:AddLine(" ")
-		tooltip:AddDoubleLine(GetColor("TITLE") .. L["TAB_BAD_PETS"] .. "|r", StateText(profile.badPets.enabled))
-		tooltip:AddLine(GetColor("BODY") .. L["BAD_PETS_SUMMARY"] .. "|r", 1, 1, 1, true)
+		tooltip:AddDoubleLine(
+			GetColor("TITLE") .. L["TAB_TANKING_TOOLS"] .. "|r",
+			StateText(profile.tankingTools.enabled)
+		)
+		tooltip:AddLine(GetColor("BODY") .. L["TANKING_TOOLS_MINIMAP_SUMMARY"] .. "|r", 1, 1, 1, true)
 		tooltip:AddDoubleLine(
 			GetColor("INFO") .. L["RIGHT_CLICK"] .. "|r",
 			GetColor("INFO") .. L["ACTION_TOGGLE"] .. "|r"
@@ -70,6 +73,7 @@ ns.LDBObject = LibDataBroker:NewDataObject(ns.LOCALE_NAME, {
 	type = "launcher",
 	text = L["ADDON_TITLE"],
 	icon = ns.MINIMAP_ICON,
+	iconCoords = ns.MINIMAP_ICON_COORDS,
 
 	OnClick = function(self, button)
 		--[[
@@ -106,9 +110,7 @@ ns.LDBObject = LibDataBroker:NewDataObject(ns.LOCALE_NAME, {
 
 		    A shifted Left- or Right-Click is ignored rather than read as the plain
 		    click: the tooltip advertises three bindings, and a click that matches
-		    none of them does nothing. Shift + Left-Click used to toggle Bad
-		    Priests, so treating it as a plain Left-Click would hand anybody with
-		    that habit the add-on's own switch instead.
+		    none of them does nothing.
 		]]
 		if IsShiftKeyDown() then
 			return
@@ -118,7 +120,7 @@ ns.LDBObject = LibDataBroker:NewDataObject(ns.LOCALE_NAME, {
 
 		if button == "RightButton" then
 			if profile.enabled then
-				profile.badPets.enabled = not profile.badPets.enabled
+				profile.tankingTools.enabled = not profile.tankingTools.enabled
 				ns:ApplyProfile()
 				Refresh()
 			end

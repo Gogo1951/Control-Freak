@@ -14,9 +14,9 @@ local _, ns = ...
 
       class    the target has to be a rage tank at all. A priest shielding a
                paladin or a mage is nobody's problem.
-      tanking  ns.FindTankUnit, the same Main Tank assignment or group finder
-               TANK role the scope gates read. A feral druid in cat form is not
-               tanking and does not want telling.
+      tanking  ns.FindTankUnit, the same seat test the scope gates read: Main
+               Tank in a raid, the group finder's TANK role in a party. A feral
+               druid in cat form is not tanking and does not want telling.
       health   a shield on somebody about to die is the right call, so the
                warning goes quiet below the line the player picked.
 
