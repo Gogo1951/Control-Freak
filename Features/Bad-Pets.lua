@@ -85,14 +85,13 @@ function ns:HandleBadPets(
 	local spellPart = ns.SpellPart(spellId, spellName)
 	local targetPart = ns.TargetPart(destName, raidIconIndex)
 
+	--[[
+	    The player's own pet takes the same line as anybody's, naming the owner:
+	    the My row can announce, and a line addressing "your pet" would tell the
+	    whole group the pet is theirs.
+	]]
 	local formatKey, parts
-	if isMine then
-		if ability.isAoe then
-			formatKey, parts = "BAD_PET_OWN_AOE", { petPart, spellPart }
-		else
-			formatKey, parts = "BAD_PET_OWN", { petPart, spellPart, targetPart }
-		end
-	elseif ownerName then
+	if ownerName then
 		local ownerPart = ns.PlayerPart(ownerName, ownerGUID)
 		if ability.isAoe then
 			formatKey, parts = "BAD_PET_AOE", { ownerPart, petPart, spellPart }
@@ -119,10 +118,17 @@ function ns:HandleBadPets(
 	ns.LogWhisperStep("decide (whisper, owner, isMine)", feature.whisper, ownerName, isMine)
 
 	if feature.whisper and ownerName and not isMine then
-		ns:QueueGroupWhisper("pet", sourceGUID, ownerName, "BAD_PET_WHISPER", {
-			ns.ShortName(sourceName),
-			ns.GetSpellDisplay(spellId, spellName),
-			destName or ns.L["UNKNOWN_TARGET"],
-		})
+		if ability.isAoe then
+			ns:QueueGroupWhisper("pet", sourceGUID, ownerName, "BAD_PET_WHISPER_AOE", {
+				ns.ShortName(sourceName),
+				ns.GetSpellDisplay(spellId, spellName),
+			})
+		else
+			ns:QueueGroupWhisper("pet", sourceGUID, ownerName, "BAD_PET_WHISPER", {
+				ns.ShortName(sourceName),
+				ns.GetSpellDisplay(spellId, spellName),
+				destName or ns.L["UNKNOWN_TARGET"],
+			})
+		end
 	end
 end

@@ -105,10 +105,10 @@ L["SCOPE_ROLE_HEALER"] = "Als Heiler"
 L["SCOPE_ROLE_TANK_HEALER"] = "Als Tank oder Heiler"
 L["SCOPE_ROLE_ALWAYS"] = "Immer"
 L["SCOPE_ROLE_DESC"] =
-	"Welche Rolle du spielen musst, damit diese Funktion überhaupt etwas sagt. Als Tank zählst du, wenn du Haupttank des Schlachtzugs bist oder in der Gruppensuche die Tank-Rolle gewählt hast, als Heiler nur, wenn du dort die Heiler-Rolle gewählt hast, denn fürs Heilen gibt es keine Zuweisung im Schlachtzug. Immer lässt die Frage weg und löst aus, egal was du spielst."
+	'Welche Rolle du spielen musst, damit diese Funktion überhaupt etwas sagt. Als Tank zählst du, wenn du im Schlachtzug als Haupttank eingeteilt bist oder in einer Gruppe in der Gruppensuche die Tank-Rolle gewählt hast. Im Schlachtzug bedeutet die Tank-Rolle nichts. Als Heiler zählst du nur, wenn du in der Gruppensuche die Heiler-Rolle gewählt hast, denn fürs Heilen gibt es keine Zuweisung im Schlachtzug. "Immer" lässt die Frage weg und löst aus, egal was du spielst.'
 L["SCOPE_GROUP_HAS_TANK"] = "Wenn die Gruppe einen Tank hat"
 L["SCOPE_GROUP_HAS_TANK_DESC"] =
-	"Löst nur aus, während jemand in deiner Gruppe tankt und noch lebt. Ein Tank, der am Boden liegt, zählt nicht als Tank, denn genau dann hilft es, wenn jemand anderes die Bedrohung hält."
+	"Löst nur aus, während jemand in deiner Gruppe tankt und noch lebt. Im Schlachtzug heißt das ein eingeteilter Haupttank, ein Schlachtzug ohne Haupttank hat für Control Freak also keinen Tank. Ein Tank, der am Boden liegt, zählt nicht als Tank, denn genau dann hilft es, wenn jemand anderes die Bedrohung hält."
 L["SCOPE_INSTANCE_ONLY"] = "Wenn du in einer Instanz bist"
 L["SCOPE_INSTANCE_ONLY_DESC"] = "Löst nur in Dungeons und Schlachtzügen aus."
 
@@ -119,8 +119,8 @@ L["SCOPE_INSTANCE_ONLY_DESC"] = "Löst nur in Dungeons und Schlachtzügen aus."
 --[[
     Every alert on every tab is drawn as the same block, so each one owns five
     strings: a HEADER naming the thing that happened; an ENABLE reading "Enable
-    Notifications for <that thing> On" -- the switch turns the telling on, not
-    the event, and the target dropdown beside it finishes the sentence, so the
+    Alerts for <that thing> On" -- the switch turns the telling on, not the
+    event, and the target dropdown beside it finishes the sentence, so the
     string ENDS on the preposition (a section with no target drops the word); a
     DESC of one or two sentences; and a MINE and an OTHERS naming the two rows.
     ns.AddWhoseAlertSection in Options-Alert-Section.lua is where that shape
@@ -144,9 +144,9 @@ L["SOUND_NONE"] = "Kein Ton"
     TAUNTS_SUCCESS_MINE below -- because "My" and "Others'" agree with the noun
     in some languages and a shared "%s" template could not.
 
-    TRANSLATORS: ALERT_AGAINST_DESC quotes one rung by name; that wording must
-    match your TARGET_RUNG_ELITE_0, or the tooltip explains a choice the player
-    cannot find in the list. The four rungs are a threshold, widest first: each
+    TRANSLATORS: ALERT_AGAINST_DESC quotes one rung and one row by name; that
+    wording must match your TARGET_RUNG_ELITE_0 and ALERT_MARKED_ALWAYS, or the
+    tooltip explains a choice the player cannot find. The four rungs are a threshold, widest first: each
     one counts itself and the ones after it, which is why every rung that
     includes bosses says so. Keep that in your translations -- a rung reading
     only "Elites" beside a separate "Bosses" reads as two disjoint sets.
@@ -165,14 +165,14 @@ L["ALERT_OUTPUT_ANNOUNCE"] = "Ansagen"
 L["ALERT_OUTPUT_DESC"] =
 	'Wohin diese Zeile geht: an einen Ort, nie an beide. "Anzeigen (nur für mich)" landet in deinem eigenen Fenster und kostet niemanden etwas. "Ansagen" schickt sie stattdessen in den Chat deiner Gruppe oder deines Schlachtzugs, und andere Leute vor dem ganzen Schlachtzug zu kommentieren ist genau das, womit sich ein Add-on unbeliebt macht, also ist diese Wahl einen Gedanken wert. "Ansagen" bleibt stumm, wenn du in keiner Gruppe bist, sowie auf Schlachtfeldern und in Arenen.'
 L["ALERT_AGAINST_DESC"] =
-	'Welche Gegner zählen, wobei jede Auswahl die nach ihr folgenden einschließt. Bosse sind Gegner mit Totenkopf-Stufe (??). Ein Dungeonboss trägt keinen eigenen Totenkopf und zählt deshalb als Elitegegner: "Elite deiner Stufe+ & Bosse" ist die Auswahl, die ihn behält und dabei das niedrigstufige Fußvolk um ihn herum weglässt. Solange die Zeile darunter angehakt ist, hat eine Zielmarkierung Vorrang vor alldem.'
+	'Welche Gegner zählen, wobei jede Auswahl die nach ihr folgenden einschließt. Bosse sind Gegner mit Totenkopf-Stufe (??). Ein Dungeonboss trägt keinen eigenen Totenkopf und zählt deshalb als Elitegegner: "Elite deiner Stufe+ & Bosse" ist die Auswahl, die ihn behält und dabei das niedrigstufige Fußvolk um ihn herum weglässt. Solange "Bei markierten Zielen immer melden" angehakt ist, hat eine Zielmarkierung Vorrang vor alldem.'
 L["TARGET_RUNG_ALL"] = "Alles"
 L["TARGET_RUNG_ELITE"] = "Elite & Bosse"
 L["TARGET_RUNG_ELITE_0"] = "Elite deiner Stufe+ & Bosse"
 L["TARGET_RUNG_BOSS"] = "Bosse"
 L["ALERT_MARKED_ALWAYS"] = "Bei markierten Zielen immer melden"
 L["ALERT_MARKED_ALWAYS_DESC"] =
-	"Ein Ziel mit Zielmarkierung zählt, egal was im Auswahlmenü neben dem Schalter steht: Totenschädel, Kreuz, jede der acht. Mit Markierungen zeigt eine Gruppe auf die Gegner, auf die es ankommt, also fällt ein Ziel, das jemand markiert hat, nie heraus, nur weil es den falschen Rang oder die falsche Stufe hat."
+	"Ein Ziel mit Zielmarkierung (Totenschädel, Kreuz, jede der acht) zählt, egal was im Auswahlmenü neben dem Schalter steht. Mit Markierungen zeigt eine Gruppe auf die Gegner, auf die es ankommt, also fällt ein Ziel, das jemand markiert hat, nie heraus, nur weil es den falschen Rang oder die falsche Stufe hat."
 
 --[[
     The cooldown dropdown's own entries, built by ns.BuildCooldownValues from a
@@ -375,7 +375,7 @@ L["TANK_DEATHS_ENABLE"] = "Überwachung von Tank-Toden aktivieren"
 
 L["TANK_DEATHS_ALERT_HEADER"] = "Tank-Tode"
 L["TANK_DEATHS_ALERT_DESC"] =
-	"Zählt den Haupttank des Schlachtzugs und alle, die in der Gruppensuche die Tank-Rolle gewählt haben, dich eingeschlossen. Nur daran erkennt das Spiel, wer tankt, also stirbt ein Tank ohne beides ungemeldet."
+	"Im Schlachtzug zählen nur die als Haupttank eingeteilten Spieler, dich eingeschlossen, und eine Rolle aus der Gruppensuche bedeutet dort nichts. In einer Gruppe zählt, wer in der Gruppensuche die Tank-Rolle gewählt hat. Ein Tank ohne beides stirbt ungemeldet."
 L["TANK_DEATHS_ALERT_ENABLE"] = "Tank-Tode melden"
 L["TANK_DEATHS_ALERT_MINE"] = "Mein Tod"
 L["TANK_DEATHS_ALERT_MINE_DESC"] =
@@ -421,7 +421,6 @@ L["BAD_PRIESTS_COOLDOWN_DESC"] =
 -- Bad Pets
 --------------------------------------------------------------------------------
 
--- Doubles as the mini-map button's Bad Pets line, so the two cannot differ.
 L["BAD_PETS_SUMMARY"] =
 	"Begleiter von Jägern und Hexenmeistern, deren Bedrohungsfähigkeiten noch auf automatischem Wirken stehen."
 L["BAD_PETS_ENABLE"] = "Überwachung böser Begleiter aktivieren"
@@ -445,17 +444,25 @@ L["BAD_PETS_ABILITIES_HEADER"] = "Fähigkeiten böser Begleiter"
 --------------------------------------------------------------------------------
 
 --[[
-    No summary line: the Tanking Tools tab opens on its enable, because the tab is
-    a collection of unrelated warnings rather than one idea a sentence can cover.
-    Each section introduces itself instead.
+    No summary line on the tab: Tanking Tools opens on its enable, because the
+    tab is a collection of unrelated warnings rather than one idea a sentence
+    can cover. Each section introduces itself instead.
+
+    The mini-map tooltip carries a short one anyway, because the button's
+    Right-Click toggles this tab and the tooltip has to say what it is turning
+    on. TRANSLATORS: it lists the four section headers below in your own words
+    for them; keep it to two lines in the tooltip.
 ]]
 L["TANKING_TOOLS_ENABLE"] = "Tank-Werkzeuge aktivieren"
+L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "Verpatzte Eröffnungen, Rüstungsschwächungen, parierte Angriffe und Frostnovas."
 
 L["TANKING_TOOLS_COLD_OPENER_HEADER"] = "Verpatzte Eröffnungen"
 L["TANKING_TOOLS_COLD_OPENER_DESC"] =
 	"Meldet deine eigenen Eröffnungsangriffe, die nicht getroffen haben: ein Verfehlen, Ausweichen, Parieren, Blocken, Widerstehen oder eine Immunität in den ersten Sekunden eines Kampfes. Bedrohung, die nie entstanden ist, genau in dem Moment, in dem sie am meisten zählt."
 L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "Verpatzte Eröffnungen melden gegen"
 L["TANKING_TOOLS_COLD_OPENER_MINE"] = "Meine verpatzten Eröffnungen"
+L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] =
+	"Meldet deine eigenen Eröffnungsfähigkeiten, die nicht getroffen haben. Das Auswahlmenü daneben legt fest, wohin die Zeile geht."
 -- The caption before the window dropdown: "Within [10 Seconds of Fight]".
 L["TANKING_TOOLS_COLD_OPENER_WITHIN"] = "In den ersten"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "%d Sekunden des Kampfes"
@@ -469,7 +476,7 @@ L["TANKING_TOOLS_ARMOR_ENABLE"] = "Rüstungsschwächungen melden gegen"
 -- The one row: the report is the group's, so it is not "My" anything.
 L["TANKING_TOOLS_ARMOR_REPORT"] = "Berichte zu Rüstungsschwächungen"
 L["TANKING_TOOLS_ARMOR_REPORT_DESC"] =
-	"Wohin der Bericht geht, sobald die Gruppe die Rüstung eines Ziels abgebaut hat. Getrennte Zeilen für eigene und fremde Zauber gibt es hier nicht: Es ist die Arbeit der Gruppe, dir berichtet."
+	"Wohin der Bericht geht, sobald die Gruppe die Rüstung eines Ziels abgebaut hat. Getrennte Zeilen für eigene und fremde Zauber gibt es hier nicht: Es ist die Arbeit der Gruppe, über die dir berichtet wird."
 L["TANKING_TOOLS_ARMOR_FAERIE_FIRE"] = "Feenfeuer einbeziehen"
 L["TANKING_TOOLS_ARMOR_FAERIE_FIRE_DESC"] =
 	"Wartet vor dem Bericht auf Feenfeuer, egal in welcher Form der Druide es wirkt. Wird ignoriert, wenn kein Druide in der Gruppe ist."
@@ -482,10 +489,17 @@ L["TANKING_TOOLS_PARRY_DESC"] =
 	"Wer von einem Gegner pariert wird, den er nicht tankt, steht vor ihm. Jedes Parieren beschleunigt den nächsten Schlag dieses Gegners gegen den, der ihn hält."
 L["TANKING_TOOLS_PARRY_ENABLE"] = "Parierte Angriffe melden gegen"
 L["TANKING_TOOLS_PARRY_MINE"] = "Meine parierten Angriffe"
+L["TANKING_TOOLS_PARRY_MINE_DESC"] =
+	"Meldet, wenn ein Gegner deine Angriffe pariert. Das Auswahlmenü daneben legt fest, wohin die Zeile geht."
 L["TANKING_TOOLS_PARRY_OTHERS"] = "Parierte Angriffe anderer"
-L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "Andere Tanks ignorieren"
+L["TANKING_TOOLS_PARRY_OTHERS_DESC"] =
+	"Meldet, wenn ein Gegner die Angriffe von jemand anderem in deiner Gruppe pariert. Das Auswahlmenü daneben legt fest, wohin die Zeile geht."
+L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "Tanks ignorieren"
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"] =
-	"Bleibt still, wenn der parierte Spieler ein Tank ist: der Haupttank des Schlachtzugs oder jemand mit der Tank-Rolle. Ein Zweittank steht für einen Spottwechsel vor dem Boss, und das ist kein Fehler, für den man jemanden anflüstern sollte. Deine eigenen parierten Angriffe werden weiterhin gemeldet."
+	"Bleibt still, wenn der parierte Spieler ein Tank ist: im Schlachtzug als Haupttank eingeteilt oder in einer Gruppe mit der Tank-Rolle aus der Gruppensuche. Ein Zweittank steht für einen Spottwechsel vor dem Boss, und das ist kein Fehler, für den man jemanden anflüstern sollte. Deine eigenen parierten Angriffe werden weiterhin gemeldet."
+L["TANKING_TOOLS_PARRY_IGNORE_PETS"] = "Begleiter ignorieren"
+L["TANKING_TOOLS_PARRY_IGNORE_PETS_DESC"] =
+	"Bleibt still, wenn der parierte Angriff von einem Begleiter kam, auch von deinem eigenen. Ein Begleiter steht dort, wo sein Besitzer ihn hingeschickt hat, und eine Zeile mit dem Namen des Begleiters gibt niemandem in der Gruppe etwas zu tun. Begleiter werden so oder so nie angeflüstert."
 L["TANKING_TOOLS_PARRY_WHISPER"] = "Den Übeltäter anflüstern"
 L["TANKING_TOOLS_PARRY_WHISPER_DESC"] =
 	"Schickt dem Übeltäter eine Nachricht mit der Bitte, sich hinter den Gegner zu stellen. Es wird nur eine geschickt, auch wenn mehrere Leute in deiner Gruppe Control Freak nutzen."
@@ -493,7 +507,8 @@ L["TANKING_TOOLS_PARRY_COOLDOWN_DESC"] =
 	"Wie lange ein Übeltäter verschont bleibt, nachdem er eine Parierwarnung ausgelöst hat. Das gilt für die Anzeige, den Ton, die Ansage und das Flüstern, denn wer sich noch nicht bewegt hat, muss es nicht bei jedem Schlag gesagt bekommen."
 
 L["TANKING_TOOLS_NOVA_HEADER"] = "Frostnovas"
-L["TANKING_TOOLS_NOVA_DESC"] = "Meldet eine Frostnova, die eine Gegnergruppe aus der Reichweite des Tanks verstreut."
+L["TANKING_TOOLS_NOVA_DESC"] =
+	"Meldet eine Frostnova, die eine Gegnergruppe dort festfriert, wo sie steht, außer Reichweite des Tanks."
 L["TANKING_TOOLS_NOVA_ENABLE"] = "Frostnovas melden"
 L["TANKING_TOOLS_NOVA_MINE"] = "Meine Frostnovas"
 L["TANKING_TOOLS_NOVA_OTHERS"] = "Frostnovas anderer"
@@ -627,16 +642,16 @@ L["SHIELD_WHISPER"] =
 
 L["BAD_PET"] = "Böser Begleiter! Der Begleiter von %s, %s, hat %s auf %s eingesetzt."
 L["BAD_PET_AOE"] = "Böser Begleiter! Der Begleiter von %s, %s, hat %s eingesetzt."
-L["BAD_PET_OWN"] = "Böser Begleiter! Dein Begleiter %s hat %s auf %s eingesetzt."
-L["BAD_PET_OWN_AOE"] = "Böser Begleiter! Dein Begleiter %s hat %s eingesetzt."
 L["BAD_PET_UNKNOWN_OWNER"] = "Böser Begleiter! %s hat %s auf %s eingesetzt."
 L["BAD_PET_UNKNOWN_OWNER_AOE"] = "Böser Begleiter! %s hat %s eingesetzt."
 --[[
-    Kept short on purpose. It renders with a spell link and two names inside a 255
-    byte chat limit, and the widest locale runs close to twice the English.
+    Kept short on purpose. They render with a spell link and up to two names inside
+    a 255 byte chat limit, and the widest locale runs close to twice the English.
 ]]
 L["BAD_PET_WHISPER"] =
 	"Dein Begleiter %s hat %s auf %s eingesetzt. Ein Rechtsklick auf die Fähigkeit schaltet das automatische Wirken ab."
+L["BAD_PET_WHISPER_AOE"] =
+	"Dein Begleiter %s hat %s eingesetzt. Ein Rechtsklick auf die Fähigkeit schaltet das automatische Wirken ab."
 
 L["COLD_OPENER_MISS"] = "Vorsicht! %s hat %s auf %s eingesetzt: verfehlt."
 L["COLD_OPENER_DODGE"] = "Vorsicht! %s hat %s auf %s eingesetzt: ausgewichen."
@@ -645,10 +660,11 @@ L["COLD_OPENER_BLOCK"] = "Vorsicht! %s hat %s auf %s eingesetzt: geblockt."
 L["COLD_OPENER_IMMUNE"] = "Vorsicht! %s hat %s auf %s eingesetzt: ignoriert."
 L["COLD_OPENER_RESIST"] = "Vorsicht! %s hat %s auf %s eingesetzt: widerstanden."
 
-L["ARMOR_REPORT"] = "Rüstung abgebaut! %s ist nach %s Sekunden verwundbar."
+L["ARMOR_REPORT"] = "Rüstung abgebaut! %s war nach %s Sekunden verwundbar."
 
 L["PARRY_WARNING"] = "Parierhast! %s steht vor %s."
-L["PARRY_WHISPER"] = "Parierhast! Bitte stell dich hinter %s: Jedes Parieren beschleunigt seinen nächsten Schlag."
+L["PARRY_WHISPER"] =
+	"Parierhast! Bitte stell dich hinter %s: Jedes Parieren beschleunigt den nächsten Schlag des Gegners."
 
 L["NOVA"] = "Nova! %s hat %s auf %s eingesetzt."
 L["NOVA_AOE"] = "Flächennova! %s hat %s eingesetzt."

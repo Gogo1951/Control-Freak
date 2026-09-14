@@ -63,12 +63,25 @@ function ns:HandleParry(feature, sourceGUID, sourceName, sourceFlags, destGUID, 
 
 	--[[
 	    An off-tank in front of the boss is there on purpose -- a taunt swap, a
-	    pick-up -- and telling them to move is wrong, not merely noisy. "Other" is
-	    the word: the player's own parries still report, tank or not, and
-	    FindTankUnit reads the same Main Tank assignment and Tank role the scope
-	    gates do. Before the cooldown, so a tank's parries do not use it up.
+	    pick-up -- and telling them to move is wrong, not merely noisy. The
+	    player's own parries still report, tank or not: a tank reading their own
+	    window asked to hear about themselves. FindTankUnit reads the same seat
+	    test the scope gates do: Main Tank in a raid, the Tank role in a party.
+	    Before the cooldown, so a tank's parries do not use it up.
 	]]
 	if settings.ignoreTanks and not ns.IsMineSource(sourceFlags) and ns.FindTankUnit(sourceGUID) then
+		return
+	end
+
+	--[[
+	    A pet in front of the boss is where its owner sent it, and the warning
+	    would name the pet -- "Idiot is standing in front of Blackwing
+	    Guardsman" -- which nobody in the group can act on, least of all the
+	    hunter at range who is not reading it. Pets and guardians both, the way
+	    Bad Pets counts them, and the player's own pet too. Before the cooldown,
+	    for the same reason as above.
+	]]
+	if settings.ignorePets and ns.IsPetSource(sourceFlags) then
 		return
 	end
 
@@ -100,7 +113,7 @@ function ns:HandleParry(feature, sourceGUID, sourceName, sourceFlags, destGUID, 
 
 	    Never whisper a pet either. The culprit's name is then the pet's, so the
 	    tell would bounce, or land on a stranger who happens to share it. The
-	    warning above still names the pet.
+	    warning above still names the pet, for a player who unticked Ignore Pets.
 
 	    The whisper rides the same election as Bad Pets', so a raid with four
 	    Control Freak users sends the culprit one note rather than four.

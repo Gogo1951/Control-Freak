@@ -32,9 +32,7 @@ function ns:HandleTaunt(
 		    The immune line is the one failure format that leads with the MOB:
 		    the immunity is what happened, where the other three have nothing to
 		    say beyond "it did not land". So its parts run mob, taunter, taunt
-		    rather than the taunter-first order the rest share, and naming the
-		    mob in the subject is also what let the old wording's second copy of
-		    it go.
+		    rather than the taunter-first order the rest share.
 		]]
 		if formatKey == "TAUNT_IMMUNE" then
 			ns:Alert(

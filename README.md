@@ -21,7 +21,7 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/control-freak) or [Wago](https://addons.wago.io/addons/control-freak).
 2. Type `/freak`, or Shift + Middle-Click the mini-map button, to open the Options Interface.
 3. Walk the tabs. Every tab but Tanking Tools is on out of the box, and most lines print only to your own window.
-4. Decide what your group hears. Five of your own lines announce out of the box, because the group needs them the moment they happen: a failed taunt, an AoE taunt, a fear you cast, a long incapacitation, and your death while tanking.
+4. Decide what your group hears. Four of your own lines announce out of the box, because the group needs them the moment they happen: a failed taunt, an AoE taunt, a fear you cast, and a long incapacitation.
 5. Narrow each tab to when it matters, like only while you're tanking or only inside dungeons and raids.
 6. *"When you do things right, people won't be sure you've done anything at all."*
 
@@ -31,7 +31,7 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 
 Plenty of add-ons and WeakAuras already handled announcements, but each had its own interface and its own filter settings. Wanting a callout only on bosses, or only while you're tanking or healing, meant hunting for that option in every one of them, when it existed at all. Control Freak brings those great ideas under one roof, with one consistent layout and plenty of easy settings: every alert on every tab is built from the same block, so once you've set one, you know how to set them all.
 
-- **Enable Notifications** // The alert's own switch. An alert aimed at one mob carries the enemies it counts beside it: Everything, Elites & Bosses, Elites Your Level+ & Bosses, or Bosses. Each choice includes the ones after it, and since a dungeon boss carries no skull, the third choice is the one that keeps it while dropping the lower-level trash around it.
+- **Enable Alerts** // The alert's own switch. An alert aimed at one mob carries the enemies it counts beside it: Everything, Elites & Bosses, Elites Your Level+ & Bosses, or Bosses. Each choice includes the ones after it, and since a dungeon boss carries no skull, the third choice is the one that keeps it while dropping the lower-level trash around it.
 - **My and Others' Rows** // Your own casts, your pet's included, and everybody else's in your group. Each row says where its line goes: Print (Self Only) or Announce.
 - **Always Alert on Marked Targets** // A mob carrying a raid mark always counts, whatever the enemy choice says. On by default.
 - **Play Sound** // Control Freak's own sounds, plus any your other add-ons share.
@@ -58,10 +58,10 @@ Printed or announced, a line leads with the news and ends with the add-on's name
 | Click | What It Does |
 |---|---|
 | Left-Click | Turns every Control Freak alert on or off |
-| Right-Click | Turns Bad Pets on or off |
+| Right-Click | Turns Tanking Tools on or off |
 | Shift + Middle-Click | Opens the Options Interface |
 
-Hovering the button shows what is on right now. Right-Click only works while Control Freak itself is switched on.
+Hovering the button shows whether All Alerts and Tanking Tools are on right now. Right-Click only works while All Alerts is on.
 
 ### Options
 

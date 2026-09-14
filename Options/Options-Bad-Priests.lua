@@ -28,7 +28,7 @@ end
     other section does: it reads a FRIENDLY target rather than an enemy, so it
     carries no target filter and passes noTarget. That frees the slot beside the
     switch, which every other section in the add-on gives to the Against ladder,
-    and the health choice takes it. The switch reads "Enable Notifications for
+    and the health choice takes it. The switch reads "Enable Alerts for
     Bad Shields" and the dropdown beside it finishes the sentence with when to
     make an exception.
 
@@ -69,8 +69,8 @@ function ns.BuildBadPriestsOptions()
 			end,
 		},
 		--[[
-		    Under the indent because it narrows who counts, the way Ignore Other
-		    Tanks does on Parries.
+		    Under the indent because it narrows who counts, the way Ignore Tanks
+		    does on Parries.
 		]]
 		extraRow = function(rowArgs, order, rowsHidden)
 			rowArgs.selfOnlyRow = ns.OptionsSubRow(order + 1, rowsHidden, {

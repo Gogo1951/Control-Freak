@@ -17,7 +17,7 @@ L["VERSION"] = "Versión"
 --------------------------------------------------------------------------------
 
 L["CHAT_LOADED"] =
-	"Versión %s. La configuración (incluida la opción de desactivar este mensaje) se encuentra en Opciones > AddOns > Control Freak. ¿Te gusta el add-on? ¡Cuéntaselo a un amigo! (="
+	"Versión %s. La configuración (incluida la opción de desactivar este mensaje) se encuentra en Opciones > Accesorios > Control Freak. ¿Te gusta el add-on? ¡Cuéntaselo a un amigo! (="
 L["CHAT_OPTIONS_IN_COMBAT"] = "Como medida de seguridad, la interfaz de opciones no se puede abrir durante el combate."
 
 --------------------------------------------------------------------------------
@@ -105,10 +105,10 @@ L["SCOPE_ROLE_HEALER"] = "Como sanador"
 L["SCOPE_ROLE_TANK_HEALER"] = "Como tanque o sanador"
 L["SCOPE_ROLE_ALWAYS"] = "Siempre"
 L["SCOPE_ROLE_DESC"] =
-	"Qué rol tienes que ocupar para que esta función diga algo. Cuentas como Tanque cuando eres el tanque principal de la banda o tienes seleccionado el rol de Tanque en el buscador de grupos, y como Sanador solo cuando tienes seleccionado el rol de Sanador, ya que no existe una asignación de banda para sanar. Siempre prescinde de la pregunta y avisa juegues de lo que juegues."
+	"Qué rol tienes que ocupar para que esta función diga algo. Cuentas como tanque cuando estás asignado como tanque principal en una banda, o cuando en un grupo tienes seleccionado el rol de Tanque en el buscador de grupos. En una banda, el rol de Tanque no significa nada. Cuentas como sanador solo cuando tienes seleccionado el rol de Sanador en el buscador de grupos, ya que no existe una asignación de banda para sanar. La opción Siempre prescinde de la pregunta y avisa juegues de lo que juegues."
 L["SCOPE_GROUP_HAS_TANK"] = "Si el grupo tiene tanque"
 L["SCOPE_GROUP_HAS_TANK_DESC"] =
-	"Solo avisa mientras alguien de tu grupo esté tanqueando y siga vivo. Un tanque caído cuenta como si no hubiera tanque, porque es justo entonces cuando ayuda que otra persona mantenga la amenaza."
+	"Solo avisa mientras alguien de tu grupo esté tanqueando y siga vivo. En una banda eso significa un tanque principal asignado, así que para Control Freak una banda sin ninguno no tiene tanque. Un tanque caído cuenta como si no hubiera tanque, porque es justo entonces cuando ayuda que otra persona mantenga la amenaza."
 L["SCOPE_INSTANCE_ONLY"] = "Si estás en una instancia"
 L["SCOPE_INSTANCE_ONLY_DESC"] = "Solo avisa dentro de calabozos y bandas."
 
@@ -119,8 +119,8 @@ L["SCOPE_INSTANCE_ONLY_DESC"] = "Solo avisa dentro de calabozos y bandas."
 --[[
     Every alert on every tab is drawn as the same block, so each one owns five
     strings: a HEADER naming the thing that happened; an ENABLE reading "Enable
-    Notifications for <that thing> On" -- the switch turns the telling on, not
-    the event, and the target dropdown beside it finishes the sentence, so the
+    Alerts for <that thing> On" -- the switch turns the telling on, not the
+    event, and the target dropdown beside it finishes the sentence, so the
     string ENDS on the preposition (a section with no target drops the word); a
     DESC of one or two sentences; and a MINE and an OTHERS naming the two rows.
     ns.AddWhoseAlertSection in Options-Alert-Section.lua is where that shape
@@ -144,9 +144,9 @@ L["SOUND_NONE"] = "Ninguno"
     TAUNTS_SUCCESS_MINE below -- because "My" and "Others'" agree with the noun
     in some languages and a shared "%s" template could not.
 
-    TRANSLATORS: ALERT_AGAINST_DESC quotes one rung by name; that wording must
-    match your TARGET_RUNG_ELITE_0, or the tooltip explains a choice the player
-    cannot find in the list. The four rungs are a threshold, widest first: each
+    TRANSLATORS: ALERT_AGAINST_DESC quotes one rung and one row by name; that
+    wording must match your TARGET_RUNG_ELITE_0 and ALERT_MARKED_ALWAYS, or the
+    tooltip explains a choice the player cannot find. The four rungs are a threshold, widest first: each
     one counts itself and the ones after it, which is why every rung that
     includes bosses says so. Keep that in your translations -- a rung reading
     only "Elites" beside a separate "Bosses" reads as two disjoint sets.
@@ -165,7 +165,7 @@ L["ALERT_OUTPUT_ANNOUNCE"] = "Anunciar"
 L["ALERT_OUTPUT_DESC"] =
 	"Adónde va esta línea: a un solo lugar, nunca a los dos. Mostrar (solo para mí) usa tu propia ventana y no le cuesta nada a nadie. Anunciar, en cambio, la envía al chat de grupo o de banda, y narrarle a toda la banda lo que hacen los demás es la forma en que un add-on deja de ser bienvenido, así que vale la pena pensarlo. Anunciar se queda en silencio cuando no estás en un grupo, y también dentro de campos de batalla y arenas."
 L["ALERT_AGAINST_DESC"] =
-	"Qué enemigos cuentan: cada opción incluye las que vienen después. Los jefes son enemigos de nivel calavera (??). Un jefe de calabozo no lleva calavera propia, así que cuenta como élite, y la opción Élites de tu nivel+ y jefes es la que lo conserva mientras descarta a los enemigos menores de nivel más bajo que lo rodean. Una marca de banda anula todo esto mientras la casilla de abajo esté activada."
+	"Qué enemigos cuentan: cada opción incluye las que vienen después. Los jefes son enemigos de nivel calavera (??). Un jefe de calabozo no lleva calavera propia, así que cuenta como élite, y la opción Élites de tu nivel+ y jefes es la que lo conserva mientras descarta a los enemigos menores de nivel más bajo que lo rodean. Una marca de banda anula todo esto mientras la casilla Alertar siempre sobre objetivos marcados esté activada."
 L["TARGET_RUNG_ALL"] = "Todo"
 L["TARGET_RUNG_ELITE"] = "Élites y jefes"
 L["TARGET_RUNG_ELITE_0"] = "Élites de tu nivel+ y jefes"
@@ -329,7 +329,7 @@ L["INCAPACITATED_SHORT_DESC"] =
 	"Adónde va la línea cuando te sacan del combate por menos tiempo que la duración de arriba. Por defecto se muestra en tu propia ventana: un aturdimiento del que te recuperas antes de que nadie haya podido cubrirte explica el tiempo de reutilización global que acabas de perder, y no es problema de nadie más."
 L["INCAPACITATED_LONG"] = "Mi incapacitación larga"
 L["INCAPACITATED_LONG_DESC"] =
-	"Adónde va la línea cuando te sacan del combate durante al menos la duración de arriba. Por defecto se anuncia: es la que otra persona sí tiene tiempo de atender, y tú eres la única persona que no puede decirlo. Un efecto sin ninguna duración, como un Control mental, cuenta como larga."
+	"Adónde va la línea cuando te sacan del combate durante al menos la duración de arriba. Por defecto se anuncia: es la que otra persona sí tiene tiempo de atender, y tú eres la única persona que no puede decirlo. Un efecto sin ninguna duración, como un Control mental, cuenta como incapacitación larga."
 
 L["INCAPACITATED_STUN"] = "Incluir aturdimientos"
 L["INCAPACITATED_STUN_DESC"] =
@@ -375,7 +375,7 @@ L["TANK_DEATHS_ENABLE"] = "Activar vigilancia de muertes de tanque"
 
 L["TANK_DEATHS_ALERT_HEADER"] = "Muertes de tanque"
 L["TANK_DEATHS_ALERT_DESC"] =
-	"Cuenta al tanque principal de la banda y a quien tenga seleccionado el rol de Tanque en el buscador de grupos, tú incluido. Son las dos únicas formas en que el juego indica quién tanquea, así que un tanque sin ninguna de ellas muere sin aviso."
+	"En una banda solo cuenta a los jugadores asignados como tanque principal, tú incluido, y un rol del buscador de grupos no significa nada ahí. En un grupo cuenta a quien tenga seleccionado el rol de Tanque en el buscador de grupos. Un tanque sin ninguna de las dos cosas muere sin aviso."
 L["TANK_DEATHS_ALERT_ENABLE"] = "Notificar muertes de tanque"
 L["TANK_DEATHS_ALERT_MINE"] = "Mi muerte"
 L["TANK_DEATHS_ALERT_MINE_DESC"] =
@@ -415,13 +415,12 @@ L["BAD_PRIESTS_WHISPER"] = "Susurrar al lanzador"
 L["BAD_PRIESTS_WHISPER_DESC"] =
 	"Envía a quien lanzó el escudo una nota que explica por qué perjudica. Solo se envía un susurro aunque varias personas de tu grupo usen Control Freak."
 L["BAD_PRIESTS_COOLDOWN_DESC"] =
-	"Cuánto tiempo se queda en silencio un mismo lanzador después de disparar un aviso de escudo. Cubre el mensaje, el sonido, el anuncio y el susurro, porque un sanador que pone un escudo cada vez que puede no debe llenarte la ventana."
+	"Cuánto tiempo se queda en silencio un mismo lanzador después de disparar un aviso de escudo. Cubre lo que se muestra, el sonido, el anuncio y el susurro, porque un sanador que pone un escudo cada vez que puede no debe llenarte la ventana."
 
 --------------------------------------------------------------------------------
 -- Bad Pets
 --------------------------------------------------------------------------------
 
--- Doubles as the mini-map button's Bad Pets line, so the two cannot differ.
 L["BAD_PETS_SUMMARY"] =
 	"Mascotas de cazador y de brujo con habilidades de amenaza que se dejaron en lanzamiento automático."
 L["BAD_PETS_ENABLE"] = "Activar vigilancia de mascotas traviesas"
@@ -436,7 +435,7 @@ L["BAD_PETS_WHISPER_ENABLE"] = "Susurrar al dueño de la mascota"
 L["BAD_PETS_WHISPER_ENABLE_DESC"] =
 	"Envía al dueño de la mascota una nota que explica cómo desactivar el lanzamiento automático. Solo se envía un susurro aunque varias personas de tu grupo usen Control Freak."
 L["BAD_PETS_COOLDOWN_DESC"] =
-	"Cuánto tiempo se queda en silencio una misma mascota después de disparar una alerta. Cubre el mensaje, el sonido, el anuncio y el susurro, para que una mascota con el lanzamiento automático activado no llene tu ventana y su dueño no reciba otro susurro cada pocos segundos."
+	"Cuánto tiempo se queda en silencio una misma mascota después de disparar una alerta. Cubre lo que se muestra, el sonido, el anuncio y el susurro, para que una mascota con el lanzamiento automático activado no llene tu ventana y su dueño no reciba otro susurro cada pocos segundos."
 
 L["BAD_PETS_ABILITIES_HEADER"] = "Habilidades de mascota traviesa"
 
@@ -445,17 +444,25 @@ L["BAD_PETS_ABILITIES_HEADER"] = "Habilidades de mascota traviesa"
 --------------------------------------------------------------------------------
 
 --[[
-    No summary line: the Tanking Tools tab opens on its enable, because the tab is
-    a collection of unrelated warnings rather than one idea a sentence can cover.
-    Each section introduces itself instead.
+    No summary line on the tab: Tanking Tools opens on its enable, because the
+    tab is a collection of unrelated warnings rather than one idea a sentence
+    can cover. Each section introduces itself instead.
+
+    The mini-map tooltip carries a short one anyway, because the button's
+    Right-Click toggles this tab and the tooltip has to say what it is turning
+    on. TRANSLATORS: it lists the four section headers below in your own words
+    for them; keep it to two lines in the tooltip.
 ]]
 L["TANKING_TOOLS_ENABLE"] = "Activar utilidades de tanque"
+L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "Aperturas en frío, perjuicios de armadura, paradas y Novas de Escarcha."
 
 L["TANKING_TOOLS_COLD_OPENER_HEADER"] = "Aperturas en frío"
 L["TANKING_TOOLS_COLD_OPENER_DESC"] =
 	"Avisa de tus propios ataques de apertura que no lograron conectar: un fallo, una esquiva, una parada, un bloqueo, una resistencia o una inmunidad en los primeros segundos de un combate. Amenaza que nunca se generó, justo en el momento en que más importa."
 L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "Notificar aperturas en frío contra"
 L["TANKING_TOOLS_COLD_OPENER_MINE"] = "Mis aperturas en frío"
+L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] =
+	"Informa sobre tus propias habilidades de apertura que no lograron conectar. El menú desplegable de al lado indica adónde va la línea."
 -- The caption before the window dropdown: "Within [10 Seconds of Fight]".
 L["TANKING_TOOLS_COLD_OPENER_WITHIN"] = "En los primeros"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "%d segundos de combate"
@@ -482,21 +489,28 @@ L["TANKING_TOOLS_PARRY_DESC"] =
 	"Si un enemigo le para un golpe a alguien que no lo está tanqueando, esa persona está delante de él. Cada parada acelera el siguiente golpe de ese enemigo contra quien lo esté tanqueando."
 L["TANKING_TOOLS_PARRY_ENABLE"] = "Notificar paradas contra"
 L["TANKING_TOOLS_PARRY_MINE"] = "Mis paradas"
+L["TANKING_TOOLS_PARRY_MINE_DESC"] =
+	"Informa cuando un enemigo para tus ataques. El menú desplegable de al lado indica adónde va la línea."
 L["TANKING_TOOLS_PARRY_OTHERS"] = "Paradas de los demás"
-L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "Ignorar a otros tanques"
+L["TANKING_TOOLS_PARRY_OTHERS_DESC"] =
+	"Informa cuando un enemigo para los ataques de cualquier otro en tu grupo. El menú desplegable de al lado indica adónde va la línea."
+L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "Ignorar a los tanques"
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"] =
-	"Guarda silencio cuando el jugador al que le paran es un tanque: el Tanque principal de la banda o alguien con el rol de Tanque. Un tanque secundario se pone delante del jefe para un cambio de provocación, y eso no es un error por el que haya que susurrarle. Los golpes que te paran a ti se siguen notificando."
+	"Guarda silencio cuando el jugador al que le paran es un tanque: asignado como tanque principal en una banda, o con el rol de Tanque del buscador de grupos en un grupo. Un tanque secundario se pone delante del jefe para un cambio de provocación, y eso no es un error por el que haya que susurrarle. Los golpes que te paran a ti se siguen notificando."
+L["TANKING_TOOLS_PARRY_IGNORE_PETS"] = "Ignorar a las mascotas"
+L["TANKING_TOOLS_PARRY_IGNORE_PETS_DESC"] =
+	"Guarda silencio cuando el golpe parado venía de una mascota, la tuya incluida. Una mascota está donde su dueño la mandó, y una línea con el nombre de la mascota no le da nada que hacer a nadie del grupo. A las mascotas nunca se les susurra, en ningún caso."
 L["TANKING_TOOLS_PARRY_WHISPER"] = "Susurrar al culpable"
 L["TANKING_TOOLS_PARRY_WHISPER_DESC"] =
 	"Envía al culpable una nota pidiéndole que se ponga detrás del enemigo. Solo se envía un susurro aunque varias personas de tu grupo usen Control Freak."
 L["TANKING_TOOLS_PARRY_COOLDOWN_DESC"] =
-	"Cuánto tiempo se queda en silencio un mismo culpable después de disparar un aviso de parada. Cubre el mensaje, el sonido, el anuncio y el susurro, porque a quien todavía no se movió no hace falta decírselo en cada golpe."
+	"Cuánto tiempo se queda en silencio un mismo culpable después de disparar un aviso de parada. Cubre lo que se muestra, el sonido, el anuncio y el susurro, porque a quien todavía no se movió no hace falta decírselo en cada golpe."
 
 L["TANKING_TOOLS_NOVA_HEADER"] = "Novas de Escarcha"
 L["TANKING_TOOLS_NOVA_DESC"] =
-	"Avisa de una Nova de Escarcha, que dispersa a los enemigos fuera del alcance del tanque."
-L["TANKING_TOOLS_NOVA_ENABLE"] = "Notificar novas de Escarcha"
-L["TANKING_TOOLS_NOVA_MINE"] = "Mis novas de Escarcha"
+	"Avisa de una Nova de Escarcha, que congela a los enemigos donde están, fuera del alcance del tanque."
+L["TANKING_TOOLS_NOVA_ENABLE"] = "Notificar Novas de Escarcha"
+L["TANKING_TOOLS_NOVA_MINE"] = "Mis Novas de Escarcha"
 L["TANKING_TOOLS_NOVA_OTHERS"] = "Novas de Escarcha de los demás"
 
 --------------------------------------------------------------------------------
@@ -519,7 +533,7 @@ L["UNKNOWN_SPELL"] = "un hechizo desconocido"
 L["TAUNT_SUCCESS"] = "¡Provocación! %s usó %s contra %s."
 L["TAUNT_AOE"] = "¡Provocación de área! %s usó %s."
 L["TAUNT_MISSED"] = "¡Provocación fallida! %s usó %s contra %s y no acertó."
-L["TAUNT_RESISTED"] = "¡Provocación fallida! %s usó %s contra %s y fue resistida."
+L["TAUNT_RESISTED"] = "¡Provocación fallida! %s usó %s contra %s, que lo resistió."
 --[[
     The one failure format that leads with the MOB rather than the taunter,
     because the immunity is the news and the other three formats have no news
@@ -628,16 +642,16 @@ L["SHIELD_WHISPER"] =
 
 L["BAD_PET"] = "¡Mascota traviesa! La mascota de %s, %s, usó %s contra %s."
 L["BAD_PET_AOE"] = "¡Mascota traviesa! La mascota de %s, %s, usó %s."
-L["BAD_PET_OWN"] = "¡Mascota traviesa! Tu mascota %s usó %s contra %s."
-L["BAD_PET_OWN_AOE"] = "¡Mascota traviesa! Tu mascota %s usó %s."
 L["BAD_PET_UNKNOWN_OWNER"] = "¡Mascota traviesa! %s usó %s contra %s."
 L["BAD_PET_UNKNOWN_OWNER_AOE"] = "¡Mascota traviesa! %s usó %s."
 --[[
-    Kept short on purpose. It renders with a spell link and two names inside a 255
-    byte chat limit, and the widest locale runs close to twice the English.
+    Kept short on purpose. They render with a spell link and up to two names inside
+    a 255 byte chat limit, and the widest locale runs close to twice the English.
 ]]
 L["BAD_PET_WHISPER"] =
 	"Tu mascota %s usó %s contra %s. Haz clic derecho en la habilidad para desactivar el lanzamiento automático."
+L["BAD_PET_WHISPER_AOE"] =
+	"Tu mascota %s usó %s. Haz clic derecho en la habilidad para desactivar el lanzamiento automático."
 
 L["COLD_OPENER_MISS"] = "¡Cuidado! %s usó %s y no le dio a %s."
 L["COLD_OPENER_DODGE"] = "¡Cuidado! %s usó %s y %s lo esquivó."

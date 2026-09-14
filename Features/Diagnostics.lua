@@ -575,30 +575,48 @@ function ns:BuildAlertGateReport()
 	)
 
 	lines[#lines + 1] = ""
-	local tanks = {}
-	if ns.IsUnitTank("player") then
-		tanks[#tanks + 1] = "player (" .. tostring(GetUnitName("player", true)) .. ")"
+
+	--[[
+	    Which signal is in force comes first, because it is what a "why did X
+	    count as a tank" report needs: in a raid only the Main Tank assignment
+	    counts and the group finder's TANK role is ignored, outside one the role
+	    is the only signal (Features/Utilities.lua says why). In a raid the
+	    ignored tags are listed too, so a healer still wearing a Tank tag from a
+	    dungeon queue shows up as exactly that rather than as a mystery.
+	]]
+	local inRaid = IsInRaid()
+	local hasRoles = type(UnitGroupRolesAssigned) == "function"
+	local tanks, ignoredTags = {}, {}
+	local function NoteUnit(unit)
+		local entry = unit .. " (" .. tostring(GetUnitName(unit, true)) .. ")"
+		if ns.IsUnitTank(unit) then
+			tanks[#tanks + 1] = entry
+		elseif inRaid and hasRoles and UnitGroupRolesAssigned(unit) == "TANK" then
+			ignoredTags[#ignoredTags + 1] = entry
+		end
 	end
-	if IsInRaid() then
+	NoteUnit("player")
+	if inRaid then
 		for index = 1, GetNumGroupMembers() do
 			local unit = "raid" .. index
-			if ns.IsUnitTank(unit) then
-				tanks[#tanks + 1] = unit .. " (" .. tostring(GetUnitName(unit, true)) .. ")"
+			if UnitGUID(unit) ~= UnitGUID("player") then
+				NoteUnit(unit)
 			end
 		end
 	elseif IsInGroup() then
 		for index = 1, 4 do
-			local unit = "party" .. index
-			if ns.IsUnitTank(unit) then
-				tanks[#tanks + 1] = unit .. " (" .. tostring(GetUnitName(unit, true)) .. ")"
-			end
+			NoteUnit("party" .. index)
 		end
 	end
+	local rule = inRaid and "in a raid only the Main Tank assignment counts"
+		or "outside a raid the group finder's Tank role counts"
 	if #tanks == 0 then
-		lines[#lines + 1] =
-			"Tanks: none by Main Tank assignment or group finder role (a tab with either tank scope set never fires without one)"
+		lines[#lines + 1] = "Tanks: none (" .. rule .. "; a tab with either tank scope set never fires without one)"
 	else
-		lines[#lines + 1] = "Tanks (Main Tank assignment or TANK role): " .. table.concat(tanks, ", ")
+		lines[#lines + 1] = "Tanks (" .. rule .. "): " .. table.concat(tanks, ", ")
+	end
+	if #ignoredTags > 0 then
+		lines[#lines + 1] = "Tank role tags ignored in a raid: " .. table.concat(ignoredTags, ", ")
 	end
 	lines[#lines + 1] = string.format("ns.GroupHasTank() = %s (a tank must also be alive)", tostring(ns.GroupHasTank()))
 

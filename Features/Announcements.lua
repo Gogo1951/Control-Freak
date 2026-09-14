@@ -347,9 +347,8 @@ end
 
     The group test is guaranteed here rather than remembered. Every dispatch in
     Features/Combat-Log.lua also bails early on an outsider, which saves the
-    work; this one exists because SPELL_INTERRUPT once did not, and a mob
-    kicking the player's heal was announced to the raid as though a group member
-    had done something useful.
+    work; this one makes sure a dispatch missing that early test still cannot
+    announce a mob's cast as a group member's.
 
     A group member's PET counts as the group. The combat log's MINE and PARTY
     affiliation cover it, and a Felhunter's Spell Lock is a real interrupt --

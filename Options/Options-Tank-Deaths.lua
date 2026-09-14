@@ -42,10 +42,8 @@ end
 
       Tank Deaths is the ALERT, drawn as the block every other tab draws and
       bent the way Fears is: a death names no mob, so there is no target ladder
-      beside the switch and no marked-targets row. It keeps the whose rows,
-      because "whose death" has two answers that want different places. The
-      tank lying dead is the one person in the group who already knows; the
-      people who have to pick the mob up are the ones who do not.
+      beside the switch and no marked-targets row. It keeps the whose rows, so
+      your own death and other tanks' deaths can each go to their own place.
 
       Deaths by Class is the LOG. Nine rows, no sounds and no destination: a
       watch list somebody keeps for themselves, and nine classes with a sound
@@ -61,11 +59,11 @@ function ns.BuildTankDeathsOptions()
 
 	--[[
 	    Both rows carry tooltips of their own, because the shared pair describes
-	    casts and neither row here reports one. The My row ships announcing;
+	    casts and neither row here reports one. Both ship printing;
 	    Data/Default-Settings.lua says why.
 
-	    The Example names the player, since the line a fresh install actually
-	    puts in front of the group is the player's own.
+	    The Example names the player: My Death is the row a player reads first,
+	    and the line it shows them is their own.
 	]]
 	ns.AddWhoseAlertSection(args, "alert", Section, 20, hidden, {
 		headerKey = "TANK_DEATHS_ALERT_HEADER",

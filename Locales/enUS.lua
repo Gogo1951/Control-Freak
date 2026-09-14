@@ -38,8 +38,8 @@ L["OPTIONS_COMMAND_DESCRIPTION"] = "Opens the Options Interface for this add-on.
     rather than the act of throwing it, which is what a player cannot read off
     the box beside it -- every other toggle on this panel governs one thing.
 
-    Its ENABLE description is shared with the mini-map button's line for the same
-    toggle, so the two cannot describe it differently.
+    The title and the ENABLE description are shared with the mini-map button's
+    block for the same toggle, so the two cannot name or describe it differently.
 ]]
 L["KILL_SWITCH"] = "All Alerts"
 L["KILL_SWITCH_SUMMARY"] =
@@ -105,10 +105,10 @@ L["SCOPE_ROLE_HEALER"] = "As a Healer"
 L["SCOPE_ROLE_TANK_HEALER"] = "As a Tank or Healer"
 L["SCOPE_ROLE_ALWAYS"] = "Always"
 L["SCOPE_ROLE_DESC"] =
-	"Which seat you have to be in for this feature to say anything. You count as tanking when you are the raid's Main Tank or have the group finder's Tank role selected, and as healing only when you have its Healer role selected, since there is no raid assignment for healing. Always drops the question and fires whatever you are playing."
+	"Which seat you have to be in for this feature to say anything. You count as tanking when you are assigned Main Tank in a raid, or have the group finder's Tank role selected in a party. In a raid the Tank role means nothing. You count as healing only when you have the group finder's Healer role selected, since there is no raid assignment for healing. Always drops the question and fires whatever you are playing."
 L["SCOPE_GROUP_HAS_TANK"] = "When Group Has a Tank"
 L["SCOPE_GROUP_HAS_TANK_DESC"] =
-	"Fire only while someone in your group is tanking and still alive. A tank who is down counts as no tank, because that is when somebody else holding threat is helping."
+	"Fire only while somebody in your group is tanking and still alive. In a raid that means an assigned Main Tank, so a raid with none assigned has no tank as far as Control Freak can tell. A tank who is down counts as no tank, because that is when somebody else holding threat is helping."
 L["SCOPE_INSTANCE_ONLY"] = "While in Instances"
 L["SCOPE_INSTANCE_ONLY_DESC"] = "Fire only inside dungeons and raids."
 
@@ -119,8 +119,8 @@ L["SCOPE_INSTANCE_ONLY_DESC"] = "Fire only inside dungeons and raids."
 --[[
     Every alert on every tab is drawn as the same block, so each one owns five
     strings: a HEADER naming the thing that happened; an ENABLE reading "Enable
-    Notifications for <that thing> On" -- the switch turns the telling on, not
-    the event, and the target dropdown beside it finishes the sentence, so the
+    Alerts for <that thing> On" -- the switch turns the telling on, not the
+    event, and the target dropdown beside it finishes the sentence, so the
     string ENDS on the preposition (a section with no target drops the word); a
     DESC of one or two sentences; and a MINE and an OTHERS naming the two rows.
     ns.AddWhoseAlertSection in Options-Alert-Section.lua is where that shape
@@ -144,9 +144,9 @@ L["SOUND_NONE"] = "None"
     TAUNTS_SUCCESS_MINE below -- because "My" and "Others'" agree with the noun
     in some languages and a shared "%s" template could not.
 
-    TRANSLATORS: ALERT_AGAINST_DESC quotes one rung by name; that wording must
-    match your TARGET_RUNG_ELITE_0, or the tooltip explains a choice the player
-    cannot find in the list. The four rungs are a threshold, widest first: each
+    TRANSLATORS: ALERT_AGAINST_DESC quotes one rung and one row by name; that
+    wording must match your TARGET_RUNG_ELITE_0 and ALERT_MARKED_ALWAYS, or the
+    tooltip explains a choice the player cannot find. The four rungs are a threshold, widest first: each
     one counts itself and the ones after it, which is why every rung that
     includes bosses says so. Keep that in your translations -- a rung reading
     only "Elites" beside a separate "Bosses" reads as two disjoint sets.
@@ -163,14 +163,14 @@ L["ALERT_OUTPUT_ANNOUNCE"] = "Announce"
 L["ALERT_OUTPUT_DESC"] =
 	"Where this line goes: one place, never both. Print (Self Only) is your own window and costs nobody anything. Announce sends it to party or raid chat instead, and narrating other people to the whole raid is how an add-on wears out its welcome, so that one is worth a thought. Announce stays silent when you are not in a group, and inside battlegrounds and arenas."
 L["ALERT_AGAINST_DESC"] =
-	"Which enemies count, each choice including the ones after it. Bosses are skull-level (??) enemies. A dungeon boss carries no skull of its own, so it counts as an elite: Elites Your Level+ & Bosses is the choice that keeps it while dropping the lower-level trash around it. A raid mark overrides all of this while the row below is ticked."
+	"Which enemies count, each choice including the ones after it. Bosses are skull-level (??) enemies. A dungeon boss carries no skull of its own, so it counts as an elite: Elites Your Level+ & Bosses is the choice that keeps it while dropping the lower-level trash around it. A raid mark overrides all of this while Always Alert on Marked Targets is ticked."
 L["TARGET_RUNG_ALL"] = "Everything"
 L["TARGET_RUNG_ELITE"] = "Elites & Bosses"
 L["TARGET_RUNG_ELITE_0"] = "Elites Your Level+ & Bosses"
 L["TARGET_RUNG_BOSS"] = "Bosses"
 L["ALERT_MARKED_ALWAYS"] = "Always Alert on Marked Targets"
 L["ALERT_MARKED_ALWAYS_DESC"] =
-	"A target carrying a raid mark counts whatever the dropdown beside the switch says: skull, cross, any of the eight. Marks are how a group points at the pull that matters, so one somebody has marked is never dropped for being the wrong rank or level."
+	"A target carrying a raid mark (skull, cross, any of the eight) counts whatever the dropdown beside the switch says. Marks are how a group points at the pull that matters, so one somebody has marked is never dropped for being the wrong rank or level."
 
 --[[
     The cooldown dropdown's own entries, built by ns.BuildCooldownValues from a
@@ -242,20 +242,20 @@ L["TAUNTS_ENABLE"] = "Enable Taunt Monitoring"
 L["TAUNTS_SUCCESS_HEADER"] = "Successful Taunts"
 L["TAUNTS_SUCCESS_DESC"] =
 	"A taunt that landed and took the mob off somebody else. A taunt on a mob already hitting the taunter is a threat refresh rather than a save, so those stay quiet."
-L["TAUNTS_SUCCESS_ENABLE"] = "Enable Notifications for Successful Taunts On"
+L["TAUNTS_SUCCESS_ENABLE"] = "Enable Alerts for Successful Taunts On"
 L["TAUNTS_SUCCESS_MINE"] = "My Successful Taunts"
 L["TAUNTS_SUCCESS_OTHERS"] = "Others' Successful Taunts"
 
 L["TAUNTS_FAILED_HEADER"] = "Failed Taunts"
 L["TAUNTS_FAILED_DESC"] =
 	"A taunt that missed, was resisted, or hit something immune. The mob did not change hands, and nothing on screen says so."
-L["TAUNTS_FAILED_ENABLE"] = "Enable Notifications for Failed Taunts On"
+L["TAUNTS_FAILED_ENABLE"] = "Enable Alerts for Failed Taunts On"
 L["TAUNTS_FAILED_MINE"] = "My Failed Taunts"
 L["TAUNTS_FAILED_OTHERS"] = "Others' Failed Taunts"
 
 L["TAUNTS_AOE_HEADER"] = "AOE Taunts"
 L["TAUNTS_AOE_DESC"] = "A taunt that grabs everything around it at once, rather than one target."
-L["TAUNTS_AOE_ENABLE"] = "Enable Notifications for AOE Taunts"
+L["TAUNTS_AOE_ENABLE"] = "Enable Alerts for AOE Taunts"
 L["TAUNTS_AOE_MINE"] = "My AOE Taunts"
 L["TAUNTS_AOE_OTHERS"] = "Others' AOE Taunts"
 
@@ -271,7 +271,7 @@ L["INTERRUPTS_ENABLE"] = "Enable Interrupt Monitoring"
 
 L["INTERRUPTS_ALERT_HEADER"] = "Successful Interrupts"
 L["INTERRUPTS_ALERT_DESC"] = "A cast stopped partway through. Names who stopped it and what they stopped."
-L["INTERRUPTS_ALERT_ENABLE"] = "Enable Notifications for Successful Interrupts On"
+L["INTERRUPTS_ALERT_ENABLE"] = "Enable Alerts for Successful Interrupts On"
 L["INTERRUPTS_ALERT_MINE"] = "My Successful Interrupts"
 L["INTERRUPTS_ALERT_OTHERS"] = "Others' Successful Interrupts"
 
@@ -284,8 +284,8 @@ L["FEARS_ENABLE"] = "Enable Fear Monitoring"
 
 L["FEARS_ALERT_HEADER"] = "Successful Fears"
 L["FEARS_ALERT_DESC"] =
-	"A fear that landed and scattered the pull out of the tank's reach. Only the landing counts: a bare cast, a resist, and an immune all moved nothing, so none of them are reported."
-L["FEARS_ALERT_ENABLE"] = "Enable Notifications for Successful Fears"
+	"A fear that landed and scattered the pull out of the tank's reach. Only the landing counts: a bare cast, a resist, and an immunity all moved nothing, so none of them are reported."
+L["FEARS_ALERT_ENABLE"] = "Enable Alerts for Successful Fears"
 L["FEARS_ALERT_MINE"] = "My Successful Fears"
 L["FEARS_ALERT_OTHERS"] = "Others' Successful Fears"
 
@@ -307,7 +307,7 @@ L["INCAPACITATED_DESC"] =
     ladder, and its "Long" threshold is a row of its own, above the two rows it
     names.
 ]]
-L["INCAPACITATED_ALERT_ENABLE"] = "Enable Notifications for Being Incapacitated"
+L["INCAPACITATED_ALERT_ENABLE"] = "Enable Alerts for Being Incapacitated"
 --[[
     The only pair of rows in the add-on that is not My and Others'. The game
     reports the player's own losses of control and nobody else's, so "whose"
@@ -371,8 +371,8 @@ L["TANK_DEATHS_ENABLE"] = "Enable Tank Death Monitoring"
 
 L["TANK_DEATHS_ALERT_HEADER"] = "Tank Deaths"
 L["TANK_DEATHS_ALERT_DESC"] =
-	"Counts the raid's Main Tank and anybody with the group finder's Tank role selected, you included. Those are the only two ways the game says who is tanking, so a tank with neither dies unreported."
-L["TANK_DEATHS_ALERT_ENABLE"] = "Enable Notifications for Tank Deaths"
+	"In a raid, counts only the players assigned Main Tank, you included, and a group finder role means nothing there. In a party, counts anybody with the group finder's Tank role selected. A tank with neither dies unreported."
+L["TANK_DEATHS_ALERT_ENABLE"] = "Enable Alerts for Tank Deaths"
 L["TANK_DEATHS_ALERT_MINE"] = "My Death"
 L["TANK_DEATHS_ALERT_MINE_DESC"] =
 	"Report your own death while you are tanking. The dropdown beside it says where the line goes."
@@ -395,7 +395,7 @@ L["BAD_PRIESTS_ENABLE"] = "Enable Bad Priest Monitoring"
 L["BAD_PRIESTS_HEADER"] = "Bad Shields"
 L["BAD_PRIESTS_DESC"] =
 	"Call out a Power Word: Shield landing on a druid or warrior who is tanking. Rage comes from damage taken, and damage a shield absorbs generates none, so a well-meant shield starves the tank of the rage they hold threat with."
-L["BAD_PRIESTS_ALERT_ENABLE"] = "Enable Notifications for Bad Shields"
+L["BAD_PRIESTS_ALERT_ENABLE"] = "Enable Alerts for Bad Shields"
 L["BAD_PRIESTS_HEALTH_DESC"] =
 	"How low the tank has to drop before a shield stops being a mistake. A shield on somebody about to die is the right call, so the warning stays quiet below the level you pick here. Pick Always to hear about every shield."
 L["BAD_PRIESTS_HEALTH_ALWAYS"] = "Always"
@@ -417,14 +417,13 @@ L["BAD_PRIESTS_COOLDOWN_DESC"] =
 -- Bad Pets
 --------------------------------------------------------------------------------
 
--- Doubles as the mini-map button's Bad Pets line, so the two cannot differ.
 L["BAD_PETS_SUMMARY"] = "Hunter and warlock pets with auto-cast threat abilities left on."
 L["BAD_PETS_ENABLE"] = "Enable Bad Pet Monitoring"
 
 L["BAD_PETS_ALERT_HEADER"] = "Pet Taunts"
 L["BAD_PETS_ALERT_DESC"] =
 	"A pet pulling the mob off the tank with auto-cast left on, usually without its owner noticing."
-L["BAD_PETS_ALERT_ENABLE"] = "Enable Notifications for Pet Taunts On"
+L["BAD_PETS_ALERT_ENABLE"] = "Enable Alerts for Pet Taunts On"
 L["BAD_PETS_ALERT_MINE"] = "My Pet Taunts"
 L["BAD_PETS_ALERT_OTHERS"] = "Others' Pet Taunts"
 L["BAD_PETS_WHISPER_ENABLE"] = "Whisper the Pet Owner"
@@ -440,17 +439,25 @@ L["BAD_PETS_ABILITIES_HEADER"] = "Bad Pet Abilities"
 --------------------------------------------------------------------------------
 
 --[[
-    No summary line: the Tanking Tools tab opens on its enable, because the tab is
-    a collection of unrelated warnings rather than one idea a sentence can cover.
-    Each section introduces itself instead.
+    No summary line on the tab: Tanking Tools opens on its enable, because the
+    tab is a collection of unrelated warnings rather than one idea a sentence
+    can cover. Each section introduces itself instead.
+
+    The mini-map tooltip carries a short one anyway, because the button's
+    Right-Click toggles this tab and the tooltip has to say what it is turning
+    on. TRANSLATORS: it lists the four section headers below in your own words
+    for them; keep it to two lines in the tooltip.
 ]]
 L["TANKING_TOOLS_ENABLE"] = "Enable Tanking Tools"
+L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "Cold openers, armor debuffs, parries, and novas."
 
 L["TANKING_TOOLS_COLD_OPENER_HEADER"] = "Cold Openers"
 L["TANKING_TOOLS_COLD_OPENER_DESC"] =
 	"Call out your own opening attacks that failed to land: a miss, a dodge, a parry, a block, a resist, or an immunity in the first seconds of a pull. Threat that never happened, at the moment it matters most."
-L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "Enable Notifications for Cold Openers On"
+L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "Enable Alerts for Cold Openers On"
 L["TANKING_TOOLS_COLD_OPENER_MINE"] = "My Cold Openers"
+L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] =
+	"Report your own opening abilities that failed to land. The dropdown beside it says where the line goes."
 -- The caption before the window dropdown: "Within [10 Seconds of Fight]".
 L["TANKING_TOOLS_COLD_OPENER_WITHIN"] = "Within"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "%d Seconds of Fight"
@@ -460,7 +467,7 @@ L["TANKING_TOOLS_COLD_OPENER_WINDOW_DESC"] =
 L["TANKING_TOOLS_ARMOR_HEADER"] = "Armor Debuffs"
 L["TANKING_TOOLS_ARMOR_DESC"] =
 	"Report how long the group took to strip a target's armor: five Sunders or a rogue's Expose Armor. Tick an Include row below and it waits for that debuff too, but only when somebody in the group can actually cast it."
-L["TANKING_TOOLS_ARMOR_ENABLE"] = "Enable Notifications for Armor Debuffs On"
+L["TANKING_TOOLS_ARMOR_ENABLE"] = "Enable Alerts for Armor Debuffs On"
 -- The one row: the report is the group's, so it is not "My" anything.
 L["TANKING_TOOLS_ARMOR_REPORT"] = "Armor Debuff Reports"
 L["TANKING_TOOLS_ARMOR_REPORT_DESC"] =
@@ -474,13 +481,20 @@ L["TANKING_TOOLS_ARMOR_RECKLESSNESS_DESC"] =
 
 L["TANKING_TOOLS_PARRY_HEADER"] = "Parries"
 L["TANKING_TOOLS_PARRY_DESC"] =
-	"Someone parried by a mob they are not tanking is standing in front of it. Every parry speeds up that mob's next swing at whoever is holding it."
-L["TANKING_TOOLS_PARRY_ENABLE"] = "Enable Notifications for Parries On"
+	"Somebody parried by a mob they are not tanking is standing in front of it. Every parry speeds up that mob's next swing at whoever is holding it."
+L["TANKING_TOOLS_PARRY_ENABLE"] = "Enable Alerts for Parries On"
 L["TANKING_TOOLS_PARRY_MINE"] = "My Parries"
+L["TANKING_TOOLS_PARRY_MINE_DESC"] =
+	"Report a mob parrying your attacks. The dropdown beside it says where the line goes."
 L["TANKING_TOOLS_PARRY_OTHERS"] = "Others' Parries"
-L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "Ignore Other Tanks"
+L["TANKING_TOOLS_PARRY_OTHERS_DESC"] =
+	"Report a mob parrying anybody else in your group. The dropdown beside it says where the line goes."
+L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "Ignore Tanks"
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"] =
-	"Stay quiet when the player parried is a tank: the raid's Main Tank, or somebody with the Tank role. An off-tank stands in front of the boss for a taunt swap, and that is not a mistake to whisper about. Your own parries still report."
+	"Stay quiet when the player parried is a tank: assigned Main Tank in a raid, or holding the group finder's Tank role in a party. An off-tank stands in front of the boss for a taunt swap, and that is not a mistake to whisper about. Your own parries still report."
+L["TANKING_TOOLS_PARRY_IGNORE_PETS"] = "Ignore Pets"
+L["TANKING_TOOLS_PARRY_IGNORE_PETS_DESC"] =
+	"Stay quiet when the one parried is a pet, yours included. A pet stands where its owner sent it, and a line naming the pet gives nobody in the group anything to do. Pets are never whispered either way."
 L["TANKING_TOOLS_PARRY_WHISPER"] = "Whisper the Culprit"
 L["TANKING_TOOLS_PARRY_WHISPER_DESC"] =
 	"Send the culprit a note asking them to move behind the mob. Only one is sent even when several people in your group run Control Freak."
@@ -488,8 +502,8 @@ L["TANKING_TOOLS_PARRY_COOLDOWN_DESC"] =
 	"How long one culprit stays quiet after setting off a parry warning. It covers the print, the sound, the announce, and the whisper, because somebody who has not moved yet does not need telling every swing."
 
 L["TANKING_TOOLS_NOVA_HEADER"] = "Novas"
-L["TANKING_TOOLS_NOVA_DESC"] = "Call out a Frost Nova, which scatters a pull out of the tank's reach."
-L["TANKING_TOOLS_NOVA_ENABLE"] = "Enable Notifications for Novas"
+L["TANKING_TOOLS_NOVA_DESC"] = "Call out a Frost Nova, which freezes a pull where it stands, out of the tank's reach."
+L["TANKING_TOOLS_NOVA_ENABLE"] = "Enable Alerts for Novas"
 L["TANKING_TOOLS_NOVA_MINE"] = "My Novas"
 L["TANKING_TOOLS_NOVA_OTHERS"] = "Others' Novas"
 
@@ -621,15 +635,14 @@ L["SHIELD_WHISPER"] = "Bad Shield! Please avoid casting %s on %s. This ability b
 
 L["BAD_PET"] = "Bad Pet! %s's pet %s used %s on %s."
 L["BAD_PET_AOE"] = "Bad Pet! %s's pet %s used %s."
-L["BAD_PET_OWN"] = "Bad Pet! Your pet %s used %s on %s."
-L["BAD_PET_OWN_AOE"] = "Bad Pet! Your pet %s used %s."
 L["BAD_PET_UNKNOWN_OWNER"] = "Bad Pet! %s used %s on %s."
 L["BAD_PET_UNKNOWN_OWNER_AOE"] = "Bad Pet! %s used %s."
 --[[
-    Kept short on purpose. It renders with a spell link and two names inside a 255
-    byte chat limit, and the widest locale runs close to twice the English.
+    Kept short on purpose. They render with a spell link and up to two names inside
+    a 255 byte chat limit, and the widest locale runs close to twice the English.
 ]]
-L["BAD_PET_WHISPER"] = "Your pet %s used %s on %s. Right-click it to turn off auto-cast."
+L["BAD_PET_WHISPER"] = "Your pet %s used %s on %s. Right-click the ability to turn off auto-cast."
+L["BAD_PET_WHISPER_AOE"] = "Your pet %s used %s. Right-click the ability to turn off auto-cast."
 
 L["COLD_OPENER_MISS"] = "Careful! %s's %s missed %s."
 L["COLD_OPENER_DODGE"] = "Careful! %s's %s was dodged by %s."
@@ -638,7 +651,7 @@ L["COLD_OPENER_BLOCK"] = "Careful! %s's %s was blocked by %s."
 L["COLD_OPENER_IMMUNE"] = "Careful! %s's %s was ignored by %s."
 L["COLD_OPENER_RESIST"] = "Careful! %s's %s was resisted by %s."
 
-L["ARMOR_REPORT"] = "Armor Stripped! %s vulnerable after %s seconds."
+L["ARMOR_REPORT"] = "Armor Stripped! %s became vulnerable after %s seconds."
 
 L["PARRY_WARNING"] = "Parry Haste! %s is standing in front of %s."
 L["PARRY_WHISPER"] = "Parry Haste! Please get behind %s: every parry speeds up its next swing."

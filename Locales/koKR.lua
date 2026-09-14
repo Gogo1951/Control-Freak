@@ -43,7 +43,7 @@ L["OPTIONS_COMMAND_DESCRIPTION"] = "이 애드온의 설정 창을 엽니다."
 ]]
 L["KILL_SWITCH"] = "모든 알림"
 L["KILL_SWITCH_SUMMARY"] =
-	"모든 탭의 모든 알림을 한 번에 켜고 끄는 스위치입니다. 끄더라도 설정은 그대로 남고, 미니맵 버튼을 왼쪽 클릭해도 어디서든 같은 일을 할 수 있습니다."
+	"모든 탭의 모든 알림을 한 번에 켜고 끄는 스위치입니다. 끄더라도 설정은 그대로 남고, 미니맵 버튼을 좌클릭해도 어디서든 같은 일을 할 수 있습니다."
 L["KILL_SWITCH_ENABLE"] = "Control Freak 사용"
 L["KILL_SWITCH_ENABLE_DESC"] = "Control Freak의 모든 알림을 켜거나 끕니다."
 
@@ -81,7 +81,7 @@ L["TAB_INCAPACITATED"] = "행동 불가"
 L["TAB_TANK_DEATHS"] = "탱커 사망"
 L["TAB_BAD_PRIESTS"] = "말썽쟁이 사제"
 L["TAB_BAD_PETS"] = "말썽쟁이 소환수"
-L["TAB_TANKING_TOOLS"] = "방어 전담 도구"
+L["TAB_TANKING_TOOLS"] = "탱킹 도구"
 
 --------------------------------------------------------------------------------
 -- Feature Scope
@@ -105,10 +105,10 @@ L["SCOPE_ROLE_HEALER"] = "힐러일 때"
 L["SCOPE_ROLE_TANK_HEALER"] = "탱커 또는 힐러일 때"
 L["SCOPE_ROLE_ALWAYS"] = "항상"
 L["SCOPE_ROLE_DESC"] =
-	"이 기능이 무언가를 알리려면 맡고 있어야 하는 역할입니다. 공격대의 메인 탱커로 지정되었거나 파티 찾기에서 방어 전담 역할을 선택했을 때 탱커로 인정되고, 치유 전담 역할을 선택했을 때만 힐러로 인정됩니다. 치유에는 공격대 지정이 없기 때문입니다. '항상'을 고르면 이 조건을 따지지 않고 어떤 역할이든 작동합니다."
+	"이 기능이 무언가를 알리려면 맡고 있어야 하는 역할입니다. 공격대에서는 메인 탱커로 지정되었을 때, 파티에서는 파티 찾기에서 방어 전담 역할을 선택했을 때 탱커로 인정됩니다. 공격대에서는 방어 전담 역할이 아무 의미도 없습니다. 파티 찾기에서 치유 전담 역할을 선택했을 때만 힐러로 인정됩니다. 치유에는 공격대 지정이 없기 때문입니다. '항상'을 고르면 이 조건을 따지지 않고 어떤 역할이든 작동합니다."
 L["SCOPE_GROUP_HAS_TANK"] = "파티에 탱커가 있을 때"
 L["SCOPE_GROUP_HAS_TANK_DESC"] =
-	"파티에서 누군가 탱킹 중이고 아직 살아 있을 때만 작동합니다. 쓰러진 탱커는 탱커가 없는 것으로 칩니다. 바로 그때가 다른 누군가가 위협 수준을 붙잡아 주는 것이 도움이 되는 순간이기 때문입니다."
+	"파티에서 누군가 탱킹 중이고 아직 살아 있을 때만 작동합니다. 공격대에서는 지정된 메인 탱커만 해당하므로, 메인 탱커가 지정되지 않은 공격대는 Control Freak에게 탱커가 없는 것과 같습니다. 쓰러진 탱커는 탱커가 없는 것으로 칩니다. 바로 그때가 다른 누군가가 위협 수준을 붙잡아 주는 것이 도움이 되는 순간이기 때문입니다."
 L["SCOPE_INSTANCE_ONLY"] = "인스턴스 안에 있을 때"
 L["SCOPE_INSTANCE_ONLY_DESC"] = "던전과 공격대 안에서만 작동합니다."
 
@@ -119,8 +119,8 @@ L["SCOPE_INSTANCE_ONLY_DESC"] = "던전과 공격대 안에서만 작동합니�
 --[[
     Every alert on every tab is drawn as the same block, so each one owns five
     strings: a HEADER naming the thing that happened; an ENABLE reading "Enable
-    Notifications for <that thing> On" -- the switch turns the telling on, not
-    the event, and the target dropdown beside it finishes the sentence, so the
+    Alerts for <that thing> On" -- the switch turns the telling on, not the
+    event, and the target dropdown beside it finishes the sentence, so the
     string ENDS on the preposition (a section with no target drops the word); a
     DESC of one or two sentences; and a MINE and an OTHERS naming the two rows.
     ns.AddWhoseAlertSection in Options-Alert-Section.lua is where that shape
@@ -144,9 +144,9 @@ L["SOUND_NONE"] = "없음"
     TAUNTS_SUCCESS_MINE below -- because "My" and "Others'" agree with the noun
     in some languages and a shared "%s" template could not.
 
-    TRANSLATORS: ALERT_AGAINST_DESC quotes one rung by name; that wording must
-    match your TARGET_RUNG_ELITE_0, or the tooltip explains a choice the player
-    cannot find in the list. The four rungs are a threshold, widest first: each
+    TRANSLATORS: ALERT_AGAINST_DESC quotes one rung and one row by name; that
+    wording must match your TARGET_RUNG_ELITE_0 and ALERT_MARKED_ALWAYS, or the
+    tooltip explains a choice the player cannot find. The four rungs are a threshold, widest first: each
     one counts itself and the ones after it, which is why every rung that
     includes bosses says so. Keep that in your translations -- a rung reading
     only "Elites" beside a separate "Bosses" reads as two disjoint sets.
@@ -165,7 +165,7 @@ L["ALERT_OUTPUT_ANNOUNCE"] = "알리기"
 L["ALERT_OUTPUT_DESC"] =
 	"이 줄을 보낼 곳입니다. 한 곳으로만 가며, 양쪽 모두로 가지는 않습니다. 출력(나에게만)은 내 대화창에만 표시되므로 아무에게도 부담을 주지 않습니다. 알리기는 대신 파티나 공격대 대화로 보내는데, 다른 사람의 행동을 공격대 전체에 중계하는 것은 애드온이 눈총을 받는 지름길이므로 한 번 생각해 볼 만합니다. 알리기는 파티나 공격대에 있지 않을 때, 그리고 전장과 투기장 안에서는 아무것도 보내지 않습니다."
 L["ALERT_AGAINST_DESC"] =
-	"어떤 적을 셀지 정합니다. 각 선택지는 목록에서 그 아래에 있는 선택지를 모두 포함합니다. 우두머리는 해골 레벨(??)인 적입니다. 던전 우두머리에게는 해골 표시가 없어서 정예로 칩니다. '내 레벨+ 정예와 우두머리'를 고르면 던전 우두머리는 남기고 주변의 낮은 레벨 일반몹은 걸러 냅니다. 아래 항목이 선택되어 있으면 공격대 징표가 이 모든 설정보다 우선합니다."
+	"어떤 적을 셀지 정합니다. 각 선택지는 목록에서 그 아래에 있는 선택지를 모두 포함합니다. 우두머리는 해골 레벨(??)인 적입니다. 던전 우두머리에게는 해골 표시가 없어서 정예로 칩니다. '내 레벨+ 정예와 우두머리'를 고르면 던전 우두머리는 남기고 주변의 낮은 레벨 일반몹은 걸러 냅니다. '징표 대상은 항상 포함'이 선택되어 있으면 공격대 징표가 이 모든 설정보다 우선합니다."
 L["TARGET_RUNG_ALL"] = "모든 적"
 L["TARGET_RUNG_ELITE"] = "정예와 우두머리"
 L["TARGET_RUNG_ELITE_0"] = "내 레벨+ 정예와 우두머리"
@@ -378,7 +378,7 @@ L["TANK_DEATHS_ENABLE"] = "탱커 사망 감시 사용"
 
 L["TANK_DEATHS_ALERT_HEADER"] = "탱커 사망"
 L["TANK_DEATHS_ALERT_DESC"] =
-	"공격대의 메인 탱커와 파티 찾기에서 방어 전담 역할을 선택한 사람을 탱커로 셉니다. 나도 포함됩니다. 게임이 누가 탱킹 중인지 알려 주는 방법은 이 두 가지뿐이므로, 둘 다 없는 탱커는 죽어도 알리지 않습니다."
+	"공격대에서는 메인 탱커로 지정된 플레이어만 탱커로 셉니다. 나도 포함되며, 파티 찾기의 역할은 공격대에서 아무 의미도 없습니다. 파티에서는 파티 찾기에서 방어 전담 역할을 선택한 사람을 셉니다. 둘 다 없는 탱커는 죽어도 알리지 않습니다."
 L["TANK_DEATHS_ALERT_ENABLE"] = "탱커 사망 알림 사용"
 L["TANK_DEATHS_ALERT_MINE"] = "내 사망"
 L["TANK_DEATHS_ALERT_MINE_DESC"] =
@@ -424,7 +424,6 @@ L["BAD_PRIESTS_COOLDOWN_DESC"] =
 -- Bad Pets
 --------------------------------------------------------------------------------
 
--- Doubles as the mini-map button's Bad Pets line, so the two cannot differ.
 L["BAD_PETS_SUMMARY"] = "위협 기술의 자동 시전을 켜 둔 사냥꾼과 흑마법사의 소환수입니다."
 L["BAD_PETS_ENABLE"] = "말썽쟁이 소환수 감시 사용"
 
@@ -447,17 +446,25 @@ L["BAD_PETS_ABILITIES_HEADER"] = "말썽쟁이 소환수 기술"
 --------------------------------------------------------------------------------
 
 --[[
-    No summary line: the Tanking Tools tab opens on its enable, because the tab is
-    a collection of unrelated warnings rather than one idea a sentence can cover.
-    Each section introduces itself instead.
+    No summary line on the tab: Tanking Tools opens on its enable, because the
+    tab is a collection of unrelated warnings rather than one idea a sentence
+    can cover. Each section introduces itself instead.
+
+    The mini-map tooltip carries a short one anyway, because the button's
+    Right-Click toggles this tab and the tooltip has to say what it is turning
+    on. TRANSLATORS: it lists the four section headers below in your own words
+    for them; keep it to two lines in the tooltip.
 ]]
-L["TANKING_TOOLS_ENABLE"] = "방어 전담 도구 사용"
+L["TANKING_TOOLS_ENABLE"] = "탱킹 도구 사용"
+L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "초반 공격 실패, 방어도 감소, 무기 막기, 회오리."
 
 L["TANKING_TOOLS_COLD_OPENER_HEADER"] = "초반 공격 실패"
 L["TANKING_TOOLS_COLD_OPENER_DESC"] =
 	"전투 시작 후 처음 몇 초 안에 들어가지 못한 내 공격을 알려 줍니다. 빗나감, 회피, 무기 막기, 방패 막기, 저항, 면역이 해당합니다. 가장 중요한 순간에 생기지 못한 위협 수준입니다."
 L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "초반 공격 실패 알림 사용, 대상:"
 L["TANKING_TOOLS_COLD_OPENER_MINE"] = "내 초반 공격 실패"
+L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] =
+	"전투 초반에 들어가지 못한 내 기술을 알립니다. 옆의 드롭다운에서 이 줄을 보낼 곳을 정합니다."
 -- The caption before the window dropdown: "Within [10 Seconds of Fight]".
 L["TANKING_TOOLS_COLD_OPENER_WITHIN"] = "전투 시작 후"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "%d초 이내"
@@ -484,10 +491,17 @@ L["TANKING_TOOLS_PARRY_DESC"] =
 	"자신이 맡지 않은 적에게 무기 막기를 당한 사람은 그 적의 정면에 서 있는 것입니다. 무기 막기가 일어날 때마다 그 적은 자신을 붙잡고 있는 사람에게 다음 공격을 더 빨리 휘두릅니다."
 L["TANKING_TOOLS_PARRY_ENABLE"] = "무기 막기 알림 사용, 대상:"
 L["TANKING_TOOLS_PARRY_MINE"] = "내가 당한 무기 막기"
+L["TANKING_TOOLS_PARRY_MINE_DESC"] =
+	"적이 내 공격을 무기 막기하면 알립니다. 옆의 드롭다운에서 이 줄을 보낼 곳을 정합니다."
 L["TANKING_TOOLS_PARRY_OTHERS"] = "다른 사람이 당한 무기 막기"
-L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "다른 탱커 무시"
+L["TANKING_TOOLS_PARRY_OTHERS_DESC"] =
+	"적이 파티의 다른 사람의 공격을 무기 막기하면 알립니다. 옆의 드롭다운에서 이 줄을 보낼 곳을 정합니다."
+L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "탱커 무시"
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"] =
-	"무기 막기를 당한 플레이어가 탱커, 즉 공격대의 메인 탱커이거나 방어 전담 역할을 선택한 사람이라면 알리지 않습니다. 보조 탱커는 도발 교대를 위해 우두머리 앞에 서는 것이므로 귓속말을 보낼 실수가 아닙니다. 내가 당한 무기 막기는 그대로 알립니다."
+	"무기 막기를 당한 플레이어가 탱커, 즉 공격대에서 메인 탱커로 지정되었거나 파티에서 파티 찾기의 방어 전담 역할을 선택한 사람이라면 알리지 않습니다. 보조 탱커는 도발 교대를 위해 우두머리 앞에 서는 것이므로 귓속말을 보낼 실수가 아닙니다. 내가 당한 무기 막기는 그대로 알립니다."
+L["TANKING_TOOLS_PARRY_IGNORE_PETS"] = "소환수 무시"
+L["TANKING_TOOLS_PARRY_IGNORE_PETS_DESC"] =
+	"무기 막기를 당한 것이 소환수라면 알리지 않습니다. 내 소환수도 포함됩니다. 소환수는 주인이 보낸 자리에 서 있을 뿐이고, 소환수 이름이 적힌 알림으로는 파티의 누구도 할 수 있는 일이 없습니다. 소환수에게는 어떤 경우에도 귓속말을 보내지 않습니다."
 L["TANKING_TOOLS_PARRY_WHISPER"] = "당사자에게 귓속말"
 L["TANKING_TOOLS_PARRY_WHISPER_DESC"] =
 	"당사자에게 적의 뒤로 이동해 달라는 귓속말을 보냅니다. 파티에서 여러 명이 Control Freak을 쓰고 있어도 귓속말은 하나만 전송됩니다."
@@ -496,7 +510,7 @@ L["TANKING_TOOLS_PARRY_COOLDOWN_DESC"] =
 
 L["TANKING_TOOLS_NOVA_HEADER"] = "회오리"
 L["TANKING_TOOLS_NOVA_DESC"] =
-	"끌어온 무리를 탱커의 손이 닿지 않는 곳으로 흩어 놓는 얼음 회오리를 알려 줍니다."
+	"끌어온 무리를 그 자리에 얼려 탱커의 손이 닿지 않게 만드는 얼음 회오리를 알려 줍니다."
 L["TANKING_TOOLS_NOVA_ENABLE"] = "회오리 알림 사용"
 L["TANKING_TOOLS_NOVA_MINE"] = "내 회오리"
 L["TANKING_TOOLS_NOVA_OTHERS"] = "다른 사람의 회오리"
@@ -630,16 +644,15 @@ L["SHIELD_WHISPER"] =
 
 L["BAD_PET"] = "말썽쟁이 소환수! %s님의 소환수 %s, %s 사용, 대상: %s."
 L["BAD_PET_AOE"] = "말썽쟁이 소환수! %s님의 소환수 %s, %s 사용."
-L["BAD_PET_OWN"] = "말썽쟁이 소환수! 내 소환수 %s, %s 사용, 대상: %s."
-L["BAD_PET_OWN_AOE"] = "말썽쟁이 소환수! 내 소환수 %s, %s 사용."
 L["BAD_PET_UNKNOWN_OWNER"] = "말썽쟁이 소환수! %s, %s 사용, 대상: %s."
 L["BAD_PET_UNKNOWN_OWNER_AOE"] = "말썽쟁이 소환수! %s, %s 사용."
 --[[
-    Kept short on purpose. It renders with a spell link and two names inside a 255
-    byte chat limit, and the widest locale runs close to twice the English.
+    Kept short on purpose. They render with a spell link and up to two names inside
+    a 255 byte chat limit, and the widest locale runs close to twice the English.
 ]]
 L["BAD_PET_WHISPER"] =
 	"소환수 %s, %s 사용, 대상: %s. 해당 기술을 우클릭하면 자동 시전이 꺼집니다."
+L["BAD_PET_WHISPER_AOE"] = "소환수 %s, %s 사용. 해당 기술을 우클릭하면 자동 시전이 꺼집니다."
 
 L["COLD_OPENER_MISS"] = "주의! %s님의 %s, %s에게 빗나감."
 L["COLD_OPENER_DODGE"] = "주의! %s님의 %s, %s에게 회피당함."

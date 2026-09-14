@@ -169,7 +169,7 @@ function ns.GetRaidIconIndex(destRaidFlags)
 end
 
 --------------------------------------------------------------------------------
--- Combat Log Handler
+-- COMBAT_LOG_EVENT_UNFILTERED
 --------------------------------------------------------------------------------
 
 --[[
@@ -198,8 +198,7 @@ function ns:COMBAT_LOG_EVENT_UNFILTERED()
 	if subevent == "SPELL_INTERRUPT" then
 		--[[
 		    Mobs interrupt too. This branch returns before the ability path's own
-		    source gate below, so without this it happily reported a Defias Prisoner
-		    kicking the player's heal.
+		    source gate below, so it needs a source gate of its own.
 		]]
 		if not ns.IsGroupSource(sourceFlags) then
 			return

@@ -105,10 +105,10 @@ L["SCOPE_ROLE_HEALER"] = "担任治疗时"
 L["SCOPE_ROLE_TANK_HEALER"] = "担任坦克或治疗时"
 L["SCOPE_ROLE_ALWAYS"] = "始终"
 L["SCOPE_ROLE_DESC"] =
-	'这项功能要开口，你必须担任的职责。当你是团队的主坦克，或在队伍查找器中选择了坦克职责时，算作坦克；只有在选择了治疗职责时才算作治疗，因为治疗没有团队指派。选择"始终"就不问职责，无论你玩什么都会提示。'
+	'你必须担任哪种职责，这项功能才会开口。在团队中，只有被指派为主坦克时才算作坦克；在小队中，在队伍查找器中选择了坦克职责时算作坦克。在团队中，坦克职责不起任何作用。只有在队伍查找器中选择了治疗职责时才算作治疗，因为治疗没有团队指派。选择"始终"就不问职责，无论你玩什么都会提示。'
 L["SCOPE_GROUP_HAS_TANK"] = "队伍中有坦克时"
 L["SCOPE_GROUP_HAS_TANK_DESC"] =
-	"只在队伍中有人正在当坦克并且还活着时触发。倒下的坦克算作没有坦克，因为这时有别人接住仇恨是在帮忙。"
+	"只在队伍中有人正在当坦克并且还活着时触发。在团队中，这指的是被指派的主坦克，所以在 Control Freak 看来，没有指派主坦克的团队就没有坦克。倒下的坦克算作没有坦克，因为这时有别人接住仇恨是在帮忙。"
 L["SCOPE_INSTANCE_ONLY"] = "身处副本时"
 L["SCOPE_INSTANCE_ONLY_DESC"] = "只在地下城和团队副本中触发。"
 
@@ -119,8 +119,8 @@ L["SCOPE_INSTANCE_ONLY_DESC"] = "只在地下城和团队副本中触发。"
 --[[
     Every alert on every tab is drawn as the same block, so each one owns five
     strings: a HEADER naming the thing that happened; an ENABLE reading "Enable
-    Notifications for <that thing> On" -- the switch turns the telling on, not
-    the event, and the target dropdown beside it finishes the sentence, so the
+    Alerts for <that thing> On" -- the switch turns the telling on, not the
+    event, and the target dropdown beside it finishes the sentence, so the
     string ENDS on the preposition (a section with no target drops the word); a
     DESC of one or two sentences; and a MINE and an OTHERS naming the two rows.
     ns.AddWhoseAlertSection in Options-Alert-Section.lua is where that shape
@@ -144,9 +144,9 @@ L["SOUND_NONE"] = "无"
     TAUNTS_SUCCESS_MINE below -- because "My" and "Others'" agree with the noun
     in some languages and a shared "%s" template could not.
 
-    TRANSLATORS: ALERT_AGAINST_DESC quotes one rung by name; that wording must
-    match your TARGET_RUNG_ELITE_0, or the tooltip explains a choice the player
-    cannot find in the list. The four rungs are a threshold, widest first: each
+    TRANSLATORS: ALERT_AGAINST_DESC quotes one rung and one row by name; that
+    wording must match your TARGET_RUNG_ELITE_0 and ALERT_MARKED_ALWAYS, or the
+    tooltip explains a choice the player cannot find. The four rungs are a threshold, widest first: each
     one counts itself and the ones after it, which is why every rung that
     includes bosses says so. Keep that in your translations -- a rung reading
     only "Elites" beside a separate "Bosses" reads as two disjoint sets.
@@ -165,14 +165,14 @@ L["ALERT_OUTPUT_ANNOUNCE"] = "通报"
 L["ALERT_OUTPUT_DESC"] =
 	"这条消息发往哪里：只发一处，绝不两处都发。显示（仅自己可见）只出现在你自己的窗口里，不会给任何人添麻烦。通报则改为发到小队或团队频道，而向整个团队播报别人的一举一动，正是插件惹人嫌的原因，所以选它之前值得三思。你不在队伍中时，以及在战场和竞技场里，通报不会发出任何消息。"
 L["ALERT_AGAINST_DESC"] =
-	'哪些敌人计入：每个选项都包含排在它后面的选项。首领指骷髅等级（??）的敌人。地下城首领的等级不显示为骷髅，所以算作精英："同级及以上精英与首领"这一项会保留它，同时滤掉它周围等级较低的小怪。勾选下面那一行时，团队标记优先于以上所有规则。'
+	'哪些敌人计入：每个选项都包含排在它后面的选项。首领指骷髅等级（??）的敌人。地下城首领的等级不显示为骷髅，所以算作精英："同级及以上精英与首领"这一项会保留它，同时滤掉它周围等级较低的小怪。勾选"始终提示已标记的目标"时，团队标记优先于以上所有规则。'
 L["TARGET_RUNG_ALL"] = "全部"
 L["TARGET_RUNG_ELITE"] = "精英与首领"
 L["TARGET_RUNG_ELITE_0"] = "同级及以上精英与首领"
 L["TARGET_RUNG_BOSS"] = "首领"
 L["ALERT_MARKED_ALWAYS"] = "始终提示已标记的目标"
 L["ALERT_MARKED_ALWAYS_DESC"] =
-	"带有团队标记的目标一律计入，不管开关旁边的下拉框选的是什么：骷髅、十字，八个标记中的任何一个都算。标记是队伍指明重点目标的方式，所以有人标记过的目标，绝不会因为类型或等级不符而被漏掉。"
+	"带有团队标记（骷髅、十字，八个标记中的任何一个）的目标一律计入，不管开关旁边的下拉框选的是什么。标记是队伍指明重点目标的方式，所以有人标记过的目标，绝不会因为类型或等级不符而被漏掉。"
 
 --[[
     The cooldown dropdown's own entries, built by ns.BuildCooldownValues from a
@@ -373,7 +373,7 @@ L["TANK_DEATHS_ENABLE"] = "启用坦克死亡监视"
 
 L["TANK_DEATHS_ALERT_HEADER"] = "坦克死亡"
 L["TANK_DEATHS_ALERT_DESC"] =
-	"计入团队的主坦克，以及在队伍查找器中选择了坦克职责的人，也包括你自己。游戏只通过这两种方式表明谁在当坦克，所以两者都没有的坦克死亡时不会提示。"
+	"在团队中，只计入被指派为主坦克的玩家，也包括你自己，队伍查找器的职责在团队中不起任何作用。在小队中，计入在队伍查找器中选择了坦克职责的人。两者都没有的坦克死亡时不会提示。"
 L["TANK_DEATHS_ALERT_ENABLE"] = "启用坦克死亡提示"
 L["TANK_DEATHS_ALERT_MINE"] = "我的死亡"
 L["TANK_DEATHS_ALERT_MINE_DESC"] =
@@ -419,7 +419,6 @@ L["BAD_PRIESTS_COOLDOWN_DESC"] =
 -- Bad Pets
 --------------------------------------------------------------------------------
 
--- Doubles as the mini-map button's Bad Pets line, so the two cannot differ.
 L["BAD_PETS_SUMMARY"] = "开着仇恨技能自动施放的猎人和术士宠物。"
 L["BAD_PETS_ENABLE"] = "启用捣蛋宠物监视"
 
@@ -442,17 +441,25 @@ L["BAD_PETS_ABILITIES_HEADER"] = "捣蛋宠物技能"
 --------------------------------------------------------------------------------
 
 --[[
-    No summary line: the Tanking Tools tab opens on its enable, because the tab is
-    a collection of unrelated warnings rather than one idea a sentence can cover.
-    Each section introduces itself instead.
+    No summary line on the tab: Tanking Tools opens on its enable, because the
+    tab is a collection of unrelated warnings rather than one idea a sentence
+    can cover. Each section introduces itself instead.
+
+    The mini-map tooltip carries a short one anyway, because the button's
+    Right-Click toggles this tab and the tooltip has to say what it is turning
+    on. TRANSLATORS: it lists the four section headers below in your own words
+    for them; keep it to two lines in the tooltip.
 ]]
 L["TANKING_TOOLS_ENABLE"] = "启用坦克工具"
+L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "开场落空、护甲削弱、招架和新星。"
 
 L["TANKING_TOOLS_COLD_OPENER_HEADER"] = "开场落空"
 L["TANKING_TOOLS_COLD_OPENER_DESC"] =
 	"提示你自己没能打上的开场攻击：开怪最初几秒内的未命中、躲闪、招架、格挡、抵抗或免疫。那是本该产生却没有产生的仇恨，而且正发生在最要紧的时刻。"
 L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "启用开场落空提示，针对"
 L["TANKING_TOOLS_COLD_OPENER_MINE"] = "我的开场落空"
+L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] =
+	"报告你自己没能打上的开场技能。旁边的下拉框决定这条消息发往哪里。"
 -- The caption before the window dropdown: "Within [10 Seconds of Fight]".
 L["TANKING_TOOLS_COLD_OPENER_WITHIN"] = "限定在"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "开战后 %d 秒内"
@@ -478,10 +485,17 @@ L["TANKING_TOOLS_PARRY_DESC"] =
 	"有人被一只不归他坦的怪物招架，说明他正站在怪物正面。每一次招架都会让那只怪物更快地对拉住它的人挥出下一击。"
 L["TANKING_TOOLS_PARRY_ENABLE"] = "启用招架提示，针对"
 L["TANKING_TOOLS_PARRY_MINE"] = "我被招架"
+L["TANKING_TOOLS_PARRY_MINE_DESC"] =
+	"报告你的攻击被怪物招架。旁边的下拉框决定这条消息发往哪里。"
 L["TANKING_TOOLS_PARRY_OTHERS"] = "他人被招架"
-L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "忽略其他坦克"
+L["TANKING_TOOLS_PARRY_OTHERS_DESC"] =
+	"报告你队伍里其他人的攻击被怪物招架。旁边的下拉框决定这条消息发往哪里。"
+L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "忽略坦克"
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"] =
-	"被招架的玩家是坦克时保持安静：团队的主坦克，或选择了坦克职责的人。副坦克站在首领面前是为了换坦时接嘲讽，这不是需要密语提醒的错误。你自己被招架时仍会提示。"
+	"被招架的玩家是坦克时保持安静：在团队中被指派为主坦克，或在小队中选择了队伍查找器的坦克职责。副坦克站在首领面前是为了换坦时接嘲讽，这不是需要密语提醒的错误。你自己被招架时仍会提示。"
+L["TANKING_TOOLS_PARRY_IGNORE_PETS"] = "忽略宠物"
+L["TANKING_TOOLS_PARRY_IGNORE_PETS_DESC"] =
+	"被招架的是宠物时保持安静，你自己的宠物也算。宠物站在主人派它去的地方，一条写着宠物名字的提示，队伍里没人能据此做什么。无论如何都不会密语宠物。"
 L["TANKING_TOOLS_PARRY_WHISPER"] = "密语肇事者"
 L["TANKING_TOOLS_PARRY_WHISPER_DESC"] =
 	"给肇事者发一条密语，请他移动到怪物背后。即使你队伍里有好几个人在用 Control Freak，也只会发出一条。"
@@ -489,7 +503,7 @@ L["TANKING_TOOLS_PARRY_COOLDOWN_DESC"] =
 	"同一个肇事者触发招架警告后，要过多久才会再次提示。它同时作用于显示、声音、通报和密语，因为还没挪位置的人，不需要每挥一下就被提醒一次。"
 
 L["TANKING_TOOLS_NOVA_HEADER"] = "新星"
-L["TANKING_TOOLS_NOVA_DESC"] = "提示冰霜新星，它会把怪物撒到坦克够不着的地方。"
+L["TANKING_TOOLS_NOVA_DESC"] = "提示冰霜新星，它会把怪物冻在原地，让坦克够不着。"
 L["TANKING_TOOLS_NOVA_ENABLE"] = "启用新星提示"
 L["TANKING_TOOLS_NOVA_MINE"] = "我的新星"
 L["TANKING_TOOLS_NOVA_OTHERS"] = "他人的新星"
@@ -623,15 +637,14 @@ L["SHIELD_WHISPER"] =
 
 L["BAD_PET"] = "捣蛋宠物！%s 的宠物 %s 使用 %s，目标 %s。"
 L["BAD_PET_AOE"] = "捣蛋宠物！%s 的宠物 %s 使用 %s。"
-L["BAD_PET_OWN"] = "捣蛋宠物！你的宠物 %s 使用 %s，目标 %s。"
-L["BAD_PET_OWN_AOE"] = "捣蛋宠物！你的宠物 %s 使用 %s。"
 L["BAD_PET_UNKNOWN_OWNER"] = "捣蛋宠物！%s 使用 %s，目标 %s。"
 L["BAD_PET_UNKNOWN_OWNER_AOE"] = "捣蛋宠物！%s 使用 %s。"
 --[[
-    Kept short on purpose. It renders with a spell link and two names inside a 255
-    byte chat limit, and the widest locale runs close to twice the English.
+    Kept short on purpose. They render with a spell link and up to two names inside
+    a 255 byte chat limit, and the widest locale runs close to twice the English.
 ]]
 L["BAD_PET_WHISPER"] = "你的宠物 %s 使用了 %s，目标 %s。右键点击该技能即可关闭自动施放。"
+L["BAD_PET_WHISPER_AOE"] = "你的宠物 %s 使用了 %s。右键点击该技能即可关闭自动施放。"
 
 L["COLD_OPENER_MISS"] = "小心！%s 使用 %s，对 %s 未命中。"
 L["COLD_OPENER_DODGE"] = "小心！%s 使用 %s，被 %s 躲闪。"
@@ -640,7 +653,7 @@ L["COLD_OPENER_BLOCK"] = "小心！%s 使用 %s，被 %s 格挡。"
 L["COLD_OPENER_IMMUNE"] = "小心！%s 使用 %s，%s 免疫。"
 L["COLD_OPENER_RESIST"] = "小心！%s 使用 %s，被 %s 抵抗。"
 
-L["ARMOR_REPORT"] = "护甲已削弱！%s 在 %s 秒后变得脆弱。"
+L["ARMOR_REPORT"] = "护甲已削弱！%s 用了 %s 秒变得脆弱。"
 
 L["PARRY_WARNING"] = "招架加速！%s 正站在 %s 的正面。"
 L["PARRY_WHISPER"] = "招架加速！请站到 %s 背后：每次招架都会加快它的下一次攻击。"
