@@ -8,7 +8,8 @@ This document combines architecture notes and contribution guidance for develope
 Control-Freak/
 ├── .github/
 │   └── workflows/
-│       └── package.yml                CurseForge and Wago release plus library vendoring, no GitHub token by design
+│       ├── ci.yml                     Calls Common-Core: Lua 5.1 syntax, luacheck, StyLua and tests on every PR
+│       └── package.yml                Calls Common-Core: CurseForge and Wago release plus library vendoring, no GitHub token by design
 ├── .gitattributes                     Line-ending normalization
 ├── .gitignore                         Dev-clutter ignore list
 ├── .luacheckrc                        Lint config, excludes Includes/
@@ -630,7 +631,7 @@ Everything else, including the Spanish file pairing and the overflow canary, is 
 - **`dialogControl = "LSM30_Sound"` on the sound picker**: that widget lives in AceGUI-3.0-SharedMediaWidgets, which Control Freak does not ship, so the panel would work only where another add-on happened to load it. The picker is a plain `select` over `ns.GetSoundValues`.
 - **Renaming an entry in `ns.SOUNDS`**: profiles store the picker name, so every profile using it goes silent behind a blank picker.
 - **Retaining references in the event log**: some events carry frames or tables that leak or go stale. `ns:LogEvent` snapshots each argument to a string, caps the count and length, and escapes pipes after the cut so a truncated argument cannot leave a dangling pipe.
-- **Adding `GITHUB_OAUTH` or `GITHUB_API_TOKEN` to `package.yml`**: given either, the packager overwrites the GitHub release's name and hand-written notes with a commit-message changelog on every build. The workflow sets neither, on purpose.
+- **Adding `GITHUB_OAUTH` or `GITHUB_API_TOKEN` to Common-Core's `package.yml`**: given either, the packager overwrites the GitHub release's name and hand-written notes with a commit-message changelog on every build. The workflow sets neither, on purpose.
 
 ## Contributing
 
