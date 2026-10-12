@@ -4,6 +4,12 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 
 **TL;DR:** Tells you what happened, who caused it, and what needs fixing while the fight is still happening. Less combat-log archaeology after the wipe, more information when it matters, so you can make better decisions and have cleaner runs.
 
+> **🔊 & Self:** Taunt! Gogowarrior used [Taunt] on Patchwerk. // Control Freak 
+
+> **🔊 & Self:** Interrupt! Fathom's [Kick] on Kel'Thuzad stopped [Frostbolt]. // Control Freak
+
+> **Party:** Healer Incapacitated for 5 seconds! Spek is afflicted by [Terrifying Roar] from Gluth. // Control Freak
+
 ## Features
 
 🛡️ **Taunts, Interrupts & Fears** // Know when a mob changes hands, whether a taunt landed or failed, who stopped a cast, and whose fear just scattered the pull.
@@ -23,7 +29,7 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 3. Walk the tabs. Every tab but Tanking Tools is on out of the box, and most lines print only to your own window.
 4. Decide what your group hears. Four of your own lines announce out of the box, because the group needs them the moment they happen: a failed taunt, an AoE taunt, a fear you cast, and a long incapacitation.
 5. Narrow each tab to when it matters, like only while you're tanking or only inside dungeons and raids.
-6. *"When you do things right, people won't be sure you've done anything at all."*
+6. _"When you do things right, people won't be sure you've done anything at all."_
 
 ## How It Works
 
@@ -49,7 +55,7 @@ Printed or announced, a line leads with the news and ends with the add-on's name
 |---|---|
 | Failed Taunts | Taunt Failed! Gogo's [Taunt] on Patchwerk was resisted. // Control Freak |
 | Successful Interrupts | Interrupt! Gogo's [Pummel] on Gothik the Harvester stopped [Shadow Bolt]. // Control Freak |
-| Being Incapacitated | Tank Incapacitated for 6 seconds; Gogo is afflicted by [Fear] (Magic) from Maexxna. // Control Freak |
+| Being Incapacitated | Tank Incapacitated for 6 seconds! Gogo is afflicted by [Fear] (Magic) from Maexxna. // Control Freak |
 | Tank Deaths | Tank Down! Gogo has died. // Control Freak |
 | Pet Taunts | Bad Pet! Joe's pet Snuffles used [Growl] on Anub'Rekhan. // Control Freak |
 
@@ -61,12 +67,12 @@ Printed or announced, a line leads with the news and ends with the add-on's name
 | Right-Click | Turns Tanking Tools on or off |
 | Shift + Middle-Click | Opens the Options Interface |
 
-Hovering the button shows whether All Alerts and Tanking Tools are on right now. Right-Click only works while All Alerts is on.
+Hovering the button shows whether All Alerts is on right now, and Tanking Tools too while it is. Right-Click only works while All Alerts is on.
 
 ### Options
 
 - **Control Freak** // All Alerts, the one switch that silences every tab without changing a setting, plus the welcome message, the mini-map button, and where to reach us.
-- **Taunts** // Successful, failed, and AoE taunts, with checklists of every taunt your game client knows: class taunts, rune taunts, and engineering target dummies. Waits for a living tank in your group out of the box.
+- **Taunts** // Successful, failed, and AoE taunts, with one checklist of every taunt your game client knows, each marked Single Target or AOE: class taunts, rune taunts, and engineering target dummies. Waits for a living tank in your group out of the box.
 - **Interrupts** // Successful interrupts: who stopped which cast.
 - **Fears** // Fears that landed, plus the fear checklist, Flash Bomb included.
 - **Incapacitated** // Which effects count (stuns, fears, mind control, confusion, silences, pacifies, spell lockouts, roots, and disarms) and how many seconds make one long. Short ones print for you, long ones announce, and out of the box the tab only speaks while you're a tank or healer.
@@ -79,56 +85,58 @@ Hovering the button shows whether All Alerts and Tanking Tools are on right now.
 
 ## Testing & Localization Status
 
-🟢 World of Warcraft Classic (🟡 Season of Discovery) // WoW 1.15.9
+🔴 World of Warcraft // 12.1.0
 
-🟢 Burning Crusade Anniversary // WoW 2.5.6
+🔴 Mists of Pandaria Classic // 5.5.4
 
-🔴 Mists of Pandaria Classic // WoW 5.5.4
+🟢 Burning Crusade Anniversary // 2.5.6
 
-🔴 World of Warcraft // WoW 12.1.0
+🔴 World of Warcraft: Forever // 1.60.1
 
-**Localization Status** // Works with all Classic WoW Locales (enUS, deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, zhTW).
+🟡 World of Warcraft: Season of Discovery // 1.15.9
 
-Please reach out if you would like to be involved!
+🟢 World of Warcraft: Classic // 1.15.9
 
-## Links
-
-- [GitHub](https://github.com/Gogo1951/Control-Freak)
-- [Discord](https://discord.gg/eh8hKq992Q)
+**Available Locales** // enUS, deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, zhTW
 
 ## Appreciation & History
 
 🚀 **This add-on stands on the shoulders of those that came before.**
 
-- Davie3's [Who Taunted?](https://www.curseforge.com/wow/addons/who-taunted)
-- BeathsCurse's [Simple Taunt Announce](https://www.curseforge.com/wow/addons/sta)
-- BeathsCurse's [Simple Interrupt Announce](https://www.curseforge.com/wow/addons/sia)
-- sfnelson's [BadPet](https://www.curseforge.com/wow/addons/badpet)
-- gogo1951's [Taunts & Fears](https://wago.io/3cGT5x2OW)
-- Vn's [Parry/Dodge/Miss Announcer 63+](https://wago.io/KVtFqses5)
-- ColtDoomhowl's [Parry - You're in the wrong spot dipshit](https://wago.io/yJAzyvcvw)
-- Commander_Snuggles's [Loss of Control Announcer](https://wago.io/qhD2-4WN6)
+* Davie3's [Who Taunted?](https://www.curseforge.com/wow/addons/who-taunted)
+* BeathsCurse's [Simple Taunt Announce](https://www.curseforge.com/wow/addons/sta)
+* BeathsCurse's [Simple Interrupt Announce](https://www.curseforge.com/wow/addons/sia)
+* sfnelson's [BadPet](https://www.curseforge.com/wow/addons/badpet)
+* gogo1951's [Taunts & Fears](https://wago.io/3cGT5x2OW)
+* Vn's [Parry/Dodge/Miss Announcer 63+](https://wago.io/KVtFqses5)
+* ColtDoomhowl's [Parry - You're in the wrong spot dipshit](https://wago.io/yJAzyvcvw)
+* Commander_Snuggles's [Loss of Control Announcer](https://wago.io/qhD2-4WN6)
+
+## Get Involved
+
+❤️ **You can help make this better!** Feedback, code contributions, testing, and localization assistance are always appreciated. If you'd like to get involved, please reach out.
+
+* [GitHub](https://github.com/Gogo1951/Control-Freak)
+* [Discord](https://discord.gg/eh8hKq992Q)
 
 ## Related Add-ons
 
-🟢 Pairs With // Funkeh's [BigWigs](https://www.curseforge.com/wow/addons/bigwigs)
+### 🟢 Pairs With
 
-🟢 Pairs With // MysticalOS's [Deadly Boss Mods](https://www.curseforge.com/wow/addons/deadly-boss-mods)
+* Funkeh's [BigWigs](https://www.curseforge.com/wow/addons/bigwigs)
+* MysticalOS's [Deadly Boss Mods](https://www.curseforge.com/wow/addons/deadly-boss-mods)
+* Terciob's [Details! Damage Meter](https://www.curseforge.com/wow/addons/details)
+* Suicidal\_Katt's [Threat Plates](https://www.curseforge.com/wow/addons/tidy-plates-threat-plates)
+* dfherr's [ThreatClassic2](https://www.curseforge.com/wow/addons/threatclassic2)
 
-🟢 Pairs With // Terciob's [Details! Damage Meter](https://www.curseforge.com/wow/addons/details)
+### 🟡 Overlaps
 
-🟢 Pairs With // Suicidal_Katt's [Threat Plates](https://www.curseforge.com/wow/addons/tidy-plates-threat-plates)
+* Stanzilla's [WeakAuras](https://www.curseforge.com/wow/addons/weakauras-2)
 
-🟢 Pairs With // dfherr's [ThreatClassic2](https://www.curseforge.com/wow/addons/threatclassic2)
+### 🔴 Alternatives
 
-🟡 Some Overlap // Stanzilla's [WeakAuras](https://www.curseforge.com/wow/addons/weakauras-2)
-
-🔴 Direct Alternative // krzysiek_7_5's [InterruptAnnouncer](https://www.curseforge.com/wow/addons/interruptannouncer)
-
-🔴 Direct Alternative // OhNoItsGread's [Interruptor](https://www.curseforge.com/wow/addons/interruptor)
-
-🔴 Direct Alternative // D4KiR's [LossOfControlMessages](https://www.curseforge.com/wow/addons/lossofcontrolmessages)
-
-🔴 Direct Alternative // cerrendel's [Night Watch Tank Announcer](https://www.curseforge.com/wow/addons/night-watch-tank-announcer)
-
-🔴 Direct Alternative // GrumpyPlayers's [TankWarningsClassic](https://www.curseforge.com/wow/addons/tankwarningsclassic)
+* krzysiek\_7\_5's [InterruptAnnouncer](https://www.curseforge.com/wow/addons/interruptannouncer)
+* OhNoItsGread's [Interruptor](https://www.curseforge.com/wow/addons/interruptor)
+* SpaceCorp's [iTaunted](https://www.curseforge.com/wow/addons/i-taunted)
+* D4KiR's [LossOfControlMessages](https://www.curseforge.com/wow/addons/lossofcontrolmessages)
+* GrumpyPlayers's [TankWarningsClassic](https://www.curseforge.com/wow/addons/tankwarningsclassic)
