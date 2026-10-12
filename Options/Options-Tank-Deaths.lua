@@ -92,7 +92,7 @@ function ns.BuildTankDeathsOptions()
 		order = 43,
 		hidden = hidden,
 	}
-	args.byClassDescSpace = { type = "description", name = " ", order = 44, hidden = hidden }
+	args.byClassDescSpace = ns.OptionsSpacer(44, hidden)
 
 	--[[
 	    Orders step by tenths, the escape hatch Options/Options-Incapacitated.lua's
@@ -118,7 +118,7 @@ function ns.BuildTankDeathsOptions()
 		})
 	end
 
-	args.classSampleSpace = { type = "description", name = " ", order = 47, hidden = hidden }
+	args.classSampleSpace = ns.OptionsSpacer(47, hidden)
 	args.classSample = {
 		type = "description",
 		name = ns.RenderSample({

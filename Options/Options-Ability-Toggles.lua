@@ -200,25 +200,20 @@ end
       categories  -- set of ability categories to draw
       order       -- the first group's order
       hidden      -- predicate hung on every group
-      aoe         -- "AOE" or "SINGLE" to draw only that half; nil draws both
-      keyPrefix   -- namespaces the returned arg keys, so a panel calling this
-                     twice does not have its second set overwrite its first
+      kindPicker  -- draws a Single Target / AOE dropdown beside each row; the
+                     Taunts tab's, see ns.GetTauntKind in Features/Ability-Index.lua
 ]]
 function ns.BuildAbilityToggles(options)
 	local args = {}
 	local byClass = {}
 	local hidden = options.hidden
-	local keyPrefix = options.keyPrefix or "class"
-	local filterAoe = options.aoe ~= nil
-	local wantAoe = options.aoe == "AOE"
 
 	--[[
 	    Bucketed by class AND by whether the ability is the class's or its pet's, so
 	    a panel showing both keeps them under separate headings.
 	]]
 	for _, group in ipairs(ns.ABILITY_GROUPS) do
-		local isAoe = group.isAoe and true or false
-		if options.categories[group.category] and (not filterAoe or isAoe == wantAoe) then
+		if options.categories[group.category] then
 			local bucketKey = group.class .. (group.category == "PET_TAUNT" and "Pet" or "")
 			local entries = byClass[bucketKey]
 			if not entries then
@@ -245,6 +240,11 @@ function ns.BuildAbilityToggles(options)
 						label = "|T" .. group.icon .. ":16|t " .. group.name
 					end
 					local ids = group.ids
+
+					local function IsTracked()
+						return not ns.IsAbilityIgnored(group.entry)
+					end
+
 					classArgs["ability" .. index] = {
 						type = "toggle",
 						dialogControl = ns.SPELL_TOGGLE_WIDGET_TYPE,
@@ -256,19 +256,13 @@ function ns.BuildAbilityToggles(options)
 						    is not enough for the longest ability names -- "Masterwork
 						    Target Dummy" wrapped onto a second line and left the row
 						    ragged. Sorted by name within the class, so the column reads
-						    alphabetically.
+						    alphabetically. A row with a dropdown beside it takes the
+						    label half instead, so the dropdown lines up with the ones
+						    above the list.
 						]]
-						width = "full",
-						order = index,
-						get = function()
-							local ignored = ns.db.profile.ignoredSpells
-							for _, id in ipairs(ids) do
-								if ignored[id] then
-									return false
-								end
-							end
-							return true
-						end,
+						width = options.kindPicker and ns.OPTIONS_GROUP_LABEL_WIDTH or "full",
+						order = index * 2 - 1,
+						get = IsTracked,
 						set = function(_, value)
 							local ignored = ns.db.profile.ignoredSpells
 							for _, id in ipairs(ids) do
@@ -280,9 +274,38 @@ function ns.BuildAbilityToggles(options)
 							end
 						end,
 					}
+
+					if options.kindPicker then
+						local entry = group.entry
+						local locked = ns.IsTauntKindLocked(entry)
+						classArgs["kind" .. index] = {
+							type = "select",
+							name = "",
+							desc = L[not locked and "TAUNTS_KIND_DESC" or entry.isAoe and "TAUNTS_KIND_LOCKED_AOE_DESC" or "TAUNTS_KIND_LOCKED_SINGLE_DESC"],
+							width = ns.OPTIONS_CONTROL_WIDTH,
+							order = index * 2,
+							values = {
+								SINGLE = L["TAUNTS_KIND_SINGLE"],
+								AOE = L["TAUNTS_KIND_AOE"],
+							},
+							sorting = ns.TAUNT_KINDS,
+							-- Greyed while the row is unticked: an ignored taunt reports nothing either way.
+							disabled = function()
+								return locked or not IsTracked()
+							end,
+							get = function()
+								return ns.GetTauntKind(entry)
+							end,
+							-- Only a pick that differs from the data is stored, so the profile stays a diff.
+							set = function(_, value)
+								local default = entry.isAoe and "AOE" or "SINGLE"
+								ns.db.profile.tauntKinds[entry.triggers[1]] = value ~= default and value or nil
+							end,
+						}
+					end
 				end
 
-				args[keyPrefix .. class .. suffix] = {
+				args["class" .. class .. suffix] = {
 					type = "group",
 					name = ClassLabel(class, suffix == "Pet"),
 					inline = true,

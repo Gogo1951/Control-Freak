@@ -54,23 +54,16 @@ local MINE_FLAGS = COMBATLOG_OBJECT_AFFILIATION_MINE
 
 --[[
     Answered once, at file scope, the way Features/Utilities.lua settles
-    UnitGroupRolesAssigned. The add-on ships for two flavors, and an older client
-    answers the same question through a different pair of calls
-    (C_LossOfControl.GetNumEvents and GetEventInfo). Rather than carry both
-    shapes for an alert neither flavor has
-    shipped without, the section goes quiet on a client that does not have the
+    UnitGroupRolesAssigned. An older client answers the same question through a
+    different pair of calls (C_LossOfControl.GetNumEvents and GetEventInfo).
+    Rather than carry both shapes for an alert no supported client has shipped
+    without, the section goes quiet on a client that does not have the
     modern pair -- and the Diagnostics panel carries a row saying so, so a player
     reporting silence gets an answer rather than a guess.
-
-    The aura call is settled separately and is NOT required. Without it the line
-    simply cannot name a dispel type, and there is a message format for exactly
-    that case, so a client missing it loses the instruction and keeps the news.
 ]]
 local HAS_LOSS_OF_CONTROL = type(C_LossOfControl) == "table"
 	and type(C_LossOfControl.GetActiveLossOfControlDataCount) == "function"
 	and type(C_LossOfControl.GetActiveLossOfControlData) == "function"
-
-local HAS_UNIT_AURAS = type(C_UnitAuras) == "table" and type(C_UnitAuras.GetDebuffDataByIndex) == "function"
 
 --[[
     Far past the sixteen a player frame shows, because the cap is on what is
@@ -138,7 +131,14 @@ end
     nil to a number and never matches.
 ]]
 local function FindPlayerDebuff(spellId)
-	if not HAS_UNIT_AURAS or not spellId then
+	if not spellId then
+		return nil
+	end
+	--[[
+	    On the Retail engine an in-combat aura read comes back secret and cannot
+	    be compared, so the line drops its dispel type there rather than throw.
+	]]
+	if C_Secrets and C_Secrets.ShouldAurasBeSecret() then
 		return nil
 	end
 	for index = 1, MAX_DEBUFF_SCAN do
@@ -332,7 +332,7 @@ function ns:LOSS_OF_CONTROL_ADDED()
 	elseif ns.IsPlayerHealer() then
 		seat = L["INCAPACITATED_ROLE_HEALER"]
 	else
-		seat = ns.ClassName(select(2, UnitClass("player")))
+		seat = ns.ClassName(select(2, UnitClass("player")), UnitSex("player"))
 	end
 
 	local parts = { seat }

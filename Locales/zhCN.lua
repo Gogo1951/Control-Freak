@@ -10,7 +10,7 @@ end
 L["ADDON_TITLE"] = "Control Freak"
 L["OPTIONS_DESCRIPTION"] =
 	"战斗播报插件，覆盖嘲讽、打断、恐惧、坦克死亡、捣蛋宠物、招架、护甲削弱以及其他关键战斗事件。通过可自定义的提示，掌握谁嘲讽了、什么失败了、谁打断了施法，以及发生了什么。"
-L["VERSION"] = "版本"
+L["OPTIONS_VERSION"] = "版本 %s"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
@@ -38,8 +38,8 @@ L["OPTIONS_COMMAND_DESCRIPTION"] = "打开本插件的选项界面。"
     rather than the act of throwing it, which is what a player cannot read off
     the box beside it -- every other toggle on this panel governs one thing.
 
-    Its ENABLE description is shared with the mini-map button's line for the same
-    toggle, so the two cannot describe it differently.
+    The title and the ENABLE description are shared with the mini-map button's
+    block for the same toggle, so the two cannot name or describe it differently.
 ]]
 L["KILL_SWITCH"] = "所有提示"
 L["KILL_SWITCH_SUMMARY"] =
@@ -146,10 +146,11 @@ L["SOUND_NONE"] = "无"
 
     TRANSLATORS: ALERT_AGAINST_DESC quotes one rung and one row by name; that
     wording must match your TARGET_RUNG_ELITE_0 and ALERT_MARKED_ALWAYS, or the
-    tooltip explains a choice the player cannot find. The four rungs are a threshold, widest first: each
-    one counts itself and the ones after it, which is why every rung that
-    includes bosses says so. Keep that in your translations -- a rung reading
-    only "Elites" beside a separate "Bosses" reads as two disjoint sets.
+    tooltip explains a choice the player cannot find. The four rungs are a
+    threshold, widest first: each one counts itself and the ones after it,
+    which is why every rung that includes bosses says so. Keep that in your
+    translations -- a rung reading only "Elites" beside a separate "Bosses"
+    reads as two disjoint sets.
 
     ALERT_MARKED_ALWAYS is the one control that WIDENS a section rather than
     narrowing it: a marked target counts whatever the rung says. Keep "Always"
@@ -262,7 +263,14 @@ L["TAUNTS_AOE_MINE"] = "我的群体嘲讽"
 L["TAUNTS_AOE_OTHERS"] = "他人的群体嘲讽"
 
 L["TAUNTS_ABILITIES_HEADER"] = "嘲讽技能"
-L["TAUNTS_AOE_ABILITIES_HEADER"] = "群体嘲讽技能"
+L["TAUNTS_ABILITIES_DESC"] =
+	'取消勾选即可忽略某个嘲讽。单体嘲讽会报告被它嘲讽的目标，并在"失败的嘲讽"中报告每一次未命中、抵抗和免疫。群体嘲讽只报告施放：它一次命中整群敌人，其中一个目标没被嘲讽到并不能说明其余目标的情况，因此不报告它的失手。只有一次抓住少数几个敌人的嘲讽可以在两者之间切换。'
+L["TAUNTS_KIND_SINGLE"] = "单体"
+L["TAUNTS_KIND_AOE"] = "群体"
+L["TAUNTS_KIND_DESC"] =
+	'这个嘲讽一次抓住少数几个敌人，因此两种方式都可以。选择"单体"时，会在"成功的嘲讽"中逐个报告被嘲讽的目标，并在"失败的嘲讽"中报告失手。选择"群体"时，只在"群体嘲讽"中报告施放，不报告失手。'
+L["TAUNTS_KIND_LOCKED_SINGLE_DESC"] = "始终为单体：这个嘲讽每次只抓一个敌人。"
+L["TAUNTS_KIND_LOCKED_AOE_DESC"] = "始终为群体：这个嘲讽一次抓住周围所有敌人。"
 
 --------------------------------------------------------------------------------
 -- Interrupts
@@ -368,7 +376,7 @@ L["INCAPACITATED_DISARM_DESC"] = "无法用武器攻击。和定身一样，嘲�
     name, from the client.
 ]]
 L["TANK_DEATHS_SUMMARY"] =
-	"队伍里的坦克死了。这是唯一会改变其他人下一步该做什么的死亡，而四十个团队头像是最难注意到它的地方。"
+	"队伍里的坦克一旦死亡，第一时间得知。这是唯一会改变其他人下一步该做什么的死亡，而四十个团队头像是最难注意到它的地方。"
 L["TANK_DEATHS_ENABLE"] = "启用坦克死亡监视"
 
 L["TANK_DEATHS_ALERT_HEADER"] = "坦克死亡"
@@ -460,9 +468,9 @@ L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "启用开场落空提示，针对"
 L["TANKING_TOOLS_COLD_OPENER_MINE"] = "我的开场落空"
 L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] =
 	"报告你自己没能打上的开场技能。旁边的下拉框决定这条消息发往哪里。"
--- The caption before the window dropdown: "Within [10 Seconds of Fight]".
+-- The caption before the window dropdown: "Within [10 Seconds of the Pull]".
 L["TANKING_TOOLS_COLD_OPENER_WITHIN"] = "限定在"
-L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "开战后 %d 秒内"
+L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "开怪后 %d 秒内"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW_DESC"] =
 	"开怪后多长时间内落空的技能仍然计入。计时从 Control Freak 第一次发现那个怪物时开始，而且只计入技能：自动攻击落空得太频繁，算不上什么新闻。"
 
@@ -538,7 +546,7 @@ L["TAUNT_RESISTED"] = "嘲讽失败！%s 使用 %s，目标 %s，被抵抗。"
     format whose first %s is not the player who cast it.
 ]]
 L["TAUNT_IMMUNE"] = "嘲讽失败！%s 免疫：%s 使用了 %s。"
-L["TAUNT_FAILED"] = "嘲讽失败！%s 使用 %s，目标 %s，无效果。"
+L["TAUNT_FAILED"] = "嘲讽失败！%s 使用 %s，目标 %s，未生效。"
 L["INTERRUPT"] = "打断！%s 使用 %s，目标 %s，打断了 %s。"
 
 L["FEAR_SUCCESS"] = "恐惧！%s 使用 %s，目标 %s。"

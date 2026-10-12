@@ -53,13 +53,6 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    Picked by availability, never by result: a call that legitimately returns nil
-    must not fall through to the other namespace.
-]]
-local HAS_C_SPELL_LINK = C_Spell and C_Spell.GetSpellLink and true or false
-local HAS_C_SPELL_INFO = C_Spell and C_Spell.GetSpellInfo and true or false
-
---[[
     Era hands back a bare spell name where a link belongs, so an alert prints
     plain text where a clickable spell should be. The API is still chosen by
     availability rather than by result; what is tested here is the SHAPE of the
@@ -78,22 +71,15 @@ local function AsSpellLink(answer, spellId)
 end
 
 function ns.GetSpellLink(spellId)
-	if HAS_C_SPELL_LINK then
-		return AsSpellLink(C_Spell.GetSpellLink(spellId), spellId)
-	end
-	return AsSpellLink(GetSpellLink(spellId), spellId)
+	return AsSpellLink(C_Spell.GetSpellLink(spellId), spellId)
 end
 
 function ns.GetSpellNameAndIcon(spellId)
-	if HAS_C_SPELL_INFO then
-		local info = C_Spell.GetSpellInfo(spellId)
-		if not info then
-			return nil
-		end
-		return info.name, info.iconID
+	local info = C_Spell.GetSpellInfo(spellId)
+	if not info then
+		return nil
 	end
-	local name, _, icon = GetSpellInfo(spellId)
-	return name, icon
+	return info.name, info.iconID
 end
 
 --[[
@@ -120,46 +106,75 @@ function ns.GetSpellDisplay(spellId, fallbackName)
 end
 
 --------------------------------------------------------------------------------
--- Game Flavor
+-- Tooltip Text
 --------------------------------------------------------------------------------
 
 --[[
-    Which column of Data/Abilities.lua's flavors list this client reads.
-
-    Season of Discovery shares Era's WOW_PROJECT_ID, so the project alone cannot
-    separate them and engraving is the probe that can. Resolved on first call and
-    kept: no event changes the answer mid-session.
-
-    The first caller is ns.BuildAbilityIndex on PLAYER_LOGIN, deliberately not
-    file scope -- engraving does not answer until the character is in, and the SoD
-    column carries taunts no other flavor has (Tease, Demonic Howl, the taunting
-    Earth Shock). Resolving too early would read Era and lose all of them.
-
-    Anything past Wrath reads the Wrath column rather than failing closed.
+    An item's or spell's tooltip as plain lines, a right-hand column kept after
+    " >> ". kind is "item" or "spell". C_TooltipInfo hands the lines over as
+    data where the client ships its GetItemByID and GetSpellByID getters (WoW
+    Forever); elsewhere they are read off a hidden tooltip that is never shown
+    (Classic Era and TBC Anniversary). Color escapes are stripped so each line
+    reads as its words. Resolved once at load. A read can throw on an odd id, so
+    callers protect it. Diagnostics is the only reader.
 ]]
-local FLAVOR_ERA, FLAVOR_SOD, FLAVOR_TBC, FLAVOR_WRATH = 1, 2, 3, 4
+local SCAN_TOOLTIP_NAME = "ControlFreakScanTooltip"
+local TOOLTIP_DATA_GETTERS = C_TooltipInfo
+	and C_TooltipInfo.GetItemByID
+	and C_TooltipInfo.GetSpellByID
+	and { item = C_TooltipInfo.GetItemByID, spell = C_TooltipInfo.GetSpellByID }
+local scanTooltip
 
-local function IsSeasonOfDiscovery()
-	if not C_Engraving or not C_Engraving.IsEngravingEnabled then
-		return false
+local function PlainText(text)
+	if type(text) ~= "string" then
+		return nil
 	end
-	local ok, enabled = pcall(C_Engraving.IsEngravingEnabled)
-	return ok and enabled == true
+	return (text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|cn[^:]*:", ""):gsub("|r", ""))
 end
 
-local flavorIndex
-
-function ns.GetFlavorIndex()
-	if not flavorIndex then
-		if WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
-			flavorIndex = FLAVOR_TBC
-		elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
-			flavorIndex = IsSeasonOfDiscovery() and FLAVOR_SOD or FLAVOR_ERA
-		else
-			flavorIndex = FLAVOR_WRATH
-		end
+local function JoinTooltipLine(left, right)
+	left = PlainText(left) or ""
+	right = PlainText(right)
+	if right and right ~= "" then
+		return left .. " >> " .. right
 	end
-	return flavorIndex
+	return left
+end
+
+local function ReadTooltipData(kind, id)
+	local lines = {}
+	local data = TOOLTIP_DATA_GETTERS[kind](id)
+	for _, line in ipairs(data and data.lines or {}) do
+		lines[#lines + 1] = JoinTooltipLine(line.leftText, line.rightText)
+	end
+	return lines
+end
+
+local function ReadScanTooltip(kind, id)
+	if not scanTooltip then
+		scanTooltip = CreateFrame("GameTooltip", SCAN_TOOLTIP_NAME, nil, "GameTooltipTemplate")
+	end
+	scanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	scanTooltip:ClearLines()
+	scanTooltip:SetHyperlink(kind .. ":" .. id)
+	local lines = {}
+	for index = 1, scanTooltip:NumLines() do
+		local left = _G[SCAN_TOOLTIP_NAME .. "TextLeft" .. index]
+		local right = _G[SCAN_TOOLTIP_NAME .. "TextRight" .. index]
+		lines[#lines + 1] = JoinTooltipLine(left and left:GetText(), right and right:IsShown() and right:GetText())
+	end
+	scanTooltip:Hide()
+	return lines
+end
+
+ns.GetTooltipLines = TOOLTIP_DATA_GETTERS and ReadTooltipData or ReadScanTooltip
+
+--------------------------------------------------------------------------------
+-- Formatting
+--------------------------------------------------------------------------------
+
+function ns:FormatCommaNumber(number)
+	return (tostring(number):reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", ""))
 end
 
 --------------------------------------------------------------------------------
@@ -338,9 +353,25 @@ end
 
     The Tank Deaths panel sorts its class rows on this, which is what makes that
     list alphabetical in every language instead of only in English.
+
+    sex is the 3 UnitSex and GetPlayerInfoByGUID return for a female character,
+    whose class is named differently in deDE, esES, esMX, frFR, ptBR and ruRU;
+    anything else, a class rather than a person included, reads the male table.
+    The client's female column is blank in enUS and itIT, so a blank answer
+    falls through to the male name rather than opening a line on nothing.
 ]]
-function ns.ClassName(class)
-	return LOCALIZED_CLASS_NAMES_MALE and LOCALIZED_CLASS_NAMES_MALE[class] or class
+local function NonBlank(names, class)
+	local name = names and names[class]
+	if name and name ~= "" then
+		return name
+	end
+	return nil
+end
+
+function ns.ClassName(class, sex)
+	return (sex == 3 and NonBlank(LOCALIZED_CLASS_NAMES_FEMALE, class))
+		or NonBlank(LOCALIZED_CLASS_NAMES_MALE, class)
+		or class
 end
 
 --[[

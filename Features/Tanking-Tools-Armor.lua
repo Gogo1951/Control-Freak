@@ -62,8 +62,15 @@ end
     one asks "is somebody tanking right now", a question about this instant; this
     one asks "could this debuff ever land", and a druid who is dead at the moment
     the tank pulls is still the reason to wait for Faerie Fire.
+
+    Answered once per frame per class and reused, the way ns.GroupHasTank is:
+    every stack on a mob not yet reported asks, a raid walk is forty class reads,
+    and the roster cannot change between two lines sharing a timestamp.
 ]]
-function ns.GroupHasClass(class)
+local groupClassFrame
+local groupClassAnswers = {}
+
+local function WalkGroupForClass(class)
 	if select(2, UnitClass("player")) == class then
 		return true
 	end
@@ -85,6 +92,20 @@ function ns.GroupHasClass(class)
 	end
 
 	return false
+end
+
+function ns.GroupHasClass(class)
+	local now = GetTime()
+	if groupClassFrame ~= now then
+		groupClassFrame = now
+		wipe(groupClassAnswers)
+	end
+	local answer = groupClassAnswers[class]
+	if answer == nil then
+		answer = WalkGroupForClass(class)
+		groupClassAnswers[class] = answer
+	end
+	return answer
 end
 
 --[[

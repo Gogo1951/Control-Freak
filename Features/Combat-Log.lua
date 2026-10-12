@@ -176,11 +176,16 @@ end
     One AoE taunt lands a separate aura on every mob it hits, so identical
     timestamp + spell + outcome is the same cast reported again.
 
+    A taunt reported as Single Target adds the mob to the key. Righteous Defense
+    takes up to three mobs in one cast, and a player who picked Single Target
+    for it wants each one named; for a taunt that only ever takes one mob the
+    extra key changes nothing.
+
     The outcome is part of the key on purpose. Never throttle on source plus
     spell across a time window: that collapses a cast and the miss that follows
     it into one event, and every resisted taunt is swallowed.
 ]]
-local lastTimestamp, lastSpellId, lastOutcome
+local lastTimestamp, lastSpellId, lastOutcome, lastDestGUID
 
 function ns:COMBAT_LOG_EVENT_UNFILTERED()
 	local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, _, destGUID, destName, destFlags, destRaidFlags, spellId, spellName, _, extra, extraName =
@@ -341,7 +346,7 @@ function ns:COMBAT_LOG_EVENT_UNFILTERED()
 	if not ability then
 		return
 	end
-	if ns.db.profile.ignoredSpells[spellId] then
+	if ns.IsAbilityIgnored(ability) then
 		return
 	end
 	if not ns.IsGroupSource(sourceFlags) then
@@ -369,9 +374,10 @@ function ns:COMBAT_LOG_EVENT_UNFILTERED()
 
 	--[[
 	    Only a single-target taunt reports a failure. An AoE taunt fires one miss
-	    per immune mob, which is noise rather than information.
+	    per immune mob, which is noise rather than information. Single or AoE is
+	    the player's pick on the Taunts tab, not the data's.
 	]]
-	if not outcome and subevent == "SPELL_MISSED" and category == "TAUNT" and not ability.isAoe then
+	if not outcome and subevent == "SPELL_MISSED" and category == "TAUNT" and not ns.IsAoeTaunt(ability) then
 		outcome = "FAIL"
 	end
 
@@ -388,10 +394,16 @@ function ns:COMBAT_LOG_EVENT_UNFILTERED()
 		return
 	end
 
-	if timestamp == lastTimestamp and spellId == lastSpellId and outcome == lastOutcome then
+	local dedupeDestGUID = (category == "TAUNT" and not ns.IsAoeTaunt(ability)) and destGUID or nil
+	if
+		timestamp == lastTimestamp
+		and spellId == lastSpellId
+		and outcome == lastOutcome
+		and dedupeDestGUID == lastDestGUID
+	then
 		return
 	end
-	lastTimestamp, lastSpellId, lastOutcome = timestamp, spellId, outcome
+	lastTimestamp, lastSpellId, lastOutcome, lastDestGUID = timestamp, spellId, outcome, dedupeDestGUID
 
 	local raidIconIndex = ns.GetRaidIconIndex(destRaidFlags)
 

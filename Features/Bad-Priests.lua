@@ -6,8 +6,8 @@ local _, ns = ...
     A druid or warrior holds threat with rage, and rage comes from damage taken.
     Damage a shield absorbs generates none, so a well-meant Power Word: Shield
     starves the tank of the resource they tank with. That is true on Classic Era
-    and Burning Crusade and not on later versions, which is why the ability's
-    flavors column in Data/Abilities.lua carries "-" for Wrath: the ids are never
+    and Burning Crusade and not on later versions, which is why the ability is
+    absent from the Wrath folder and every later one: the ids are never
     registered there and the section can never fire.
 
     Three gates, cheapest first.

@@ -17,8 +17,8 @@ function ns.OptionsDesc(text, order)
 	return { type = "description", name = text, fontSize = "medium", order = order }
 end
 
-function ns.OptionsSpacer(order)
-	return { type = "description", name = " ", order = order }
+function ns.OptionsSpacer(order, hidden)
+	return { type = "description", name = " ", order = order, hidden = hidden }
 end
 
 function ns.OptionsRowLabel(text, order, width)
@@ -37,9 +37,8 @@ end
 
 --[[
     A blank line and a header: the pair that opens a block on a feature tab. Both
-    carry the tab's hidden predicate, because ns.OptionsSpacer takes no hidden
-    argument and a spacer that outlives the controls it separated leaves a
-    switched-off feature as a column of empty rows.
+    carry the tab's hidden predicate, because a spacer that outlives the controls
+    it separated leaves a switched-off feature as a column of empty rows.
 
     trailingSpace adds the blank line under the header. A notifications header
     does not want one -- the alert section below opens with its own -- while an
@@ -50,10 +49,10 @@ end
     prefix without one quietly overwriting the other's spacer.
 ]]
 function ns.AddGatedHeader(args, key, titleKey, order, hidden, trailingSpace)
-	args[key .. "HeaderSpace"] = { type = "description", name = " ", order = order, hidden = hidden }
+	args[key .. "HeaderSpace"] = ns.OptionsSpacer(order, hidden)
 	args[key .. "Header"] = ns.OptionsHeader(L[titleKey], order + 1, hidden)
 	if trailingSpace then
-		args[key .. "HeaderSpaceAfter"] = { type = "description", name = " ", order = order + 2, hidden = hidden }
+		args[key .. "HeaderSpaceAfter"] = ns.OptionsSpacer(order + 2, hidden)
 	end
 end
 

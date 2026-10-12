@@ -1,7 +1,7 @@
 std = "lua51"
 max_line_length = false -- StyLua owns formatting
 ignore = { "212/self", "611", "612", "613", "614", "621" } -- implicit self (house ns: methods) + whitespace — StyLua owns the latter
-exclude_files = { "Includes/" } -- vendored, never linted
+exclude_files = { "Includes/", ".claude/" } -- vendored or session-local, never linted
 read_globals = {
 	-- Lua extensions the client adds
 	"bit",
@@ -15,18 +15,26 @@ read_globals = {
 	-- Add-on and UI
 	"C_AddOns",
 	"C_ChatInfo",
+	"C_CombatLog",
 	"C_CVar",
-	"C_Engraving",
 	"C_EventUtils",
+	"C_Item",
 	"C_LossOfControl",
 	"C_NamePlate",
+	"C_QuestLog",
+	"C_Seasons",
+	"C_Secrets",
 	"C_Spell",
+	"C_SpellBook",
 	"C_Timer",
+	"C_TooltipInfo",
 	"C_UnitAuras",
 	"CreateFrame",
+	"Enum",
 	"PlaySound",
 	"GameTooltip",
 	"GetBuildInfo",
+	"GetCVar",
 	"GetPhysicalScreenSize",
 	"GetTime",
 	"InCombatLockdown",
@@ -34,10 +42,9 @@ read_globals = {
 	"IsPlayerSpell",
 	"IsSpellKnown",
 	"Settings",
+	"SetCVar",
 	"UIParent",
-	"WOW_PROJECT_BURNING_CRUSADE_CLASSIC",
-	"WOW_PROJECT_CLASSIC",
-	"WOW_PROJECT_ID",
+	"WorldFrame",
 
 	-- Combat log
 	"CombatLogGetCurrentEventInfo",
@@ -70,6 +77,7 @@ read_globals = {
 	"IsInInstance",
 	"IsInRaid",
 	"LE_PARTY_CATEGORY_INSTANCE",
+	"LOCALIZED_CLASS_NAMES_FEMALE",
 	"LOCALIZED_CLASS_NAMES_MALE",
 	"UnitClass",
 	"UnitClassification",
@@ -82,15 +90,14 @@ read_globals = {
 	"UnitIsDeadOrGhost",
 	"UnitIsFeignDeath",
 	"UnitLevel",
+	"UnitSex",
 
 	-- Spells, sound, and chat
-	"GetSpellInfo",
-	"GetSpellLink",
 	"PlaySoundFile",
 	"SendChatMessage",
 }
 globals = {
 	"ControlFreakDB",
 	"SLASH_CONTROLFREAK1",
-	"SlashCmdList",
+	SlashCmdList = { fields = { "CONTROLFREAK" } }, -- a field, so only the add-on's own slash entry is writable
 }

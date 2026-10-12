@@ -61,7 +61,7 @@ function ns:HandleTaunt(
 	    no target filter and the gate is handed nothing to filter on. The destGUID
 	    the log happened to report first would only ever have been one mob of many.
 	]]
-	if ability.isAoe then
+	if ns.IsAoeTaunt(ability) then
 		ns:Alert(feature.aoe, "TAUNT_AOE", { sourcePart, spellPart }, sourceFlags, nil, nil)
 		return
 	end

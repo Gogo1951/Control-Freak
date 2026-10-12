@@ -15,6 +15,9 @@ ns.LOCALE_NAME = "ControlFreak"
 ns.L = LibStub("AceLocale-3.0"):GetLocale(ns.LOCALE_NAME)
 local L = ns.L
 
+ns.ADDON_TITLE = L["ADDON_TITLE"]
+ns.SAVED_VARIABLES_NAME = "ControlFreakDB"
+
 ns.ADDON_MESSAGE_PREFIX = ns.LOCALE_NAME
 
 --------------------------------------------------------------------------------
@@ -55,7 +58,6 @@ ns.SPELL_LINK_COLOR = "71D5FF"
 
 ns.OPTIONS_REGISTRY = {
 	General = ADDON_NAME .. "_General",
-	Apology = ADDON_NAME .. "_Apology", -- TEMPORARY; see Options/Options-Apology.lua
 	Taunts = ADDON_NAME .. "_Taunts",
 	Interrupts = ADDON_NAME .. "_Interrupts",
 	Fears = ADDON_NAME .. "_Fears",
@@ -177,6 +179,14 @@ ns.OPTIONS_SUB_LABEL_WIDTH = ns.OPTIONS_LABEL_WIDTH - ns.OPTIONS_SUB_INDENT_WIDT
 ns.OPTIONS_SUB_CONTROL_WIDTH = ns.OPTIONS_CONTROL_WIDTH
 
 --[[
+    The same derivation for a row inside an inline group, the class boxes of an
+    ability list: AceGUI's InlineGroup insets its content 10 px from the panel's
+    edge, and AceConfigDialog draws 170 px to the unit, so a label that much
+    narrower puts its dropdown in the column every dropdown above it shares.
+]]
+ns.OPTIONS_GROUP_LABEL_WIDTH = ns.OPTIONS_LABEL_WIDTH - 10 / 170
+
+--[[
     A sub-option that is a choice rather than a switch -- Cold Openers' "Within"
     -- draws a caption with no box. AceConfig starts a checkbox's caption one
     pixel past a 24-pixel box, and one width unit is AceConfigDialog's 170
@@ -193,12 +203,6 @@ ns.OPTIONS_SUB_CAPTION_WIDTH = ns.OPTIONS_SUB_LABEL_WIDTH - ns.OPTIONS_SUB_CAPTI
 --------------------------------------------------------------------------------
 
 ns.CHAT_MESSAGE_MAX_LENGTH = 255
-
---[[
-    The columns of Data/Abilities.lua's flavors list, in order. Anything past
-    Wrath reads the Wrath column; ns.GetFlavorIndex picks the live one.
-]]
-ns.FLAVOR_NAMES = { "Era", "SoD", "TBC", "Wrath" }
 
 --[[
     Seconds between Bad Pets alerts for the same pet, whisper included -- the
@@ -248,68 +252,6 @@ ns.COLD_OPENER_MISS_FORMATS = {
 	BLOCK = "COLD_OPENER_BLOCK",
 	IMMUNE = "COLD_OPENER_IMMUNE",
 	RESIST = "COLD_OPENER_RESIST",
-}
-
---[[
-    The armor debuffs the Armor Debuffs tool waits on, and what each one needs
-    before it counts as up.
-
-    The ids are the ones the combat log reports on SPELL_AURA_APPLIED, which is
-    usually the casting spell but is not always: Righteous Defense is cast as
-    31789 and lands as 31790, and Torment's 11776 and 11777 are effect ids
-    rather than castable ranks. Every entry below is a plain self-applied
-    debuff, where the two match.
-
-    satisfies is what a component contributes, and it is why Sunder and Expose
-    Armor share a value: five Sunders OR one Expose Armor is the same answer to
-    the same question, and a group with a rogue should not be told its armor is
-    still up.
-
-    requiresClass is the gate that keeps an optional component from stalling the
-    report forever. Waiting on Faerie Fire in a group with no druid would mean the
-    line never prints, so the wait only applies when somebody could actually cast
-    it. The player still has to ask for it with the matching setting.
-
-    Devastate is deliberately absent. It applies the same debuff, but it is a
-    Wrath ability and this list is matched against the combat log by id; add its
-    ids when the Wrath column is worth supporting.
-]]
--- TODO: Add SQL Query
-ns.ARMOR_DEBUFFS = {
-	{
-		key = "sunder",
-		satisfies = "ARMOR",
-		stacks = 5,
-		ids = { 7386, 7405, 8380, 11596, 11597, 25225 },
-	},
-	{
-		key = "expose",
-		satisfies = "ARMOR",
-		stacks = 1,
-		ids = { 8647, 8649, 8650, 11197, 11198, 26866 },
-	},
-	{
-		key = "faerieFire",
-		satisfies = "FAERIE_FIRE",
-		stacks = 1,
-		requiresClass = "DRUID",
-		setting = "includeFaerieFire",
-		--[[
-		    Two names by design, so Validate Data reads a differing name as RENAMED
-		    rather than as the typo signal NAME MISMATCH.
-		]]
-		renamed = true,
-		-- Balance ranks first, then the feral ones. Either satisfies it.
-		ids = { 770, 778, 9749, 9907, 26993, 16857, 17390, 17391, 17392, 27011 },
-	},
-	{
-		key = "recklessness",
-		satisfies = "RECKLESSNESS",
-		stacks = 1,
-		requiresClass = "WARLOCK",
-		setting = "includeRecklessness",
-		ids = { 704, 7658, 7659, 11717, 27226 },
-	},
 }
 
 --[[

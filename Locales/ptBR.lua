@@ -10,7 +10,7 @@ end
 L["ADDON_TITLE"] = "Control Freak"
 L["OPTIONS_DESCRIPTION"] =
 	"Anunciador de combate para provocações, interrupções, medos, mortes de tanque, ajudantes danados, aparos, reduções de armadura e outros eventos críticos da luta. Acompanhe quem provocou, o que falhou, quem interrompeu um lançamento e o que aconteceu, com alertas personalizáveis."
-L["VERSION"] = "Versão"
+L["OPTIONS_VERSION"] = "Versão %s"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
@@ -38,8 +38,8 @@ L["OPTIONS_COMMAND_DESCRIPTION"] = "Abre a janela de opções deste add-on."
     rather than the act of throwing it, which is what a player cannot read off
     the box beside it -- every other toggle on this panel governs one thing.
 
-    Its ENABLE description is shared with the mini-map button's line for the same
-    toggle, so the two cannot describe it differently.
+    The title and the ENABLE description are shared with the mini-map button's
+    block for the same toggle, so the two cannot name or describe it differently.
 ]]
 L["KILL_SWITCH"] = "Todos os alertas"
 L["KILL_SWITCH_SUMMARY"] =
@@ -146,10 +146,11 @@ L["SOUND_NONE"] = "Nenhum"
 
     TRANSLATORS: ALERT_AGAINST_DESC quotes one rung and one row by name; that
     wording must match your TARGET_RUNG_ELITE_0 and ALERT_MARKED_ALWAYS, or the
-    tooltip explains a choice the player cannot find. The four rungs are a threshold, widest first: each
-    one counts itself and the ones after it, which is why every rung that
-    includes bosses says so. Keep that in your translations -- a rung reading
-    only "Elites" beside a separate "Bosses" reads as two disjoint sets.
+    tooltip explains a choice the player cannot find. The four rungs are a
+    threshold, widest first: each one counts itself and the ones after it,
+    which is why every rung that includes bosses says so. Keep that in your
+    translations -- a rung reading only "Elites" beside a separate "Bosses"
+    reads as two disjoint sets.
 
     ALERT_MARKED_ALWAYS is the one control that WIDENS a section rather than
     narrowing it: a marked target counts whatever the rung says. Keep "Always"
@@ -262,7 +263,14 @@ L["TAUNTS_AOE_MINE"] = "Minhas provocações em área"
 L["TAUNTS_AOE_OTHERS"] = "Provocações em área dos outros"
 
 L["TAUNTS_ABILITIES_HEADER"] = "Habilidades de provocação"
-L["TAUNTS_AOE_ABILITIES_HEADER"] = "Habilidades de provocação em área"
+L["TAUNTS_ABILITIES_DESC"] =
+	'Desmarque uma provocação para ignorá-la. Uma provocação de alvo único nomeia o inimigo que puxou e registra cada erro, resistência e imunidade em "Provocações falhas". Uma provocação em área informa só o lançamento: ela atinge um grupo inteiro de uma vez, e um inimigo que escapa dela não diz nada sobre o resto, então as falhas dela ficam em silêncio. Só uma provocação que agarra poucos inimigos de uma vez pode alternar entre as duas.'
+L["TAUNTS_KIND_SINGLE"] = "Alvo único"
+L["TAUNTS_KIND_AOE"] = "Área"
+L["TAUNTS_KIND_DESC"] =
+	'Esta provocação agarra poucos inimigos de uma vez, então pode ser informada dos dois jeitos. A opção "Alvo único" nomeia cada inimigo puxado em "Provocações bem-sucedidas" e informa as falhas em "Provocações falhas". A opção "Área" informa só o lançamento, em "Provocações em área", e deixa as falhas de fora.'
+L["TAUNTS_KIND_LOCKED_SINGLE_DESC"] = "Sempre alvo único: esta provocação só pega um inimigo."
+L["TAUNTS_KIND_LOCKED_AOE_DESC"] = "Sempre em área: esta provocação agarra tudo ao redor de uma vez."
 
 --------------------------------------------------------------------------------
 -- Interrupts
@@ -370,7 +378,7 @@ L["INCAPACITATED_DISARM_DESC"] =
     name, from the client.
 ]]
 L["TANK_DEATHS_SUMMARY"] =
-	"O tanque do seu grupo morreu. É a única morte que muda o que todos os outros devem fazer em seguida, e quarenta retratos de raide são o pior lugar para perceber isso."
+	"Saiba na hora quando um tanque do seu grupo morre. É a única morte que muda o que todos os outros devem fazer em seguida, e quarenta retratos de raide são o pior lugar para perceber isso."
 L["TANK_DEATHS_ENABLE"] = "Ativar monitoramento de mortes de tanque"
 
 L["TANK_DEATHS_ALERT_HEADER"] = "Mortes de tanque"
@@ -463,9 +471,9 @@ L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "Avisar aberturas frias contra"
 L["TANKING_TOOLS_COLD_OPENER_MINE"] = "Minhas aberturas frias"
 L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] =
 	"Relata as suas próprias habilidades de abertura que não pegaram. O menu ao lado diz para onde vai a linha."
--- The caption before the window dropdown: "Within [10 Seconds of Fight]".
+-- The caption before the window dropdown: "Within [10 Seconds of the Pull]".
 L["TANKING_TOOLS_COLD_OPENER_WITHIN"] = "Nos primeiros"
-L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "%d segundos de luta"
+L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "%d segundos da puxada"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW_DESC"] =
 	"Até quanto tempo depois do início de uma puxada uma habilidade evitada ainda conta. O relógio começa na primeira vez que o Control Freak vê aquele inimigo, e só habilidades contam: um ataque automático erra vezes demais para virar notícia."
 
@@ -543,7 +551,7 @@ L["TAUNT_RESISTED"] = "Provocação falhou! %s usou %s em %s, que resistiu."
     format whose first %s is not the player who cast it.
 ]]
 L["TAUNT_IMMUNE"] = "Provocação falhou! %s é imune: %s usou %s."
-L["TAUNT_FAILED"] = "Provocação falhou! %s usou %s em %s sem efeito."
+L["TAUNT_FAILED"] = "Provocação falhou! %s usou %s em %s e não surtiu efeito."
 L["INTERRUPT"] = "Interrupção! %s usou %s em %s e interrompeu %s."
 
 L["FEAR_SUCCESS"] = "Medo! %s usou %s em %s."
@@ -567,10 +575,10 @@ L["FEAR_AOE"] = "Medo em área! %s usou %s."
     raid may run Control Freak, and a bare "Incapacitated!" leaves the group
     working out who to cover for.
 ]]
-L["INCAPACITATED"] = "%s incapacitado por %s; %s sofre %s (%s) de %s."
-L["INCAPACITATED_PLAIN"] = "%s incapacitado por %s; %s sofre %s de %s."
-L["INCAPACITATED_INDEFINITE"] = "%s incapacitado; %s sofre %s (%s) de %s."
-L["INCAPACITATED_PLAIN_INDEFINITE"] = "%s incapacitado; %s sofre %s de %s."
+L["INCAPACITATED"] = "%s incapacitado por %s! %s sofre %s (%s) de %s."
+L["INCAPACITATED_PLAIN"] = "%s incapacitado por %s! %s sofre %s de %s."
+L["INCAPACITATED_INDEFINITE"] = "%s incapacitado! %s sofre %s (%s) de %s."
+L["INCAPACITATED_PLAIN_INDEFINITE"] = "%s incapacitado! %s sofre %s de %s."
 
 --[[
     The seat the line opens on, as its own phrase rather than a format per role,
