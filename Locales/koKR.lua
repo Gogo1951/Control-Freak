@@ -10,7 +10,7 @@ end
 L["ADDON_TITLE"] = "Control Freak"
 L["OPTIONS_DESCRIPTION"] =
 	"도발, 차단, 공포, 탱커 사망, 말썽쟁이 소환수, 무기 막기, 방어도 감소 등 전투의 중요한 순간을 알려 주는 전투 알림 애드온입니다. 원하는 대로 설정할 수 있는 알림으로 누가 도발했는지, 무엇이 실패했는지, 누가 시전을 차단했는지, 무슨 일이 일어났는지 확인하세요."
-L["VERSION"] = "버전"
+L["OPTIONS_VERSION"] = "버전 %s"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
@@ -38,8 +38,8 @@ L["OPTIONS_COMMAND_DESCRIPTION"] = "이 애드온의 설정 창을 엽니다."
     rather than the act of throwing it, which is what a player cannot read off
     the box beside it -- every other toggle on this panel governs one thing.
 
-    Its ENABLE description is shared with the mini-map button's line for the same
-    toggle, so the two cannot describe it differently.
+    The title and the ENABLE description are shared with the mini-map button's
+    block for the same toggle, so the two cannot name or describe it differently.
 ]]
 L["KILL_SWITCH"] = "모든 알림"
 L["KILL_SWITCH_SUMMARY"] =
@@ -146,10 +146,11 @@ L["SOUND_NONE"] = "없음"
 
     TRANSLATORS: ALERT_AGAINST_DESC quotes one rung and one row by name; that
     wording must match your TARGET_RUNG_ELITE_0 and ALERT_MARKED_ALWAYS, or the
-    tooltip explains a choice the player cannot find. The four rungs are a threshold, widest first: each
-    one counts itself and the ones after it, which is why every rung that
-    includes bosses says so. Keep that in your translations -- a rung reading
-    only "Elites" beside a separate "Bosses" reads as two disjoint sets.
+    tooltip explains a choice the player cannot find. The four rungs are a
+    threshold, widest first: each one counts itself and the ones after it,
+    which is why every rung that includes bosses says so. Keep that in your
+    translations -- a rung reading only "Elites" beside a separate "Bosses"
+    reads as two disjoint sets.
 
     ALERT_MARKED_ALWAYS is the one control that WIDENS a section rather than
     narrowing it: a marked target counts whatever the rung says. Keep "Always"
@@ -263,7 +264,14 @@ L["TAUNTS_AOE_MINE"] = "내 광역 도발"
 L["TAUNTS_AOE_OTHERS"] = "다른 사람의 광역 도발"
 
 L["TAUNTS_ABILITIES_HEADER"] = "도발 기술"
-L["TAUNTS_AOE_ABILITIES_HEADER"] = "광역 도발 기술"
+L["TAUNTS_ABILITIES_DESC"] =
+	"체크를 해제하면 그 도발을 무시합니다. 단일 대상 도발은 끌어온 적의 이름을 알리고, 빗나감, 저항, 면역을 모두 '도발 실패'에 알립니다. 광역 도발은 시전만 알립니다. 한 무리 전체에 한꺼번에 걸리고, 적 하나가 버텼다고 해서 나머지에 대해 알 수 있는 것은 없으므로 실패는 알리지 않습니다. 적 몇 명만 한꺼번에 끌어오는 도발만 둘 중 하나로 바꿀 수 있습니다."
+L["TAUNTS_KIND_SINGLE"] = "단일 대상"
+L["TAUNTS_KIND_AOE"] = "광역"
+L["TAUNTS_KIND_DESC"] =
+	"이 도발은 적 몇 명을 한꺼번에 끌어오므로 어느 쪽으로든 알릴 수 있습니다. '단일 대상'은 끌어온 적마다 이름을 '도발 성공'에 알리고, 빗나간 도발은 '도발 실패'에 알립니다. '광역'은 시전만 '광역 도발'에 알리고 빗나간 도발은 알리지 않습니다."
+L["TAUNTS_KIND_LOCKED_SINGLE_DESC"] = "항상 단일 대상: 이 도발은 언제나 적 하나만 끌어옵니다."
+L["TAUNTS_KIND_LOCKED_AOE_DESC"] = "항상 광역: 이 도발은 주위의 모든 적을 한꺼번에 끌어옵니다."
 
 --------------------------------------------------------------------------------
 -- Interrupts
@@ -373,7 +381,7 @@ L["INCAPACITATED_DISARM_DESC"] =
     name, from the client.
 ]]
 L["TANK_DEATHS_SUMMARY"] =
-	"파티의 탱커가 사망했습니다. 다른 사람들이 당장 무엇을 해야 하는지를 바꾸는 유일한 죽음이며, 마흔 개의 공격대 초상화는 그것을 알아차리기에 가장 나쁜 곳입니다."
+	"파티의 탱커가 죽는 순간 바로 알 수 있습니다. 다른 사람들이 당장 무엇을 해야 하는지를 바꾸는 유일한 죽음이며, 마흔 개의 공격대 초상화는 그것을 알아차리기에 가장 나쁜 곳입니다."
 L["TANK_DEATHS_ENABLE"] = "탱커 사망 감시 사용"
 
 L["TANK_DEATHS_ALERT_HEADER"] = "탱커 사망"
@@ -465,7 +473,7 @@ L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "초반 공격 실패 알림 사용, 대
 L["TANKING_TOOLS_COLD_OPENER_MINE"] = "내 초반 공격 실패"
 L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] =
 	"전투 초반에 들어가지 못한 내 기술을 알립니다. 옆의 드롭다운에서 이 줄을 보낼 곳을 정합니다."
--- The caption before the window dropdown: "Within [10 Seconds of Fight]".
+-- The caption before the window dropdown: "Within [10 Seconds of the Pull]".
 L["TANKING_TOOLS_COLD_OPENER_WITHIN"] = "전투 시작 후"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "%d초 이내"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW_DESC"] =
@@ -545,7 +553,7 @@ L["TAUNT_RESISTED"] = "도발 실패! %s님의 %s, %s에게 저항당함."
     format whose first %s is not the player who cast it.
 ]]
 L["TAUNT_IMMUNE"] = "도발 실패! %s 면역: %s님의 %s."
-L["TAUNT_FAILED"] = "도발 실패! %s님의 %s, %s에게 실패."
+L["TAUNT_FAILED"] = "도발 실패! %s님의 %s, %s에게 통하지 않음."
 L["INTERRUPT"] = "차단! %s님의 %s, %s의 %s 차단."
 
 L["FEAR_SUCCESS"] = "공포! %s님이 %s 사용, 대상: %s."

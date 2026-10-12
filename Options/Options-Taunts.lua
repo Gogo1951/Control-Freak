@@ -22,8 +22,8 @@ function ns.BuildTauntsOptions()
 	    A row for the player's own casts, one for everybody else's, and the
 	    Against ladder beside the switch.
 
-	    Three sections, spaced 20 of order apart, then the two ability lists well
-	    clear of them at 120 and 160.
+	    Three sections, spaced 20 of order apart, then the ability list well clear
+	    of them at 120.
 	]]
 	ns.AddWhoseAlertSection(args, "success", Section("success"), 20, hidden, {
 		headerKey = "TAUNTS_SUCCESS_HEADER",
@@ -61,34 +61,30 @@ function ns.BuildTauntsOptions()
 		},
 	})
 
+	--[[
+	    One list, every taunt with a Single Target / AOE dropdown beside it. The
+	    pick routes the taunt to the Successful and Failed sections or to the AOE
+	    one, which is the adjustment the data cannot make for everybody: whether
+	    a taunt that grabs a few mobs is worth naming them is the player's call.
+	]]
 	ns.AddGatedHeader(args, "abilities", "TAUNTS_ABILITIES_HEADER", 120, hidden, true)
 
-	for key, value in
-		pairs(ns.BuildAbilityToggles({
-			categories = { TAUNT = true },
-			order = 123,
-			hidden = hidden,
-			aoe = "SINGLE",
-			keyPrefix = "single",
-		}))
-	do
-		args[key] = value
-	end
-
-	--[[
-	    Split from the single-target list because the alert sections above are split
-	    the same way: an AOE taunt has its own Successful section, so its abilities
-	    get their own list rather than being mixed in.
-	]]
-	ns.AddGatedHeader(args, "aoeAbilities", "TAUNTS_AOE_ABILITIES_HEADER", 160, hidden, true)
+	-- The one ability list with a description: its dropdowns need explaining, a checkbox does not.
+	args.abilitiesDesc = {
+		type = "description",
+		name = L["TAUNTS_ABILITIES_DESC"],
+		fontSize = "medium",
+		order = 123,
+		hidden = hidden,
+	}
+	args.abilitiesDescSpace = ns.OptionsSpacer(124, hidden)
 
 	for key, value in
 		pairs(ns.BuildAbilityToggles({
 			categories = { TAUNT = true },
-			order = 163,
+			order = 125,
 			hidden = hidden,
-			aoe = "AOE",
-			keyPrefix = "aoe",
+			kindPicker = true,
 		}))
 	do
 		args[key] = value

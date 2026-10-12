@@ -155,6 +155,15 @@ ns.LDBObject = LibDataBroker:NewDataObject(ns.LOCALE_NAME, {
 function ns:RegisterMinimapButton()
 	if not LibDBIcon:IsRegistered(ns.LOCALE_NAME) then
 		LibDBIcon:Register(ns.LOCALE_NAME, ns.LDBObject, ns.db.profile.minimap)
+		-- The Retail engine leaves the square icon off-center in its ring.
+		if ns.FLAVOR == "Camelot" or ns.FLAVOR == "Mainline" then
+			LibDBIcon:SetButtonIcon(ns.LOCALE_NAME, nil, 20, "CENTER", 1, -0.35)
+			local button = LibDBIcon:GetMinimapButton(ns.LOCALE_NAME)
+			local mask = button:CreateMaskTexture()
+			mask:SetTexture(130924, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE") -- Interface\CharacterFrame\TempPortraitAlphaMask
+			mask:SetAllPoints(button.icon)
+			button.icon:AddMaskTexture(mask)
+		end
 	end
 end
 

@@ -10,7 +10,7 @@ end
 L["ADDON_TITLE"] = "Control Freak"
 L["OPTIONS_DESCRIPTION"] =
 	"Боевой глашатай: сообщает о провокациях, прерываниях, страхе, смертях танка, плохих питомцах, парированиях, снижении брони и других критических событиях боя. Отслеживайте, кто спровоцировал, что не сработало, кто прервал заклинание и что произошло, с помощью настраиваемых оповещений."
-L["VERSION"] = "Версия"
+L["OPTIONS_VERSION"] = "Версия %s"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
@@ -40,8 +40,8 @@ L["OPTIONS_COMMAND_DESCRIPTION"] = "Открывает окно настроек
     rather than the act of throwing it, which is what a player cannot read off
     the box beside it -- every other toggle on this panel governs one thing.
 
-    Its ENABLE description is shared with the mini-map button's line for the same
-    toggle, so the two cannot describe it differently.
+    The title and the ENABLE description are shared with the mini-map button's
+    block for the same toggle, so the two cannot name or describe it differently.
 ]]
 L["KILL_SWITCH"] = "Все оповещения"
 L["KILL_SWITCH_SUMMARY"] =
@@ -151,10 +151,11 @@ L["SOUND_NONE"] = "Нет"
 
     TRANSLATORS: ALERT_AGAINST_DESC quotes one rung and one row by name; that
     wording must match your TARGET_RUNG_ELITE_0 and ALERT_MARKED_ALWAYS, or the
-    tooltip explains a choice the player cannot find. The four rungs are a threshold, widest first: each
-    one counts itself and the ones after it, which is why every rung that
-    includes bosses says so. Keep that in your translations -- a rung reading
-    only "Elites" beside a separate "Bosses" reads as two disjoint sets.
+    tooltip explains a choice the player cannot find. The four rungs are a
+    threshold, widest first: each one counts itself and the ones after it,
+    which is why every rung that includes bosses says so. Keep that in your
+    translations -- a rung reading only "Elites" beside a separate "Bosses"
+    reads as two disjoint sets.
 
     ALERT_MARKED_ALWAYS is the one control that WIDENS a section rather than
     narrowing it: a marked target counts whatever the rung says. Keep "Always"
@@ -269,7 +270,16 @@ L["TAUNTS_AOE_MINE"] = "Мои провокации по площади"
 L["TAUNTS_AOE_OTHERS"] = "Чужие провокации по площади"
 
 L["TAUNTS_ABILITIES_HEADER"] = "Способности провокации"
-L["TAUNTS_AOE_ABILITIES_HEADER"] = "Способности провокации по площади"
+L["TAUNTS_ABILITIES_DESC"] =
+	'Снимите галочку, чтобы игнорировать провокацию. Провокация на одну цель называет перехваченного противника и отмечает каждый промах, сопротивление и иммунитет в разделе "Неудачные провокации". Провокация по площади сообщает только о применении: она действует на всю группу сразу, и один устоявший противник ничего не говорит об остальных, поэтому её промахи не сообщаются. Переключать между двумя режимами можно только провокацию, которая забирает сразу нескольких противников.'
+L["TAUNTS_KIND_SINGLE"] = "Одна цель"
+L["TAUNTS_KIND_AOE"] = "По площади"
+L["TAUNTS_KIND_DESC"] =
+	'Эта провокация забирает сразу нескольких противников, поэтому о ней можно сообщать любым способом. "Одна цель" называет каждого перехваченного противника в разделе "Удачные провокации", а промахи отмечает в разделе "Неудачные провокации". "По площади" сообщает только о применении, в разделе "Провокации по площади", без промахов.'
+L["TAUNTS_KIND_LOCKED_SINGLE_DESC"] =
+	"Всегда одна цель: эта провокация забирает только одного противника."
+L["TAUNTS_KIND_LOCKED_AOE_DESC"] =
+	"Всегда по площади: эта провокация забирает всех вокруг сразу."
 
 --------------------------------------------------------------------------------
 -- Interrupts
@@ -383,7 +393,7 @@ L["INCAPACITATED_DISARM_DESC"] =
     name, from the client.
 ]]
 L["TANK_DEATHS_SUMMARY"] =
-	"Танк в вашей группе погиб. Это единственная смерть, которая меняет то, что всем остальным делать дальше, а среди сорока рейдовых портретов её труднее всего заметить."
+	"Узнайте в тот же миг, когда погибает танк вашей группы. Это единственная смерть, которая меняет то, что всем остальным делать дальше, а среди сорока рейдовых портретов её труднее всего заметить."
 L["TANK_DEATHS_ENABLE"] = "Включить отслеживание смертей танка"
 
 L["TANK_DEATHS_ALERT_HEADER"] = "Смерти танка"
@@ -479,7 +489,7 @@ L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "Сообщать о холодном н
 L["TANKING_TOOLS_COLD_OPENER_MINE"] = "Моё холодное начало"
 L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] =
 	"Сообщает о ваших собственных начальных способностях, которые не прошли. Список рядом задаёт, куда уходит строка."
--- The caption before the window dropdown: "Within [10 Seconds of Fight]".
+-- The caption before the window dropdown: "Within [10 Seconds of the Pull]".
 L["TANKING_TOOLS_COLD_OPENER_WITHIN"] = "В первые"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "%d сек. боя"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW_DESC"] =
@@ -559,7 +569,7 @@ L["TAUNT_RESISTED"] = "Провал провокации! %s: %s на %s, соп
     format whose first %s is not the player who cast it.
 ]]
 L["TAUNT_IMMUNE"] = "Провал провокации! Иммунитет у цели %s: %s применяет %s."
-L["TAUNT_FAILED"] = "Провал провокации! %s: %s на %s, без эффекта."
+L["TAUNT_FAILED"] = "Провал провокации! %s: %s на %s, не сработало."
 L["INTERRUPT"] = "Прервано! %s: %s на %s сбивает %s."
 
 L["FEAR_SUCCESS"] = "Страх! %s: %s на %s."
@@ -583,10 +593,10 @@ L["FEAR_AOE"] = "Страх по площади! %s: %s."
     raid may run Control Freak, and a bare "Incapacitated!" leaves the group
     working out who to cover for.
 ]]
-L["INCAPACITATED"] = "%s выведен из строя на %s; %s: %s (%s) от %s."
-L["INCAPACITATED_PLAIN"] = "%s выведен из строя на %s; %s: %s от %s."
-L["INCAPACITATED_INDEFINITE"] = "%s выведен из строя; %s: %s (%s) от %s."
-L["INCAPACITATED_PLAIN_INDEFINITE"] = "%s выведен из строя; %s: %s от %s."
+L["INCAPACITATED"] = "%s выведен из строя на %s! %s: %s (%s) от %s."
+L["INCAPACITATED_PLAIN"] = "%s выведен из строя на %s! %s: %s от %s."
+L["INCAPACITATED_INDEFINITE"] = "%s выведен из строя! %s: %s (%s) от %s."
+L["INCAPACITATED_PLAIN_INDEFINITE"] = "%s выведен из строя! %s: %s от %s."
 
 --[[
     The seat the line opens on, as its own phrase rather than a format per role,

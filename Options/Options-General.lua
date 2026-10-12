@@ -48,14 +48,6 @@ function ns.BuildGeneralOptions()
 			end,
 		},
 
-		spaceCommands0 = ns.OptionsSpacer(5),
-		headerCommands = ns.OptionsHeader(L["OPTIONS_COMMANDS_HEADER"], 6),
-		spaceCommands1 = ns.OptionsSpacer(7),
-		descCommands = ns.OptionsDesc(
-			GetColor("INFO") .. L["OPTIONS_COMMAND"] .. "|r" .. "  " .. L["OPTIONS_COMMAND_DESCRIPTION"],
-			8
-		),
-
 		--[[
 		    Header, summary, switch -- the same three the feature tabs open on
 		    (ns.AddFeatureScope), because this is the same question asked once for
@@ -83,6 +75,14 @@ function ns.BuildGeneralOptions()
 			end,
 		},
 
+		spaceCommands0 = ns.OptionsSpacer(16),
+		headerCommands = ns.OptionsHeader(L["OPTIONS_COMMANDS_HEADER"], 17),
+		spaceCommands1 = ns.OptionsSpacer(18),
+		descCommands = ns.OptionsDesc(
+			GetColor("INFO") .. L["OPTIONS_COMMAND"] .. "|r" .. "  " .. L["OPTIONS_COMMAND_DESCRIPTION"],
+			19
+		),
+
 		spaceFeedback0 = ns.OptionsSpacer(20),
 		headerFeedback = ns.OptionsHeader(L["FEEDBACK_HEADER"], 21),
 		spaceFeedback1 = ns.OptionsSpacer(22),
@@ -96,7 +96,7 @@ function ns.BuildGeneralOptions()
 		version = {
 			type = "description",
 			name = function()
-				return GetColor("MUTED") .. L["VERSION"] .. " " .. ns.Version .. "|r"
+				return GetColor("MUTED") .. L["OPTIONS_VERSION"]:format(ns.Version) .. "|r"
 			end,
 			fontSize = "medium",
 			order = 999,

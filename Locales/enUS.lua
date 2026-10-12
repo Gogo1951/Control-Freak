@@ -10,7 +10,7 @@ end
 L["ADDON_TITLE"] = "Control Freak"
 L["OPTIONS_DESCRIPTION"] =
 	"Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, armor debuffs, and other critical fight events. Track who taunted, what failed, who interrupted a cast, and what happened with customizable alerts."
-L["VERSION"] = "Version"
+L["OPTIONS_VERSION"] = "Version %s"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
@@ -146,10 +146,11 @@ L["SOUND_NONE"] = "None"
 
     TRANSLATORS: ALERT_AGAINST_DESC quotes one rung and one row by name; that
     wording must match your TARGET_RUNG_ELITE_0 and ALERT_MARKED_ALWAYS, or the
-    tooltip explains a choice the player cannot find. The four rungs are a threshold, widest first: each
-    one counts itself and the ones after it, which is why every rung that
-    includes bosses says so. Keep that in your translations -- a rung reading
-    only "Elites" beside a separate "Bosses" reads as two disjoint sets.
+    tooltip explains a choice the player cannot find. The four rungs are a
+    threshold, widest first: each one counts itself and the ones after it,
+    which is why every rung that includes bosses says so. Keep that in your
+    translations -- a rung reading only "Elites" beside a separate "Bosses"
+    reads as two disjoint sets.
 
     ALERT_MARKED_ALWAYS is the one control that WIDENS a section rather than
     narrowing it: a marked target counts whatever the rung says. Keep "Always"
@@ -260,7 +261,14 @@ L["TAUNTS_AOE_MINE"] = "My AOE Taunts"
 L["TAUNTS_AOE_OTHERS"] = "Others' AOE Taunts"
 
 L["TAUNTS_ABILITIES_HEADER"] = "Taunt Abilities"
-L["TAUNTS_AOE_ABILITIES_HEADER"] = "AOE Taunt Abilities"
+L["TAUNTS_ABILITIES_DESC"] =
+	"Untick a taunt to ignore it. A Single Target taunt names the mob it took and catches every miss, resist, and immunity under Failed Taunts. An AOE taunt reports only the cast: it lands on a whole pack at once, and one mob shrugging it off says nothing about the rest, so its misses stay quiet. Only a taunt that grabs a few mobs at once can be switched between the two."
+L["TAUNTS_KIND_SINGLE"] = "Single Target"
+L["TAUNTS_KIND_AOE"] = "AOE"
+L["TAUNTS_KIND_DESC"] =
+	"This taunt grabs a few mobs at once, so it can go either way. Single Target names each mob it took, under Successful Taunts, and reports its misses under Failed Taunts. AOE reports only the cast, under AOE Taunts, and leaves its misses out."
+L["TAUNTS_KIND_LOCKED_SINGLE_DESC"] = "Always Single Target: this taunt only ever takes one mob."
+L["TAUNTS_KIND_LOCKED_AOE_DESC"] = "Always AOE: this taunt grabs everything around it at once."
 
 --------------------------------------------------------------------------------
 -- Interrupts
@@ -366,7 +374,7 @@ L["INCAPACITATED_DISARM_DESC"] = "Unable to attack with weapons. As with Roots, 
     name, from the client.
 ]]
 L["TANK_DEATHS_SUMMARY"] =
-	"The tank in your group has died. It is the one death that changes what everybody else should do next, and forty raid portraits are the worst place to notice it."
+	"Know the moment a tank in your group dies. It is the one death that changes what everybody else should do next, and forty raid portraits are the worst place to notice it."
 L["TANK_DEATHS_ENABLE"] = "Enable Tank Death Monitoring"
 
 L["TANK_DEATHS_ALERT_HEADER"] = "Tank Deaths"
@@ -458,9 +466,9 @@ L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "Enable Alerts for Cold Openers On"
 L["TANKING_TOOLS_COLD_OPENER_MINE"] = "My Cold Openers"
 L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] =
 	"Report your own opening abilities that failed to land. The dropdown beside it says where the line goes."
--- The caption before the window dropdown: "Within [10 Seconds of Fight]".
+-- The caption before the window dropdown: "Within [10 Seconds of the Pull]".
 L["TANKING_TOOLS_COLD_OPENER_WITHIN"] = "Within"
-L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "%d Seconds of Fight"
+L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "%d Seconds of the Pull"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW_DESC"] =
 	"How long into a pull an avoided ability still counts. The clock starts the first time Control Freak sees that mob, and only abilities count: an auto-attack whiffs too often to be news."
 
@@ -537,7 +545,7 @@ L["TAUNT_RESISTED"] = "Taunt Failed! %s's %s on %s was resisted."
     format whose first %s is not the player who cast it.
 ]]
 L["TAUNT_IMMUNE"] = "Taunt Failed! %s is immune to %s's %s."
-L["TAUNT_FAILED"] = "Taunt Failed! %s's %s on %s failed."
+L["TAUNT_FAILED"] = "Taunt Failed! %s's %s on %s did not land."
 L["INTERRUPT"] = "Interrupt! %s's %s on %s stopped %s."
 
 L["FEAR_SUCCESS"] = "Fear! %s used %s on %s."
@@ -561,10 +569,10 @@ L["FEAR_AOE"] = "AOE Fear! %s used %s."
     raid may run Control Freak, and a bare "Incapacitated!" leaves the group
     working out who to cover for.
 ]]
-L["INCAPACITATED"] = "%s Incapacitated for %s; %s is afflicted by %s (%s) from %s."
-L["INCAPACITATED_PLAIN"] = "%s Incapacitated for %s; %s is afflicted by %s from %s."
-L["INCAPACITATED_INDEFINITE"] = "%s Incapacitated; %s is afflicted by %s (%s) from %s."
-L["INCAPACITATED_PLAIN_INDEFINITE"] = "%s Incapacitated; %s is afflicted by %s from %s."
+L["INCAPACITATED"] = "%s Incapacitated for %s! %s is afflicted by %s (%s) from %s."
+L["INCAPACITATED_PLAIN"] = "%s Incapacitated for %s! %s is afflicted by %s from %s."
+L["INCAPACITATED_INDEFINITE"] = "%s Incapacitated! %s is afflicted by %s (%s) from %s."
+L["INCAPACITATED_PLAIN_INDEFINITE"] = "%s Incapacitated! %s is afflicted by %s from %s."
 
 --[[
     The seat the line opens on, as its own phrase rather than a format per role,

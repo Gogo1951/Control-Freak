@@ -83,7 +83,7 @@ end
 --------------------------------------------------------------------------------
 
 function ns:PLAYER_LOGIN()
-	ns.db = LibStub("AceDB-3.0"):New("ControlFreakDB", ns.DATABASE_DEFAULTS, true)
+	ns.db = LibStub("AceDB-3.0"):New(ns.SAVED_VARIABLES_NAME, ns.DATABASE_DEFAULTS, true)
 
 	for _, message in ipairs({ "OnProfileChanged", "OnProfileReset", "OnProfileCopied" }) do
 		ns.db.RegisterCallback(ns, message, "ApplyProfile")

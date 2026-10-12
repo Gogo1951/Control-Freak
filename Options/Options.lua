@@ -71,17 +71,9 @@ function ns.RegisterOptionsPanels()
 	AceConfig:RegisterOptionsTable(registry.Profiles, profiles)
 	AceConfigDialog:AddToBlizOptions(registry.Profiles, profiles.name, L["ADDON_TITLE"])
 
-	AceConfig:RegisterOptionsTable(registry.Diagnostics, ns.BuildDiagnosticsOptions())
+	-- A builder function, so the tabs come and go with the enable toggle (see Diagnostics/Options-Diagnostics.lua).
+	AceConfig:RegisterOptionsTable(registry.Diagnostics, ns.BuildDiagnosticsOptions)
 	AceConfigDialog:AddToBlizOptions(registry.Diagnostics, ns.DiagnosticsStrings.TAB, L["ADDON_TITLE"])
-
-	--[[
-	    TEMPORARY (remove after 2026-12-03) -- see Options/Options-Apology.lua.
-
-	    Registered last so it sits at the bottom of the list: it is a note to read
-	    once, not a panel to come back to, and it should not push the settings down.
-	]]
-	AceConfig:RegisterOptionsTable(registry.Apology, ns.BuildApologyOptions())
-	AceConfigDialog:AddToBlizOptions(registry.Apology, ns.APOLOGY_TAB_NAME, L["ADDON_TITLE"])
 end
 
 --------------------------------------------------------------------------------

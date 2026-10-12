@@ -432,5 +432,12 @@ ns.DATABASE_DEFAULTS = {
 		}),
 
 		ignoredSpells = {},
+
+		--[[
+		    Single Target or AOE, per taunt, keyed by the entry's first trigger id.
+		    Empty on purpose: a taunt nobody has picked for reads its isAoe from
+		    Data/Abilities.lua, so Reset Profile puts every row back on the data.
+		]]
+		tauntKinds = {},
 	},
 }

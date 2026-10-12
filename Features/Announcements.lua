@@ -279,6 +279,9 @@ local function RenderPart(part, rich)
 	return tostring(part)
 end
 
+-- Diagnostics' Message Length report renders through this, so it measures exactly what ns:Alert sends.
+ns.RenderAlertPart = RenderPart
+
 --[[
     Where this event's line goes. A section keeps one row for the player's own
     casts and one for everybody else's (ns.ALERT_OUTPUTS); the event picks its

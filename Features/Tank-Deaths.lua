@@ -95,7 +95,7 @@ function ns:HandleUnitDeath(destGUID, destName, destFlags)
 		return
 	end
 
-	local _, class = GetPlayerInfoByGUID(destGUID)
+	local _, class, _, _, sex = GetPlayerInfoByGUID(destGUID)
 	local playerPart = ns.PlayerPart(destName, destGUID, class)
 	local isMine = destGUID == ns.playerGUID
 
@@ -150,5 +150,5 @@ function ns:HandleUnitDeath(destGUID, destName, destFlags)
 	    colour is not a label: somebody watching three classes has to read which
 	    one this was, and colour-blind players need it at all.
 	]]
-	ns:PrintLine("TANK_DEATHS_CLASS_LINE", { ns.ClassName(class), playerPart })
+	ns:PrintLine("TANK_DEATHS_CLASS_LINE", { ns.ClassName(class, sex), playerPart })
 end

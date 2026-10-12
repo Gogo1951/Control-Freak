@@ -25,7 +25,7 @@ end
       Cold Openers reports the player's own opener and nobody else's, so it has a
       My row and no Others'. Its window -- how long into a pull an avoided
       ability still counts -- is a parameter of the detection, not a filter, and
-      sits as a caption row under the whose row, "Within [10 Seconds of Fight]".
+      sits as a caption row under the whose row, "Within [10 Seconds of the Pull]".
       The slot beside the switch belongs to the target ladder, as everywhere.
 
       Armor Debuffs has no whose at all: the report is the group's, told to the
