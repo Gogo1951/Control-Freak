@@ -10,14 +10,13 @@ end
 L["ADDON_TITLE"] = "Control Freak"
 L["OPTIONS_DESCRIPTION"] =
 	"Annonceur de combat pour les provocations, les interruptions, les peurs, les morts de tank, les vilains familiers, les parades, les affaiblissements d'armure et d'autres événements critiques du combat. Suivez qui a provoqué, ce qui a échoué, qui a interrompu une incantation et ce qui s'est passé, grâce à des alertes personnalisables."
-L["OPTIONS_VERSION"] = "Version %s"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
 --------------------------------------------------------------------------------
 
 L["CHAT_LOADED"] =
-	"Version %s. Les réglages (dont l'option pour désactiver ce message) se trouvent dans Options > AddOns > Control Freak. L'add-on vous plaît ? Parlez-en à un ami ! (="
+	"Version %s. Les réglages (dont l'option pour désactiver ce message) se trouvent dans Options > AddOns > Control Freak. Cet add-on vous plaît ? Parlez-en à un ami, ajoutez-le à vos favoris sur CurseForge ou donnez-lui une étoile sur GitHub. (="
 L["CHAT_OPTIONS_IN_COMBAT"] = "Par mesure de sécurité, la fenêtre des options ne peut pas être ouverte en combat."
 
 --------------------------------------------------------------------------------
@@ -29,29 +28,49 @@ L["ENABLE_WELCOME_MESSAGE_DESC"] = "Affiche le message d'accueil de Control Frea
 L["ENABLE_MINIMAP_BUTTON"] = "Activer le bouton de la minicarte"
 L["ENABLE_MINIMAP_BUTTON_DESC"] = "Affiche le bouton Control Freak sur votre minicarte."
 
+L["OPTIONS_FEATURES_HEADER"] = "Fonctionnalités"
+
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/freak"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Ouvre la fenêtre des options de cet add-on."
 
 --[[
-    The add-on's own switch, above every feature's. The title names its REACH
-    rather than the act of throwing it, which is what a player cannot read off
-    the box beside it -- every other toggle on this panel governs one thing.
-
-    The title and the ENABLE description are shared with the mini-map button's
-    block for the same toggle, so the two cannot name or describe it differently.
+    The add-on's own switch. KILL_SWITCH titles the mini-map tooltip's block for
+    it, naming its REACH rather than the act of throwing it. KILL_SWITCH_ENABLE
+    captions it as the first of the General panel's Features switches, and
+    KILL_SWITCH_ENABLE_DESC is both that switch's tooltip and the mini-map
+    block's description, so the two cannot describe it differently.
 ]]
 L["KILL_SWITCH"] = "Toutes les alertes"
-L["KILL_SWITCH_SUMMARY"] =
-	"Un seul interrupteur pour toutes les alertes de tous les onglets : le couper rend l'add-on silencieux sans modifier le moindre réglage, et un clic gauche sur le bouton de la minicarte fait la même chose depuis n'importe où."
 L["KILL_SWITCH_ENABLE"] = "Activer Control Freak"
 L["KILL_SWITCH_ENABLE_DESC"] = "Active ou désactive toutes les alertes de Control Freak."
 
-L["FEEDBACK_HEADER"] = "Retours et assistance"
-L["FEEDBACK_DISCORD"] = "Discord"
-L["FEEDBACK_GITHUB"] = "GitHub"
-L["FEEDBACK_CURSEFORGE"] = "CurseForge"
-L["FEEDBACK_WAGO"] = "Wago"
+--------------------------------------------------------------------------------
+-- Feedback & Support Panel
+--------------------------------------------------------------------------------
+
+L["OPTIONS_LEVEL_UP_TITLE"] = "Aidez Control Freak à monter de niveau"
+L["OPTIONS_LEVEL_UP_INTRO"] =
+	"Cet add-on a été créé par des joueurs qui adorent ce jeu et veulent le rendre aussi amusant que possible pour tout le monde. Nous ne demanderons jamais de dons. Notre vraie récompense, c'est de savoir que notre travail rend le jeu un peu meilleur pour vous. Si c'est le cas, nous serions ravis de l'apprendre !"
+L["OPTIONS_LEVEL_UP_WAYS"] = "Voici quelques façons de nous aider à toucher plus de joueurs."
+L["OPTIONS_LEVEL_UP_FEEDBACK"] =
+	"• Donnez votre avis : un bug ou une idée ? Dites-le-nous sur Discord. Vos retours nous aident à améliorer l'add-on, et les pull requests sont toujours les bienvenues."
+L["OPTIONS_LEVEL_UP_FRIEND"] =
+	"• Parlez-en à un ami : vous connaissez quelqu'un à qui cet add-on pourrait plaire ? Parlez-lui-en. Le bouche-à-oreille aide plus de joueurs à découvrir de bons add-ons."
+L["OPTIONS_LEVEL_UP_CURSEFORGE"] =
+	"• Favori sur CurseForge : ouvrez le lien CurseForge ci-dessous, connectez-vous et cliquez sur l'étoile sous le bouton \"Download\". Les favoris aident plus de joueurs à découvrir l'add-on."
+L["OPTIONS_LEVEL_UP_GITHUB"] =
+	'• Étoile sur GitHub : ouvrez le lien GitHub ci-dessous, connectez-vous et cliquez sur "Star" en haut à droite. Les étoiles aident le projet à accéder à davantage d\'outils de développement gratuits.'
+L["OPTIONS_LEVEL_UP_THANKS"] = "Merci d'avoir choisi Control Freak !"
+
+L["OPTIONS_FEEDBACK"] = "Retours et assistance"
+L["OPTIONS_FEEDBACK_LINKS_HEADER"] = "Liens de retours et d'assistance"
+L["OPTIONS_CURSEFORGE"] = "CurseForge"
+L["OPTIONS_GITHUB"] = "GitHub"
+L["OPTIONS_DISCORD"] = "Discord"
+L["OPTIONS_WAGO"] = "Wago"
+L["OPTIONS_COPY_LINK"] = "Pour copier un lien, cliquez dans son champ, puis appuyez sur Ctrl+A et Ctrl+C."
+L["OPTIONS_VERSION"] = "Version %s"
 
 --------------------------------------------------------------------------------
 -- Mini-map Button
@@ -262,9 +281,9 @@ L["TAUNTS_AOE_ENABLE"] = "Signaler les provocations de zone"
 L["TAUNTS_AOE_MINE"] = "Mes provocations de zone"
 L["TAUNTS_AOE_OTHERS"] = "Provocations de zone des autres"
 
-L["TAUNTS_ABILITIES_HEADER"] = "Capacités de provocation"
+L["TRACKED_HEADER"] = "Capacités suivies"
 L["TAUNTS_ABILITIES_DESC"] =
-	"Décochez une provocation pour l'ignorer. Une provocation à cible unique nomme le monstre qu'elle a pris et relève chaque raté, résistance ou insensibilité dans \"Provocations ratées\". Une provocation de zone ne signale que le lancement : elle touche tout un groupe d'un coup, et un monstre qui y échappe ne dit rien des autres, donc ses ratés restent muets. Seule une provocation qui attire quelques monstres à la fois peut basculer de l'une à l'autre."
+	'Décochez une provocation pour ne plus la suivre. Le menu déroulant à côté choisit entre "Cible unique" et "Zone".'
 L["TAUNTS_KIND_SINGLE"] = "Cible unique"
 L["TAUNTS_KIND_AOE"] = "Zone"
 L["TAUNTS_KIND_DESC"] =
@@ -300,7 +319,7 @@ L["FEARS_ALERT_ENABLE"] = "Signaler les peurs réussies"
 L["FEARS_ALERT_MINE"] = "Mes peurs réussies"
 L["FEARS_ALERT_OTHERS"] = "Peurs réussies des autres"
 
-L["FEARS_ABILITIES_HEADER"] = "Capacités de peur"
+L["FEARS_ABILITIES_DESC"] = "Décochez une peur pour ne plus la suivre."
 
 --------------------------------------------------------------------------------
 -- Incapacitated
@@ -445,7 +464,7 @@ L["BAD_PETS_WHISPER_ENABLE_DESC"] =
 L["BAD_PETS_COOLDOWN_DESC"] =
 	"Durée pendant laquelle un même familier n'est plus signalé après avoir déclenché une alerte. Cela couvre l'affichage, le son, l'annonce et le chuchotement, pour qu'un familier resté en lancement automatique ne remplisse pas votre fenêtre et que son maître ne reçoive pas un nouveau chuchotement toutes les quelques secondes."
 
-L["BAD_PETS_ABILITIES_HEADER"] = "Capacités des vilains familiers"
+L["BAD_PETS_ABILITIES_DESC"] = "Décochez une capacité de familier pour ne plus la suivre."
 
 --------------------------------------------------------------------------------
 -- Tanking Tools
@@ -583,8 +602,9 @@ L["INCAPACITATED_PLAIN_INDEFINITE"] = "%s neutralisé ! %s subit %s de %s."
     The seat the line opens on, as its own phrase rather than a format per role,
     which would be eight copies of the four above.
 
-    TRANSLATORS: this is the client's own word for the group finder role, and it
-    opens a sentence. "Afflicted by" in the formats above is deliberately the
+    TRANSLATORS: this is our own word for the person in that seat, not the
+    client's group finder role label, which names a role rather than a person.
+    It opens a sentence as its subject. "Afflicted by" in the formats above is deliberately the
     phrasing Blizzard's combat log uses for a debuff landing
     (AURAADDEDOTHERHARMFUL), so a player reads the same words here as in the log
     they already watch -- use your client's wording for both if it has one.
@@ -652,8 +672,9 @@ L["BAD_PET_AOE"] = "Vilain familier ! Le familier de %s, %s, a utilisé %s."
 L["BAD_PET_UNKNOWN_OWNER"] = "Vilain familier ! %s a utilisé %s sur %s."
 L["BAD_PET_UNKNOWN_OWNER_AOE"] = "Vilain familier ! %s a utilisé %s."
 --[[
-    Kept short on purpose. They render with a spell link and up to two names inside
-    a 255 byte chat limit, and the widest locale runs close to twice the English.
+    Kept short on purpose. They render with a spell link and up to two names
+    inside a 255 byte chat limit, and the widest locale runs close to twice the
+    English.
 ]]
 L["BAD_PET_WHISPER"] =
 	"Ton familier %s a utilisé %s sur %s. Fais un clic droit sur la capacité pour couper le lancement automatique."

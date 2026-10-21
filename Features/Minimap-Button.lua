@@ -155,9 +155,11 @@ ns.LDBObject = LibDataBroker:NewDataObject(ns.LOCALE_NAME, {
 function ns:RegisterMinimapButton()
 	if not LibDBIcon:IsRegistered(ns.LOCALE_NAME) then
 		LibDBIcon:Register(ns.LOCALE_NAME, ns.LDBObject, ns.db.profile.minimap)
-		-- The Retail engine leaves the square icon off-center in its ring.
-		-- Fitted by hand, not SetButtonIcon: its ResetButtonIcon calls icon:UpdateCoord(),
-		-- which errors when another add-on has replaced the button's icon.
+		--[[
+		    The Retail engine leaves the square icon off-center in its ring.
+		    Fitted by hand, not SetButtonIcon: its ResetButtonIcon calls icon:UpdateCoord(),
+		    which errors when another add-on has replaced the button's icon.
+		]]
 		local button = LibDBIcon:GetMinimapButton(ns.LOCALE_NAME)
 		if (ns.FLAVOR == "Camelot" or ns.FLAVOR == "Mainline") and button and button.icon then
 			button.icon:SetSize(20, 20)

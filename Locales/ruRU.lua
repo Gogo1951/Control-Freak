@@ -10,14 +10,13 @@ end
 L["ADDON_TITLE"] = "Control Freak"
 L["OPTIONS_DESCRIPTION"] =
 	"Боевой глашатай: сообщает о провокациях, прерываниях, страхе, смертях танка, плохих питомцах, парированиях, снижении брони и других критических событиях боя. Отслеживайте, кто спровоцировал, что не сработало, кто прервал заклинание и что произошло, с помощью настраиваемых оповещений."
-L["OPTIONS_VERSION"] = "Версия %s"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
 --------------------------------------------------------------------------------
 
 L["CHAT_LOADED"] =
-	"Версия %s. Настройки (включая возможность отключить это сообщение) находятся в разделе Настройки > Модификации > Control Freak. Нравится аддон? Расскажите о нём другу! (="
+	"Версия %s. Настройки (включая возможность отключить это сообщение) находятся в разделе Настройки > Модификации > Control Freak. Нравится этот аддон? Расскажите о нём другу, добавьте его в избранное на CurseForge или поставьте ему звезду на GitHub. (="
 L["CHAT_OPTIONS_IN_COMBAT"] =
 	"В целях безопасности окно настроек нельзя открыть в бою."
 
@@ -31,29 +30,51 @@ L["ENABLE_WELCOME_MESSAGE_DESC"] =
 L["ENABLE_MINIMAP_BUTTON"] = "Включить кнопку на миникарте"
 L["ENABLE_MINIMAP_BUTTON_DESC"] = "Показывать кнопку Control Freak на вашей миникарте."
 
+L["OPTIONS_FEATURES_HEADER"] = "Функции"
+
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/freak"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Открывает окно настроек этого аддона."
 
 --[[
-    The add-on's own switch, above every feature's. The title names its REACH
-    rather than the act of throwing it, which is what a player cannot read off
-    the box beside it -- every other toggle on this panel governs one thing.
-
-    The title and the ENABLE description are shared with the mini-map button's
-    block for the same toggle, so the two cannot name or describe it differently.
+    The add-on's own switch. KILL_SWITCH titles the mini-map tooltip's block for
+    it, naming its REACH rather than the act of throwing it. KILL_SWITCH_ENABLE
+    captions it as the first of the General panel's Features switches, and
+    KILL_SWITCH_ENABLE_DESC is both that switch's tooltip and the mini-map
+    block's description, so the two cannot describe it differently.
 ]]
 L["KILL_SWITCH"] = "Все оповещения"
-L["KILL_SWITCH_SUMMARY"] =
-	"Один выключатель для всех оповещений на всех вкладках: если его выключить, аддон умолкает, но ни одна настройка не меняется, а левый щелчок по кнопке на миникарте делает то же самое откуда угодно."
 L["KILL_SWITCH_ENABLE"] = "Включить Control Freak"
 L["KILL_SWITCH_ENABLE_DESC"] = "Включает или выключает все оповещения Control Freak."
 
-L["FEEDBACK_HEADER"] = "Отзывы и поддержка"
-L["FEEDBACK_DISCORD"] = "Discord"
-L["FEEDBACK_GITHUB"] = "GitHub"
-L["FEEDBACK_CURSEFORGE"] = "CurseForge"
-L["FEEDBACK_WAGO"] = "Wago"
+--------------------------------------------------------------------------------
+-- Feedback & Support Panel
+--------------------------------------------------------------------------------
+
+L["OPTIONS_LEVEL_UP_TITLE"] = "Помогите Control Freak поднять уровень"
+L["OPTIONS_LEVEL_UP_INTRO"] =
+	"Этот аддон создали игроки, которые любят эту игру и хотят сделать её как можно интереснее для всех. Мы никогда не будем просить пожертвований. Для нас настоящая награда в том, что наша работа делает игру для вас чуточку лучше. Если это так, мы будем рады об этом услышать!"
+L["OPTIONS_LEVEL_UP_WAYS"] =
+	"Вот несколько способов помочь нам рассказать об аддоне большему числу игроков."
+L["OPTIONS_LEVEL_UP_FEEDBACK"] =
+	"• Поделитесь отзывом: нашли ошибку или есть идея? Сообщите нам в Discord. Ваши отзывы помогают нам улучшать аддон, а пул-реквесты всегда приветствуются."
+L["OPTIONS_LEVEL_UP_FRIEND"] =
+	"• Расскажите другу: знаете кого-то, кому может понравиться этот аддон? Расскажите о нём. Сарафанное радио помогает большему числу игроков находить отличные аддоны."
+L["OPTIONS_LEVEL_UP_CURSEFORGE"] =
+	'• Избранное на CurseForge: откройте ссылку на CurseForge ниже, войдите в аккаунт и нажмите на звезду под кнопкой "Download". Избранное помогает большему числу игроков находить аддон.'
+L["OPTIONS_LEVEL_UP_GITHUB"] =
+	'• Звезда на GitHub: откройте ссылку на GitHub ниже, войдите в аккаунт и нажмите "Star" в правом верхнем углу. Звёзды помогают проекту получить доступ к большему числу бесплатных инструментов для разработчиков.'
+L["OPTIONS_LEVEL_UP_THANKS"] = "Спасибо, что выбрали Control Freak!"
+
+L["OPTIONS_FEEDBACK"] = "Отзывы и поддержка"
+L["OPTIONS_FEEDBACK_LINKS_HEADER"] = "Ссылки для отзывов и поддержки"
+L["OPTIONS_CURSEFORGE"] = "CurseForge"
+L["OPTIONS_GITHUB"] = "GitHub"
+L["OPTIONS_DISCORD"] = "Discord"
+L["OPTIONS_WAGO"] = "Wago"
+L["OPTIONS_COPY_LINK"] =
+	"Чтобы скопировать ссылку, щёлкните по её полю, затем нажмите Ctrl+A и Ctrl+C."
+L["OPTIONS_VERSION"] = "Версия %s"
 
 --------------------------------------------------------------------------------
 -- Mini-map Button
@@ -269,9 +290,9 @@ L["TAUNTS_AOE_ENABLE"] = "Сообщать о провокациях по пло
 L["TAUNTS_AOE_MINE"] = "Мои провокации по площади"
 L["TAUNTS_AOE_OTHERS"] = "Чужие провокации по площади"
 
-L["TAUNTS_ABILITIES_HEADER"] = "Способности провокации"
+L["TRACKED_HEADER"] = "Отслеживаемые способности"
 L["TAUNTS_ABILITIES_DESC"] =
-	'Снимите галочку, чтобы игнорировать провокацию. Провокация на одну цель называет перехваченного противника и отмечает каждый промах, сопротивление и иммунитет в разделе "Неудачные провокации". Провокация по площади сообщает только о применении: она действует на всю группу сразу, и один устоявший противник ничего не говорит об остальных, поэтому её промахи не сообщаются. Переключать между двумя режимами можно только провокацию, которая забирает сразу нескольких противников.'
+	'Снимите галочку с провокации, чтобы перестать её отслеживать. В выпадающем списке рядом выбирается "Одна цель" или "По площади".'
 L["TAUNTS_KIND_SINGLE"] = "Одна цель"
 L["TAUNTS_KIND_AOE"] = "По площади"
 L["TAUNTS_KIND_DESC"] =
@@ -311,7 +332,8 @@ L["FEARS_ALERT_ENABLE"] = "Сообщать о сработавшем страх
 L["FEARS_ALERT_MINE"] = "Мой сработавший страх"
 L["FEARS_ALERT_OTHERS"] = "Чужой сработавший страх"
 
-L["FEARS_ABILITIES_HEADER"] = "Способности страха"
+L["FEARS_ABILITIES_DESC"] =
+	"Снимите галочку с эффекта страха, чтобы перестать его отслеживать."
 
 --------------------------------------------------------------------------------
 -- Incapacitated
@@ -462,7 +484,8 @@ L["BAD_PETS_WHISPER_ENABLE_DESC"] =
 L["BAD_PETS_COOLDOWN_DESC"] =
 	"Сколько один питомец молчит после того, как вызвал оповещение. Действует на вывод в чат, звук, объявление и шёпот, чтобы питомец с оставленным автоприменением не забивал ваше окно, а его хозяин не получал шёпот каждые несколько секунд."
 
-L["BAD_PETS_ABILITIES_HEADER"] = "Способности плохих питомцев"
+L["BAD_PETS_ABILITIES_DESC"] =
+	"Снимите галочку со способности питомца, чтобы перестать её отслеживать."
 
 --------------------------------------------------------------------------------
 -- Tanking Tools
@@ -602,8 +625,9 @@ L["INCAPACITATED_PLAIN_INDEFINITE"] = "%s выведен из строя! %s: %s
     The seat the line opens on, as its own phrase rather than a format per role,
     which would be eight copies of the four above.
 
-    TRANSLATORS: this is the client's own word for the group finder role, and it
-    opens a sentence. "Afflicted by" in the formats above is deliberately the
+    TRANSLATORS: this is our own word for the person in that seat, not the
+    client's group finder role label, which names a role rather than a person.
+    It opens a sentence as its subject. "Afflicted by" in the formats above is deliberately the
     phrasing Blizzard's combat log uses for a debuff landing
     (AURAADDEDOTHERHARMFUL), so a player reads the same words here as in the log
     they already watch -- use your client's wording for both if it has one.
@@ -671,8 +695,9 @@ L["BAD_PET_AOE"] = "Плохой питомец! %s: питомец %s прим�
 L["BAD_PET_UNKNOWN_OWNER"] = "Плохой питомец! %s применяет %s на %s."
 L["BAD_PET_UNKNOWN_OWNER_AOE"] = "Плохой питомец! %s применяет %s."
 --[[
-    Kept short on purpose. They render with a spell link and up to two names inside
-    a 255 byte chat limit, and the widest locale runs close to twice the English.
+    Kept short on purpose. They render with a spell link and up to two names
+    inside a 255 byte chat limit, and the widest locale runs close to twice the
+    English.
 ]]
 L["BAD_PET_WHISPER"] =
 	"Ваш питомец %s: %s на %s. Отключите автоприменение: ПКМ по кнопке."

@@ -48,7 +48,7 @@ function ns.BuildBadPriestsOptions()
 		noTarget = true,
 		sample = {
 			key = "SHIELD_WARNING",
-			args = { ns.SAMPLE_OTHER, ns.SampleSpell(17, "Power Word: Shield"), ns.SAMPLE_PLAYER },
+			args = { ns.SAMPLE_OTHER, ns.SampleSpell(ns.SAMPLE_SPELL_IDS.POWER_WORD_SHIELD), ns.SAMPLE_PLAYER },
 		},
 		control = {
 			type = "select",
@@ -102,7 +102,7 @@ function ns.BuildBadPriestsOptions()
 				cooldowns = ns.BAD_PET_COOLDOWNS,
 				sample = {
 					key = "SHIELD_WHISPER",
-					args = { ns.SampleSpell(17, "Power Word: Shield"), ns.SAMPLE_PLAYER },
+					args = { ns.SampleSpell(ns.SAMPLE_SPELL_IDS.POWER_WORD_SHIELD), ns.SAMPLE_PLAYER },
 				},
 				getWhisper = function()
 					return Section().whisper

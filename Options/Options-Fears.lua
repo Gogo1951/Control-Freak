@@ -28,17 +28,28 @@ function ns.BuildFearsOptions()
 		noTarget = true,
 		sample = {
 			key = "FEAR_AOE",
-			args = { ns.SAMPLE_OTHER, ns.SampleSpell(8122, "Psychic Scream") },
+			args = { ns.SAMPLE_OTHER, ns.SampleSpell(ns.SAMPLE_SPELL_IDS.PSYCHIC_SCREAM) },
 		},
 	})
 
-	ns.AddGatedHeader(args, "abilities", "FEARS_ABILITIES_HEADER", 40, hidden, true)
+	return {
+		type = "group",
+		name = L["TAB_FEARS"],
+		args = args,
+	}
+end
+
+-- The Tracked Abilities sub-panel under Fears; not hidden, for the reason Taunts' is not.
+function ns.BuildFearsTrackedOptions()
+	local args = {
+		abilitiesDesc = ns.OptionsDesc(L["FEARS_ABILITIES_DESC"], 1),
+		abilitiesDescSpace = ns.OptionsSpacer(2),
+	}
 
 	for key, value in
 		pairs(ns.BuildAbilityToggles({
 			categories = { FEAR = true },
-			order = 45,
-			hidden = hidden,
+			order = 3,
 		}))
 	do
 		args[key] = value
@@ -46,7 +57,7 @@ function ns.BuildFearsOptions()
 
 	return {
 		type = "group",
-		name = L["TAB_FEARS"],
+		name = ns.SubPanelTitle(L["TAB_FEARS"], L["TRACKED_HEADER"]),
 		args = args,
 	}
 end

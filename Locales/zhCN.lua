@@ -10,14 +10,13 @@ end
 L["ADDON_TITLE"] = "Control Freak"
 L["OPTIONS_DESCRIPTION"] =
 	"战斗播报插件，覆盖嘲讽、打断、恐惧、坦克死亡、捣蛋宠物、招架、护甲削弱以及其他关键战斗事件。通过可自定义的提示，掌握谁嘲讽了、什么失败了、谁打断了施法，以及发生了什么。"
-L["OPTIONS_VERSION"] = "版本 %s"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
 --------------------------------------------------------------------------------
 
 L["CHAT_LOADED"] =
-	"版本 %s。设置（包括关闭这条消息的选项）可以在 选项 > 插件 > Control Freak 中找到。喜欢这个插件吗？告诉朋友吧！(="
+	"版本 %s。设置（包括关闭这条消息的选项）位于 选项 > 插件 > Control Freak。喜欢这个插件吗？告诉朋友，在 CurseForge 上收藏它，或在 GitHub 上为它点星吧！(="
 L["CHAT_OPTIONS_IN_COMBAT"] = "出于安全考虑，战斗中无法打开选项界面。"
 
 --------------------------------------------------------------------------------
@@ -29,29 +28,49 @@ L["ENABLE_WELCOME_MESSAGE_DESC"] = "登录时显示 Control Freak 的问候语�
 L["ENABLE_MINIMAP_BUTTON"] = "启用小地图按钮"
 L["ENABLE_MINIMAP_BUTTON_DESC"] = "在你的小地图上显示 Control Freak 按钮。"
 
+L["OPTIONS_FEATURES_HEADER"] = "功能"
+
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/freak"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "打开本插件的选项界面。"
 
 --[[
-    The add-on's own switch, above every feature's. The title names its REACH
-    rather than the act of throwing it, which is what a player cannot read off
-    the box beside it -- every other toggle on this panel governs one thing.
-
-    The title and the ENABLE description are shared with the mini-map button's
-    block for the same toggle, so the two cannot name or describe it differently.
+    The add-on's own switch. KILL_SWITCH titles the mini-map tooltip's block for
+    it, naming its REACH rather than the act of throwing it. KILL_SWITCH_ENABLE
+    captions it as the first of the General panel's Features switches, and
+    KILL_SWITCH_ENABLE_DESC is both that switch's tooltip and the mini-map
+    block's description, so the two cannot describe it differently.
 ]]
 L["KILL_SWITCH"] = "所有提示"
-L["KILL_SWITCH_SUMMARY"] =
-	"一个开关管住所有标签页里的全部提示：关掉它，插件就安静下来，而所有设置都原样保留；左键点击小地图按钮也能随时做同样的事。"
 L["KILL_SWITCH_ENABLE"] = "启用 Control Freak"
 L["KILL_SWITCH_ENABLE_DESC"] = "打开或关闭 Control Freak 的全部提示。"
 
-L["FEEDBACK_HEADER"] = "反馈与支持"
-L["FEEDBACK_DISCORD"] = "Discord"
-L["FEEDBACK_GITHUB"] = "GitHub"
-L["FEEDBACK_CURSEFORGE"] = "CurseForge"
-L["FEEDBACK_WAGO"] = "Wago"
+--------------------------------------------------------------------------------
+-- Feedback & Support Panel
+--------------------------------------------------------------------------------
+
+L["OPTIONS_LEVEL_UP_TITLE"] = "帮助 Control Freak 升级"
+L["OPTIONS_LEVEL_UP_INTRO"] =
+	"这个插件由热爱这款游戏、希望让每个人都玩得尽可能开心的玩家打造。我们永远不会请求捐款。真正的满足感，来自知道我们的工作让你的游戏变得更好一点。如果确实如此，我们很想听你说说！"
+L["OPTIONS_LEVEL_UP_WAYS"] = "你可以通过以下几种方式，帮助我们接触到更多玩家。"
+L["OPTIONS_LEVEL_UP_FEEDBACK"] =
+	"• 分享反馈：发现了错误或有新想法？在 Discord 上告诉我们。你的反馈能帮助我们改进插件，也随时欢迎提交 Pull Request。"
+L["OPTIONS_LEVEL_UP_FRIEND"] =
+	"• 告诉朋友：认识可能会喜欢这个插件的人吗？告诉他们吧。口碑能帮助更多玩家发现优秀的插件。"
+L["OPTIONS_LEVEL_UP_CURSEFORGE"] =
+	'• 在 CurseForge 上收藏：打开下方的 CurseForge 链接，登录后点击"Download"按钮下方的星标。收藏能帮助更多玩家发现这个插件。'
+L["OPTIONS_LEVEL_UP_GITHUB"] =
+	'• 在 GitHub 上点星：打开下方的 GitHub 链接，登录后点击右上角的"Star"。星标能帮助项目获得更多免费开发者工具的资格。'
+L["OPTIONS_LEVEL_UP_THANKS"] = "感谢选择 Control Freak！"
+
+L["OPTIONS_FEEDBACK"] = "反馈与支持"
+L["OPTIONS_FEEDBACK_LINKS_HEADER"] = "反馈与支持链接"
+L["OPTIONS_CURSEFORGE"] = "CurseForge"
+L["OPTIONS_GITHUB"] = "GitHub"
+L["OPTIONS_DISCORD"] = "Discord"
+L["OPTIONS_WAGO"] = "Wago"
+L["OPTIONS_COPY_LINK"] = "要复制链接，请点击它的输入框，然后按 Ctrl+A 和 Ctrl+C。"
+L["OPTIONS_VERSION"] = "版本 %s"
 
 --------------------------------------------------------------------------------
 -- Mini-map Button
@@ -262,9 +281,9 @@ L["TAUNTS_AOE_ENABLE"] = "启用群体嘲讽提示"
 L["TAUNTS_AOE_MINE"] = "我的群体嘲讽"
 L["TAUNTS_AOE_OTHERS"] = "他人的群体嘲讽"
 
-L["TAUNTS_ABILITIES_HEADER"] = "嘲讽技能"
+L["TRACKED_HEADER"] = "追踪的技能"
 L["TAUNTS_ABILITIES_DESC"] =
-	'取消勾选即可忽略某个嘲讽。单体嘲讽会报告被它嘲讽的目标，并在"失败的嘲讽"中报告每一次未命中、抵抗和免疫。群体嘲讽只报告施放：它一次命中整群敌人，其中一个目标没被嘲讽到并不能说明其余目标的情况，因此不报告它的失手。只有一次抓住少数几个敌人的嘲讽可以在两者之间切换。'
+	'取消勾选某个嘲讽即可不再追踪它。旁边的下拉菜单可选择"单体"或"群体"。'
 L["TAUNTS_KIND_SINGLE"] = "单体"
 L["TAUNTS_KIND_AOE"] = "群体"
 L["TAUNTS_KIND_DESC"] =
@@ -299,7 +318,7 @@ L["FEARS_ALERT_ENABLE"] = "启用成功恐惧提示"
 L["FEARS_ALERT_MINE"] = "我的成功恐惧"
 L["FEARS_ALERT_OTHERS"] = "他人的成功恐惧"
 
-L["FEARS_ABILITIES_HEADER"] = "恐惧技能"
+L["FEARS_ABILITIES_DESC"] = "取消勾选某个恐惧技能即可不再追踪它。"
 
 --------------------------------------------------------------------------------
 -- Incapacitated
@@ -442,7 +461,7 @@ L["BAD_PETS_WHISPER_ENABLE_DESC"] =
 L["BAD_PETS_COOLDOWN_DESC"] =
 	"同一只宠物触发提示后，要过多久才会再次提示。它同时作用于显示、声音、通报和密语，这样开着自动施放的宠物就不会刷满你的窗口，它的主人也不会每隔几秒就被密语一次。"
 
-L["BAD_PETS_ABILITIES_HEADER"] = "捣蛋宠物技能"
+L["BAD_PETS_ABILITIES_DESC"] = "取消勾选某个宠物技能即可不再追踪它。"
 
 --------------------------------------------------------------------------------
 -- Tanking Tools
@@ -579,8 +598,9 @@ L["INCAPACITATED_PLAIN_INDEFINITE"] = "%s失控！%s 中了 %s，来自 %s。"
     The seat the line opens on, as its own phrase rather than a format per role,
     which would be eight copies of the four above.
 
-    TRANSLATORS: this is the client's own word for the group finder role, and it
-    opens a sentence. "Afflicted by" in the formats above is deliberately the
+    TRANSLATORS: this is our own word for the person in that seat, not the
+    client's group finder role label, which names a role rather than a person.
+    It opens a sentence as its subject. "Afflicted by" in the formats above is deliberately the
     phrasing Blizzard's combat log uses for a debuff landing
     (AURAADDEDOTHERHARMFUL), so a player reads the same words here as in the log
     they already watch -- use your client's wording for both if it has one.
@@ -648,8 +668,9 @@ L["BAD_PET_AOE"] = "捣蛋宠物！%s 的宠物 %s 使用 %s。"
 L["BAD_PET_UNKNOWN_OWNER"] = "捣蛋宠物！%s 使用 %s，目标 %s。"
 L["BAD_PET_UNKNOWN_OWNER_AOE"] = "捣蛋宠物！%s 使用 %s。"
 --[[
-    Kept short on purpose. They render with a spell link and up to two names inside
-    a 255 byte chat limit, and the widest locale runs close to twice the English.
+    Kept short on purpose. They render with a spell link and up to two names
+    inside a 255 byte chat limit, and the widest locale runs close to twice the
+    English.
 ]]
 L["BAD_PET_WHISPER"] = "你的宠物 %s 使用了 %s，目标 %s。右键点击该技能即可关闭自动施放。"
 L["BAD_PET_WHISPER_AOE"] = "你的宠物 %s 使用了 %s。右键点击该技能即可关闭自动施放。"

@@ -10,14 +10,13 @@ end
 L["ADDON_TITLE"] = "Control Freak"
 L["OPTIONS_DESCRIPTION"] =
 	"도발, 차단, 공포, 탱커 사망, 말썽쟁이 소환수, 무기 막기, 방어도 감소 등 전투의 중요한 순간을 알려 주는 전투 알림 애드온입니다. 원하는 대로 설정할 수 있는 알림으로 누가 도발했는지, 무엇이 실패했는지, 누가 시전을 차단했는지, 무슨 일이 일어났는지 확인하세요."
-L["OPTIONS_VERSION"] = "버전 %s"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
 --------------------------------------------------------------------------------
 
 L["CHAT_LOADED"] =
-	"버전 %s. 설정(이 메시지를 끄는 옵션 포함)은 설정 > 애드온 > Control Freak에서 찾을 수 있습니다. 애드온이 마음에 드시나요? 친구에게도 알려 주세요! (="
+	"버전 %s. 설정(이 메시지를 끄는 옵션 포함)은 설정 > 애드온 > Control Freak에 있습니다. 이 애드온이 마음에 드시나요? 친구에게 알려 주거나, CurseForge에서 즐겨찾기에 추가하거나, GitHub에서 별을 눌러 주세요. (="
 L["CHAT_OPTIONS_IN_COMBAT"] = "안전을 위해 전투 중에는 설정 창을 열 수 없습니다."
 
 --------------------------------------------------------------------------------
@@ -29,29 +28,50 @@ L["ENABLE_WELCOME_MESSAGE_DESC"] = "접속할 때 Control Freak 인사말을 표
 L["ENABLE_MINIMAP_BUTTON"] = "미니맵 버튼 사용"
 L["ENABLE_MINIMAP_BUTTON_DESC"] = "미니맵에 Control Freak 버튼을 표시합니다."
 
+L["OPTIONS_FEATURES_HEADER"] = "기능"
+
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/freak"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "이 애드온의 설정 창을 엽니다."
 
 --[[
-    The add-on's own switch, above every feature's. The title names its REACH
-    rather than the act of throwing it, which is what a player cannot read off
-    the box beside it -- every other toggle on this panel governs one thing.
-
-    The title and the ENABLE description are shared with the mini-map button's
-    block for the same toggle, so the two cannot name or describe it differently.
+    The add-on's own switch. KILL_SWITCH titles the mini-map tooltip's block for
+    it, naming its REACH rather than the act of throwing it. KILL_SWITCH_ENABLE
+    captions it as the first of the General panel's Features switches, and
+    KILL_SWITCH_ENABLE_DESC is both that switch's tooltip and the mini-map
+    block's description, so the two cannot describe it differently.
 ]]
 L["KILL_SWITCH"] = "모든 알림"
-L["KILL_SWITCH_SUMMARY"] =
-	"모든 탭의 모든 알림을 한 번에 켜고 끄는 스위치입니다. 끄더라도 설정은 그대로 남고, 미니맵 버튼을 좌클릭해도 어디서든 같은 일을 할 수 있습니다."
 L["KILL_SWITCH_ENABLE"] = "Control Freak 사용"
 L["KILL_SWITCH_ENABLE_DESC"] = "Control Freak의 모든 알림을 켜거나 끕니다."
 
-L["FEEDBACK_HEADER"] = "의견 및 지원"
-L["FEEDBACK_DISCORD"] = "Discord"
-L["FEEDBACK_GITHUB"] = "GitHub"
-L["FEEDBACK_CURSEFORGE"] = "CurseForge"
-L["FEEDBACK_WAGO"] = "Wago"
+--------------------------------------------------------------------------------
+-- Feedback & Support Panel
+--------------------------------------------------------------------------------
+
+L["OPTIONS_LEVEL_UP_TITLE"] = "Control Freak의 레벨 업을 도와주세요"
+L["OPTIONS_LEVEL_UP_INTRO"] =
+	"이 애드온은 이 게임을 사랑하고 모두가 최대한 즐겁게 플레이하기를 바라는 플레이어들이 만들었습니다. 후원을 요청하는 일은 절대 없을 것입니다. 우리의 작업이 여러분의 게임을 조금 더 즐겁게 만든다는 것이 진짜 보람입니다. 그렇다면 꼭 알려 주세요!"
+L["OPTIONS_LEVEL_UP_WAYS"] =
+	"더 많은 플레이어에게 닿을 수 있도록 도와주실 방법을 몇 가지 소개합니다."
+L["OPTIONS_LEVEL_UP_FEEDBACK"] =
+	"• 의견 보내기: 버그를 찾으셨거나 아이디어가 있으신가요? Discord에서 알려 주세요. 여러분의 의견은 애드온을 개선하는 데 도움이 되며, 풀 리퀘스트도 언제나 환영합니다."
+L["OPTIONS_LEVEL_UP_FRIEND"] =
+	"• 친구에게 알리기: 이 애드온을 좋아할 만한 분을 알고 계신가요? 알려 주세요. 입소문은 더 많은 플레이어가 좋은 애드온을 발견하는 데 도움이 됩니다."
+L["OPTIONS_LEVEL_UP_CURSEFORGE"] =
+	"• CurseForge 즐겨찾기: 아래 CurseForge 링크를 열고 로그인한 뒤 'Download' 버튼 아래의 별을 클릭하세요. 즐겨찾기는 더 많은 플레이어가 애드온을 발견하는 데 도움이 됩니다."
+L["OPTIONS_LEVEL_UP_GITHUB"] =
+	"• GitHub 별표: 아래 GitHub 링크를 열고 로그인한 뒤 오른쪽 위의 'Star'를 클릭하세요. 별표는 프로젝트가 더 많은 무료 개발 도구를 받을 자격을 얻는 데 도움이 됩니다."
+L["OPTIONS_LEVEL_UP_THANKS"] = "Control Freak을 선택해 주셔서 감사합니다!"
+
+L["OPTIONS_FEEDBACK"] = "의견 및 지원"
+L["OPTIONS_FEEDBACK_LINKS_HEADER"] = "의견 및 지원 링크"
+L["OPTIONS_CURSEFORGE"] = "CurseForge"
+L["OPTIONS_GITHUB"] = "GitHub"
+L["OPTIONS_DISCORD"] = "Discord"
+L["OPTIONS_WAGO"] = "Wago"
+L["OPTIONS_COPY_LINK"] = "링크를 복사하려면 해당 칸을 클릭한 다음 Ctrl+A, Ctrl+C를 누르세요."
+L["OPTIONS_VERSION"] = "버전 %s"
 
 --------------------------------------------------------------------------------
 -- Mini-map Button
@@ -263,9 +283,9 @@ L["TAUNTS_AOE_ENABLE"] = "광역 도발 알림 사용"
 L["TAUNTS_AOE_MINE"] = "내 광역 도발"
 L["TAUNTS_AOE_OTHERS"] = "다른 사람의 광역 도발"
 
-L["TAUNTS_ABILITIES_HEADER"] = "도발 기술"
+L["TRACKED_HEADER"] = "추적 중인 기술"
 L["TAUNTS_ABILITIES_DESC"] =
-	"체크를 해제하면 그 도발을 무시합니다. 단일 대상 도발은 끌어온 적의 이름을 알리고, 빗나감, 저항, 면역을 모두 '도발 실패'에 알립니다. 광역 도발은 시전만 알립니다. 한 무리 전체에 한꺼번에 걸리고, 적 하나가 버텼다고 해서 나머지에 대해 알 수 있는 것은 없으므로 실패는 알리지 않습니다. 적 몇 명만 한꺼번에 끌어오는 도발만 둘 중 하나로 바꿀 수 있습니다."
+	"체크를 해제하면 그 도발을 더 이상 추적하지 않습니다. 옆의 드롭다운에서 '단일 대상' 또는 '광역'을 고릅니다."
 L["TAUNTS_KIND_SINGLE"] = "단일 대상"
 L["TAUNTS_KIND_AOE"] = "광역"
 L["TAUNTS_KIND_DESC"] =
@@ -301,7 +321,7 @@ L["FEARS_ALERT_ENABLE"] = "공포 성공 알림 사용"
 L["FEARS_ALERT_MINE"] = "내 공포 성공"
 L["FEARS_ALERT_OTHERS"] = "다른 사람의 공포 성공"
 
-L["FEARS_ABILITIES_HEADER"] = "공포 기술"
+L["FEARS_ABILITIES_DESC"] = "체크를 해제하면 그 공포 기술을 더 이상 추적하지 않습니다."
 
 --------------------------------------------------------------------------------
 -- Incapacitated
@@ -447,7 +467,7 @@ L["BAD_PETS_WHISPER_ENABLE_DESC"] =
 L["BAD_PETS_COOLDOWN_DESC"] =
 	"한 소환수가 알림을 일으킨 뒤, 그 소환수에 대해 다시 알리지 않는 시간입니다. 출력, 소리, 알리기, 귓속말 모두에 적용되므로, 자동 시전을 켜 둔 소환수가 대화창을 가득 채우거나 주인이 몇 초마다 귓속말을 받는 일이 없습니다."
 
-L["BAD_PETS_ABILITIES_HEADER"] = "말썽쟁이 소환수 기술"
+L["BAD_PETS_ABILITIES_DESC"] = "체크를 해제하면 그 소환수 기술을 더 이상 추적하지 않습니다."
 
 --------------------------------------------------------------------------------
 -- Tanking Tools
@@ -586,8 +606,9 @@ L["INCAPACITATED_PLAIN_INDEFINITE"] = "%s 행동 불가! %s님이 %s에 걸림, 
     The seat the line opens on, as its own phrase rather than a format per role,
     which would be eight copies of the four above.
 
-    TRANSLATORS: this is the client's own word for the group finder role, and it
-    opens a sentence. "Afflicted by" in the formats above is deliberately the
+    TRANSLATORS: this is our own word for the person in that seat, not the
+    client's group finder role label, which names a role rather than a person.
+    It opens a sentence as its subject. "Afflicted by" in the formats above is deliberately the
     phrasing Blizzard's combat log uses for a debuff landing
     (AURAADDEDOTHERHARMFUL), so a player reads the same words here as in the log
     they already watch -- use your client's wording for both if it has one.
@@ -655,8 +676,9 @@ L["BAD_PET_AOE"] = "말썽쟁이 소환수! %s님의 소환수 %s, %s 사용."
 L["BAD_PET_UNKNOWN_OWNER"] = "말썽쟁이 소환수! %s, %s 사용, 대상: %s."
 L["BAD_PET_UNKNOWN_OWNER_AOE"] = "말썽쟁이 소환수! %s, %s 사용."
 --[[
-    Kept short on purpose. They render with a spell link and up to two names inside
-    a 255 byte chat limit, and the widest locale runs close to twice the English.
+    Kept short on purpose. They render with a spell link and up to two names
+    inside a 255 byte chat limit, and the widest locale runs close to twice the
+    English.
 ]]
 L["BAD_PET_WHISPER"] =
 	"소환수 %s, %s 사용, 대상: %s. 해당 기술을 우클릭하면 자동 시전이 꺼집니다."

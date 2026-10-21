@@ -56,9 +56,9 @@ end
 local function MessageLengthNote(text)
 	local _, over = string.gsub(text, "%[OVER%]", "")
 	if over == 0 then
-		return D.MESSAGE_LENGTH_ALL_FIT
+		return D.MESSAGES_ALL_FIT
 	end
-	return string.format(D.MESSAGE_LENGTH_SOME_OVER, over)
+	return string.format(D.MESSAGES_SOME_OVER, over)
 end
 
 ns.DIAGNOSTIC_REPORTS = {
@@ -129,9 +129,9 @@ ns.DIAGNOSTIC_REPORTS = {
 			ns:StopNameLookupReport()
 		end,
 	},
-	messageLength = {
-		title = D.MESSAGE_LENGTH_TITLE,
-		description = D.MESSAGE_LENGTH_DESCRIPTION,
+	messages = {
+		title = D.MESSAGES_TITLE,
+		description = D.MESSAGES_DESCRIPTION,
 		build = function()
 			return ns:BuildMessageLengthReport()
 		end,
@@ -147,7 +147,7 @@ ns.DIAGNOSTIC_SECTIONS = {
 	},
 	{ key = "code", label = D.SECTION_CODE, reports = { "events", "api", "libs" } },
 	{ key = "data", label = D.SECTION_DATA, reports = {} },
-	{ key = "localization", label = D.SECTION_LOCALIZATION, reports = { "locale", "names", "messageLength" } },
+	{ key = "localization", label = D.SECTION_LOCALIZATION, reports = { "locale", "names", "messages" } },
 }
 
 function ns:GetDiagnosticSection(key)

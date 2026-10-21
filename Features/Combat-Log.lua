@@ -173,8 +173,9 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    One AoE taunt lands a separate aura on every mob it hits, so identical
-    timestamp + spell + outcome is the same cast reported again.
+    One AoE taunt lands a separate aura on every mob it hits, all from one
+    caster, so identical timestamp + caster + spell + outcome is the same cast
+    reported again.
 
     A taunt reported as Single Target adds the mob to the key. Righteous Defense
     takes up to three mobs in one cast, and a player who picked Single Target
@@ -185,7 +186,7 @@ end
     spell across a time window: that collapses a cast and the miss that follows
     it into one event, and every resisted taunt is swallowed.
 ]]
-local lastTimestamp, lastSpellId, lastOutcome, lastDestGUID
+local lastTimestamp, lastSourceGUID, lastSpellId, lastOutcome, lastDestGUID
 
 function ns:COMBAT_LOG_EVENT_UNFILTERED()
 	local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, _, destGUID, destName, destFlags, destRaidFlags, spellId, spellName, _, extra, extraName =
@@ -397,13 +398,15 @@ function ns:COMBAT_LOG_EVENT_UNFILTERED()
 	local dedupeDestGUID = (category == "TAUNT" and not ns.IsAoeTaunt(ability)) and destGUID or nil
 	if
 		timestamp == lastTimestamp
+		and sourceGUID == lastSourceGUID
 		and spellId == lastSpellId
 		and outcome == lastOutcome
 		and dedupeDestGUID == lastDestGUID
 	then
 		return
 	end
-	lastTimestamp, lastSpellId, lastOutcome, lastDestGUID = timestamp, spellId, outcome, dedupeDestGUID
+	lastTimestamp, lastSourceGUID, lastSpellId, lastOutcome, lastDestGUID =
+		timestamp, sourceGUID, spellId, outcome, dedupeDestGUID
 
 	local raidIconIndex = ns.GetRaidIconIndex(destRaidFlags)
 

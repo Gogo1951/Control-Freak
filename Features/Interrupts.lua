@@ -1,6 +1,6 @@
 local _, ns = ...
 
-local lastTimestamp, lastSpellId
+local lastTimestamp, lastSourceGUID, lastSpellId
 
 --[[
     Era reports the interrupted spell's id as 0 on SPELL_INTERRUPT, handing over
@@ -52,10 +52,10 @@ function ns:HandleInterrupt(
 )
 	local settings = ns.db.profile.interrupts.alert
 
-	if timestamp == lastTimestamp and spellId == lastSpellId then
+	if timestamp == lastTimestamp and sourceGUID == lastSourceGUID and spellId == lastSpellId then
 		return
 	end
-	lastTimestamp, lastSpellId = timestamp, spellId
+	lastTimestamp, lastSourceGUID, lastSpellId = timestamp, sourceGUID, spellId
 
 	if not interruptedSpellId or interruptedSpellId == 0 then
 		interruptedSpellId = RecallInterruptedSpell(destGUID)

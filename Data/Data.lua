@@ -59,14 +59,22 @@ ns.SPELL_LINK_COLOR = "71D5FF"
 ns.OPTIONS_REGISTRY = {
 	General = ADDON_NAME .. "_General",
 	Taunts = ADDON_NAME .. "_Taunts",
+	TauntsTracked = ADDON_NAME .. "_TauntsTracked",
 	Interrupts = ADDON_NAME .. "_Interrupts",
 	Fears = ADDON_NAME .. "_Fears",
+	FearsTracked = ADDON_NAME .. "_FearsTracked",
 	Incapacitated = ADDON_NAME .. "_Incapacitated",
 	TankDeaths = ADDON_NAME .. "_TankDeaths",
 	BadPriests = ADDON_NAME .. "_BadPriests",
 	BadPets = ADDON_NAME .. "_BadPets",
+	BadPetsTracked = ADDON_NAME .. "_BadPetsTracked",
 	TankingTools = ADDON_NAME .. "_TankingTools",
+	TankingToolsColdOpener = ADDON_NAME .. "_TankingToolsColdOpener",
+	TankingToolsArmor = ADDON_NAME .. "_TankingToolsArmor",
+	TankingToolsParry = ADDON_NAME .. "_TankingToolsParry",
+	TankingToolsNova = ADDON_NAME .. "_TankingToolsNova",
 	Profiles = ADDON_NAME .. "_Profiles",
+	FeedbackSupport = ADDON_NAME .. "_FeedbackSupport",
 	Diagnostics = ADDON_NAME .. "_Diagnostics",
 }
 
@@ -214,6 +222,8 @@ ns.CHAT_MESSAGE_MAX_LENGTH = 255
     rather than informing. Five minutes at the top is for somebody who has already
     been told and is not going to change it tonight. A minute is the shipped
     middle: one reminder per fight rather than one per pull.
+
+    The cooldown is the only throttle: there is no per-boss or per-instance mode.
 ]]
 ns.BAD_PET_COOLDOWNS = { 30, 60, 300 }
 ns.BAD_PET_COOLDOWN_DEFAULT = 60
@@ -430,9 +440,9 @@ ns.INCAPACITATED_COOLDOWN = 1.5
     settings with a friend across the faction line would find the list disagreeing
     about how many rows it has.
 
-    Token order here is arbitrary: ns.BuildTankDeathsOptions sorts by the
-    client's own localized class name, so the list reads alphabetically in every
-    language rather than only in English.
+    Token order here is arbitrary: Options/Options-Tank-Deaths.lua sorts the
+    rows by the client's own localized class name, so the list reads
+    alphabetically in every language rather than only in English.
 ]]
 ns.DEATH_CLASSES = {
 	"DRUID",
@@ -556,10 +566,12 @@ ns.SAMPLE_BOSSES = {
 
 ns.SPELL_TOGGLE_WIDGET_TYPE = ADDON_NAME .. "_SpellToggle"
 
-ns.URL_DISCORD = "https://discord.gg/eh8hKq992Q"
-ns.URL_GITHUB = "https://github.com/Gogo1951/Control-Freak"
-ns.URL_CURSEFORGE = "https://www.curseforge.com/wow/addons/control-freak"
-ns.URL_WAGO = "https://addons.wago.io/addons/control-freak"
+ns.LINKS = {
+	CURSEFORGE = "https://www.curseforge.com/wow/addons/control-freak",
+	GITHUB = "https://github.com/Gogo1951/Control-Freak",
+	DISCORD = "https://discord.gg/eh8hKq992Q",
+	WAGO = "https://addons.wago.io/addons/control-freak",
+}
 
 --------------------------------------------------------------------------------
 -- Sounds

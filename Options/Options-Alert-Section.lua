@@ -167,11 +167,12 @@ end
 --[[
     A spell's name for a sample line, from the client rather than the locale, so
     the example reads in the player's own language and matches the tooltip they
-    would see. Call it at build time: this client's spell data is not loaded when
-    the options files are.
+    would see. The ids live in ns.SAMPLE_SPELL_IDS, in each flavor's
+    Data/{Game}/Sample-Spells-{Game}.lua. Call it at build time: this client's
+    spell data is not loaded when the options files are.
 ]]
-function ns.SampleSpell(spellId, fallback)
-	return (ns.GetSpellNameAndIcon(spellId)) or fallback
+function ns.SampleSpell(spellId)
+	return (ns.GetSpellNameAndIcon(spellId)) or L["UNKNOWN_SPELL"]
 end
 
 --[[
@@ -193,9 +194,15 @@ local function AddSectionFrame(args, prefix, getSettings, order, hidden, options
 		return hidden() or not getSettings().enabled
 	end
 
-	args[prefix .. "HeadSpace"] = ns.OptionsSpacer(order, hidden)
-	args[prefix .. "Head"] = ns.OptionsHeader(L[options.headerKey], order + 1, hidden)
-	args[prefix .. "HeadSpaceAfter"] = ns.OptionsSpacer(order + 2, hidden)
+	--[[
+	    No header on a sub-panel that holds only this block: the page title above
+	    it already names the alert, and a header under it would print it twice.
+	]]
+	if not options.noHeader then
+		args[prefix .. "HeadSpace"] = ns.OptionsSpacer(order, hidden)
+		args[prefix .. "Head"] = ns.OptionsHeader(L[options.headerKey], order + 1, hidden)
+		args[prefix .. "HeadSpaceAfter"] = ns.OptionsSpacer(order + 2, hidden)
+	end
 	args[prefix .. "Desc"] = {
 		type = "description",
 		name = L[options.descKey],

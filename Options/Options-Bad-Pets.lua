@@ -18,7 +18,7 @@ function ns.BuildBadPetsOptions()
 	    One pet, one growl, one mob for both examples: the line the group sees and
 	    the whisper its owner gets describe the same event.
 	]]
-	local GROWL = ns.SampleSpell(2649, "Growl")
+	local GROWL = ns.SampleSpell(ns.SAMPLE_SPELL_IDS.GROWL)
 	local BOSS = ns.SampleBoss()
 
 	--[[
@@ -67,13 +67,24 @@ function ns.BuildBadPetsOptions()
 		end,
 	})
 
-	ns.AddGatedHeader(args, "abilities", "BAD_PETS_ABILITIES_HEADER", 40, hidden, true)
+	return {
+		type = "group",
+		name = L["TAB_BAD_PETS"],
+		args = args,
+	}
+end
+
+-- The Tracked Abilities sub-panel under Bad Pets; not hidden, for the reason Taunts' is not.
+function ns.BuildBadPetsTrackedOptions()
+	local args = {
+		abilitiesDesc = ns.OptionsDesc(L["BAD_PETS_ABILITIES_DESC"], 1),
+		abilitiesDescSpace = ns.OptionsSpacer(2),
+	}
 
 	for key, value in
 		pairs(ns.BuildAbilityToggles({
 			categories = { PET_TAUNT = true },
-			order = 45,
-			hidden = hidden,
+			order = 3,
 		}))
 	do
 		args[key] = value
@@ -81,7 +92,7 @@ function ns.BuildBadPetsOptions()
 
 	return {
 		type = "group",
-		name = L["TAB_BAD_PETS"],
+		name = ns.SubPanelTitle(L["TAB_BAD_PETS"], L["TRACKED_HEADER"]),
 		args = args,
 	}
 end

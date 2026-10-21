@@ -6,8 +6,8 @@ local _, ns = ...
     A frost nova on a pull scatters mobs out of the tank's threat range and off
     whatever the group was killing, so the tank wants to know it happened without
     reading the combat log. The NOVA ability category has exactly one member,
-    Frost Nova, so the same word runs from Data/Abilities.lua through here to the
-    printed line.
+    Frost Nova, so the same word runs from each flavor's
+    Data/{Game}/Abilities-{Game}.lua through here to the printed line.
 ]]
 function ns:HandleNova(
 	feature,

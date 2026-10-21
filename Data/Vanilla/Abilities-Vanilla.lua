@@ -206,7 +206,7 @@ ns.ABILITIES = {
 
 	-- ITEMS
 
-	-- These are the summon spells the item's Use casts, not the item ids.
+	-- triggers are the spells each item's Use casts, which is all the combat log reports.
 	{
 		class = "ITEM",
 		category = "TAUNT",
@@ -241,7 +241,7 @@ ns.ABILITIES = {
 How We Got the Data
 
 Last Validated
-	2026-10-11, Classic Era 1.15.9.70003
+	2026-10-20, Classic Era 1.15.9.70003
 
 Notes
 	- Every ability Control Freak watches on Classic Era, one row per checkbox in the options panel, grouped by class, with the pets' taunts and the engineering items last.
@@ -252,7 +252,14 @@ Notes
 	- kindChoice, taunts only, marks a taunt that takes a few mobs rather than one or a whole pack, so the Taunts tab lets the player report it as Single Target or AOE, with isAoe as the default. Every other taunt's dropdown is locked on its isAoe. It needs AURA detection: a cast names one target at most, where an aura lands on each mob the taunt took. No row on this client sets it.
 	- renamed marks an ability whose ranks answer to more than one name on this client, so Validate Data reports a differing name as RENAMED rather than as the typo signal NAME MISMATCH. Set it only for a verified rename, never to quiet a surprise. A rename stays one row, and the panel shows whichever name the client gives the highest rank the character has. No row on this client sets it.
 	- triggers lists every rank and variant the one checkbox covers, in rank order, and only ids this client knows: an id Validate Data reports NOT ON CLIENT leaves the folder. Unchecking the row ignores every id listed, so levelling preserves the choice.
-	- Season of Discovery's own copies (its rune taunts and its second Growl, Taunt and pet Growl ids) live only in Data/Discovery/. The Classic Era client knows them, but they never belong in this folder.
+	- The items behind the ITEM rows, and every other item worth auditing, live in Data/Vanilla/Items-Vanilla.lua, whose spell field names the trigger each one casts.
+	- The other items whose Use carries a fear or taunt aura are left out: spell books, drinks and Cowardly Flight Potion fear the player themselves, and Devilsaur Barb (22432) is a quest item.
+	- Quest tools whose Use only puts threat on a quest's own mob are left out too: the Taming Rods, Morbent's Bane, Torch of Flame, the Alterac Valley collar and muzzle, and Glowing Crystal Prison. No equipped item procs a fear or taunt on an enemy.
+	- Items have no category of their own. An ITEM row takes the category of what its Use does, so the target dummies are AOE taunts and Flash Bomb an AOE fear.
+	- Tame Beast carries threat only to start a tame, so it is left out.
+	- The pet family test is a spell on a pet's skill line whose only effect is threat on enemies: Growl, Torment and Suffering. Cower and Soothing Kiss carry only threat too, but lower it, so they are left out.
+	- The three paladin bubbles are parked, listed in the comment under the PALADIN rows with what bringing them back would take.
+	- Season of Discovery's own copies (its rune taunts, its second Growl, Taunt and pet Growl ids, and the felguard's Anguish) live only in Data/Discovery/. The Classic Era client knows them, but they never belong in this folder.
 
 SQL (CMaNGOS)
 	TODO: Add SQL Query
@@ -267,5 +274,11 @@ wago.tools
 	https://wago.tools/db2/SpellLevels?build=1.15.9.70003
 	https://wago.tools/db2/SpellClassOptions?build=1.15.9.70003
 	https://wago.tools/db2/SkillLineAbility?build=1.15.9.70003
+	https://wago.tools/db2/SkillLine?build=1.15.9.70003
 	https://wago.tools/db2/SpellCooldowns?build=1.15.9.70003
+	https://wago.tools/db2/ItemEffect?build=1.15.9.70003
+	https://wago.tools/db2/ItemSparse?build=1.15.9.70003
+
+QuestieDB
+	None.
 ]]
