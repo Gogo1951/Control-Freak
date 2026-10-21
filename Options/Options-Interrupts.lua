@@ -29,9 +29,9 @@ function ns.BuildInterruptsOptions()
 			key = "INTERRUPT",
 			args = {
 				ns.SAMPLE_PLAYER,
-				ns.SampleSpell(6552, "Pummel"),
+				ns.SampleSpell(ns.SAMPLE_SPELL_IDS.PUMMEL),
 				ns.SampleBoss(),
-				ns.SampleSpell(686, "Shadow Bolt"),
+				ns.SampleSpell(ns.SAMPLE_SPELL_IDS.SHADOW_BOLT),
 			},
 		},
 	})

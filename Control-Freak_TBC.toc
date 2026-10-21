@@ -58,6 +58,8 @@ Data/Flavor.lua
 Data/Data.lua
 Data/TBC/Abilities-TBC.lua
 Data/TBC/Armor-Debuffs-TBC.lua
+Data/TBC/Items-TBC.lua
+Data/TBC/Sample-Spells-TBC.lua
 Data/Default-Settings.lua
 
 # Control Freak
@@ -107,6 +109,7 @@ Options/Options-Bad-Priests.lua
 Options/Options-Bad-Pets.lua
 Options/Options-Tanking-Tools.lua
 Options/Options-Profiles.lua
+Options/Options-Feedback-Support.lua
 Diagnostics/Options-Diagnostics.lua
 Options/Options.lua
 

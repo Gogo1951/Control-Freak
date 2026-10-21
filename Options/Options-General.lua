@@ -3,18 +3,104 @@ local _, ns = ...
 local L = ns.L
 local GetColor = ns.GetColor
 
+-- Each tab's switch caption, keyed like ns.FEATURE_KEYS.
+local FEATURE_ENABLE_KEYS = {
+	taunts = "TAUNTS_ENABLE",
+	interrupts = "INTERRUPTS_ENABLE",
+	fears = "FEARS_ENABLE",
+	incapacitated = "INCAPACITATED_ENABLE",
+	tankDeaths = "TANK_DEATHS_ENABLE",
+	badPriests = "BAD_PRIESTS_ENABLE",
+	badPets = "BAD_PETS_ENABLE",
+	tankingTools = "TANKING_TOOLS_ENABLE",
+}
+
 --[[
-    The Feedback & Support rows override the default label/control split,
-    ns.OPTIONS_LABEL_WIDTH to ns.OPTIONS_CONTROL_WIDTH (2.1 to 1.3). Their labels
-    are one short word each, so the standard label width leaves a wide gap after
-    "Wago" and spends most of the row on nothing, while the URL beside it — the
-    part the player is there to copy — truncates mid-address. Giving the label
-    only what a word needs and the rest to the input fits every URL but the
-    longest, and the two still total ns.OPTIONS_ROW_WIDTH, so the rows end where
-    every other row ends.
+    The All Alerts switch alone on top, since it sits above every feature, then
+    the features in tiers with a blank line between each: the three that report
+    what somebody cast, the two about the player's own seat, the two Bad tabs,
+    and Tanking Tools alone at the bottom, the one that ships off and the one
+    the Tanking Tools section below belongs to. Everything under the top switch
+    hides while it is off, since none of it fires then; the switch re-runs
+    ns:ApplyProfile, which redraws this panel. The lone switches still go
+    through ns.OptionsTogglePairs, so they sit in the same inset as the pairs.
 ]]
-local LINK_LABEL_WIDTH = 0.6
-local LINK_URL_WIDTH = ns.OPTIONS_ROW_WIDTH - LINK_LABEL_WIDTH
+local FEATURE_TIERS = {
+	{ "taunts", "interrupts", "fears" },
+	{ "incapacitated", "tankDeaths" },
+	{ "badPets", "badPriests" },
+	{ "tankingTools" },
+}
+
+local function AllAlertsOff()
+	return not ns.db.profile.enabled
+end
+
+local function AddFeatureToggles(args, startOrder)
+	ns.OptionsTogglePairs(args, "rowKillSwitch", startOrder, {
+		{
+			type = "toggle",
+			name = L["KILL_SWITCH_ENABLE"],
+			desc = L["KILL_SWITCH_ENABLE_DESC"],
+			get = function()
+				return ns.db.profile.enabled
+			end,
+			-- Decides whether the combat log is registered at all, so the write re-runs ns:ApplyProfile.
+			set = function(_, value)
+				ns.db.profile.enabled = value
+				ns:ApplyProfile()
+			end,
+		},
+	})
+
+	-- Four orders per tier: its blank line, then up to two rows of pairs.
+	for tier, keys in ipairs(FEATURE_TIERS) do
+		local base = startOrder + 2 + (tier - 1) * 4
+		args["spaceFeatures" .. tier] = ns.OptionsSpacer(base, AllAlertsOff)
+		local toggles = {}
+		for _, key in ipairs(keys) do
+			toggles[#toggles + 1] = ns.FeatureEnableToggle(function()
+				return ns.db.profile[key]
+			end, FEATURE_ENABLE_KEYS[key])
+		end
+		ns.OptionsTogglePairs(args, "rowFeatures" .. tier .. "_", base, toggles, AllAlertsOff)
+	end
+end
+
+--[[
+    One switch per tool, so the tools can be turned off without opening each
+    sub-panel. Each binds the same setting as the switch on its own sub-panel,
+    and is captioned with that sub-panel's name: the sub-panel's "Enable Alerts
+    for Cold Openers On" ends on the ladder beside it, which is not drawn here.
+    Shown only while Tanking Tools and All Alerts are on; both switches re-run
+    ns:ApplyProfile, which redraws this panel when it changes.
+]]
+local function AddTankingToolToggles(args, order)
+	local hidden = function()
+		return AllAlertsOff() or not ns.db.profile.tankingTools.enabled
+	end
+
+	args.spaceTankingTools0 = ns.OptionsSpacer(order, hidden)
+	args.headerTankingTools = ns.OptionsHeader(L["TAB_TANKING_TOOLS"], order + 1, hidden)
+	args.spaceTankingTools1 = ns.OptionsSpacer(order + 2, hidden)
+
+	local toggles = {}
+	for _, tool in ipairs(ns.TANKING_TOOLS) do
+		local key = tool.key
+		toggles[#toggles + 1] = {
+			type = "toggle",
+			name = L[tool.headerKey],
+			desc = L["ALERT_SECTION_ENABLE_DESC"],
+			get = function()
+				return ns.db.profile.tankingTools[key].enabled
+			end,
+			set = function(_, value)
+				ns.db.profile.tankingTools[key].enabled = value
+			end,
+		}
+	end
+	ns.OptionsTogglePairs(args, "rowTankingTools", order + 2, toggles, hidden)
+end
 
 function ns.BuildGeneralOptions()
 	local args = {
@@ -48,88 +134,21 @@ function ns.BuildGeneralOptions()
 			end,
 		},
 
-		--[[
-		    Header, summary, switch -- the same three the feature tabs open on
-		    (ns.AddFeatureScope), because this is the same question asked once for
-		    all of them. The summary is what tells a player the switch is not on
-		    this page's scale: every other box on the General panel governs one
-		    thing, and this one governs the add-on.
-		]]
-		spaceKillSwitch0 = ns.OptionsSpacer(10),
-		headerKillSwitch = ns.OptionsHeader(L["KILL_SWITCH"], 11),
-		spaceKillSwitch1 = ns.OptionsSpacer(12),
-		descKillSwitch = ns.OptionsDesc(L["KILL_SWITCH_SUMMARY"], 13),
-		spaceKillSwitch2 = ns.OptionsSpacer(14),
-		enabled = {
-			type = "toggle",
-			name = L["KILL_SWITCH_ENABLE"],
-			desc = L["KILL_SWITCH_ENABLE_DESC"],
-			width = "full",
-			order = 15,
-			get = function()
-				return ns.db.profile.enabled
-			end,
-			set = function(_, value)
-				ns.db.profile.enabled = value
-				ns:ApplyProfile()
-			end,
-		},
+		spaceFeatures0 = ns.OptionsSpacer(20),
+		headerFeatures = ns.OptionsHeader(L["OPTIONS_FEATURES_HEADER"], 21),
+		spaceFeatures1 = ns.OptionsSpacer(22),
 
-		spaceCommands0 = ns.OptionsSpacer(16),
-		headerCommands = ns.OptionsHeader(L["OPTIONS_COMMANDS_HEADER"], 17),
-		spaceCommands1 = ns.OptionsSpacer(18),
+		spaceCommands0 = ns.OptionsSpacer(90),
+		headerCommands = ns.OptionsHeader(L["OPTIONS_COMMANDS_HEADER"], 91),
+		spaceCommands1 = ns.OptionsSpacer(92),
 		descCommands = ns.OptionsDesc(
 			GetColor("INFO") .. L["OPTIONS_COMMAND"] .. "|r" .. "  " .. L["OPTIONS_COMMAND_DESCRIPTION"],
-			19
+			93
 		),
-
-		spaceFeedback0 = ns.OptionsSpacer(20),
-		headerFeedback = ns.OptionsHeader(L["FEEDBACK_HEADER"], 21),
-		spaceFeedback1 = ns.OptionsSpacer(22),
-
-		spaceVersion = {
-			type = "description",
-			name = " ",
-			width = "full",
-			order = 998,
-		},
-		version = {
-			type = "description",
-			name = function()
-				return GetColor("MUTED") .. L["OPTIONS_VERSION"]:format(ns.Version) .. "|r"
-			end,
-			fontSize = "medium",
-			order = 999,
-		},
 	}
 
-	local urls = {
-		{ L["FEEDBACK_DISCORD"], ns.URL_DISCORD },
-		{ L["FEEDBACK_GITHUB"], ns.URL_GITHUB },
-		{ L["FEEDBACK_CURSEFORGE"], ns.URL_CURSEFORGE },
-		{ L["FEEDBACK_WAGO"], ns.URL_WAGO },
-	}
-
-	local order = 23
-	for index, row in ipairs(urls) do
-		if index > 1 then
-			args["urlSpace" .. index] = ns.OptionsSpacer(order)
-			order = order + 1
-		end
-		local url = row[2]
-		args["urlLabel" .. index] = ns.OptionsRowLabel(GetColor("TITLE") .. row[1] .. "|r", order, LINK_LABEL_WIDTH)
-		args["urlValue" .. index] = {
-			type = "input",
-			name = "",
-			width = LINK_URL_WIDTH,
-			order = order + 1,
-			get = function()
-				return url
-			end,
-			set = function() end,
-		}
-		order = order + 2
-	end
+	AddFeatureToggles(args, 22)
+	AddTankingToolToggles(args, 40)
 
 	return {
 		type = "group",

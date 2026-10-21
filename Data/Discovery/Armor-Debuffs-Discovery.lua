@@ -46,7 +46,7 @@ ns.ARMOR_DEBUFFS = {
 How We Got the Data
 
 Last Validated
-	2026-10-11, Season of Discovery 1.15.9.70003
+	2026-10-20, Season of Discovery 1.15.9.70003
 
 Notes
 	- The debuffs the Armor Debuffs tool (Features/Tanking-Tools-Armor.lua) waits on before it reports a target's armor as down, and what each one needs before it counts.

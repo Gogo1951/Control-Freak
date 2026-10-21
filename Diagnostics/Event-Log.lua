@@ -88,6 +88,17 @@ function ns:StopEventLog()
 	ns.diagnostics.logging = false
 end
 
+--[[
+    One entry in the buffer, for ns:LogEvent and ns:LogEventNow below.
+    Snapshots arguments to strings immediately -- never retain references, since
+    some events carry frames or tables that would leak memory or go stale. Caps
+    the arg count and per-argument byte length so a single entry can't run away.
+
+    Pipes are escaped (| -> ||) AFTER the length cut so each argument shows
+    verbatim in the report editbox instead of rendering as a clickable item
+    swatch. Escaping last also means the cut can never leave a dangling pipe that
+    would eat the following ", " separator.
+]]
 local function AppendEntry(event, ...)
 	local log = ns.diagnostics.log
 	if not log then
@@ -107,17 +118,7 @@ local function AppendEntry(event, ...)
 	end
 end
 
---[[
-    Called by Core's central dispatcher for every event while logging is active.
-    Snapshots arguments to strings immediately -- never retain references, since
-    some events carry frames or tables that would leak memory or go stale. Caps
-    the arg count and per-argument byte length so a single entry can't run away.
-
-    Pipes are escaped (| -> ||) AFTER the length cut so each argument shows
-    verbatim in the report editbox instead of rendering as a clickable item
-    swatch. Escaping last also means the cut can never leave a dangling pipe that
-    would eat the following ", " separator.
-]]
+-- Called by Core's central dispatcher for every event while logging is active.
 function ns:LogEvent(event, ...)
 	if ns.DIAGNOSTIC_EVENT_EXCLUDE[event] then
 		return
@@ -129,9 +130,11 @@ function ns:LogEvent(event, ...)
 end
 
 --[[
-    The way back in for an excluded firehose: the handler that decided a firing
-    was signal writes it here, past the exclude list. Callers read
-    ns.diagnostics.logging first, so off costs one boolean.
+    The way back in for an excluded firehose that is sometimes signal: the
+    handler that decides a firing mattered calls this with the event and its
+    arguments, and it is recorded as the dispatcher would have, past the
+    exclude list. Feature code calls it, so it carries the dispatcher's own
+    single boolean check before any work.
 ]]
 function ns:LogEventNow(event, ...)
 	if not ns.diagnostics.logging then

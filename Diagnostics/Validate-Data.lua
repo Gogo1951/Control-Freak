@@ -28,14 +28,20 @@ local GetItemStats = ns.GetItemStats
 local GetItemClassName = C_Item.GetItemClassInfo
 local GetItemSubClassName = C_Item.GetItemSubClassInfo
 local GetSpellDescription = C_Spell.GetSpellDescription
-local GetSpellName = C_Spell.GetSpellName
-local DoesSpellExist = C_Spell.DoesSpellExist
-local IsPlayerSpellRead = IsPlayerSpell
-local IsSpellKnownRead = (C_SpellBook and C_SpellBook.IsSpellKnown) or IsSpellKnown
 local RequestLoadSpellData = C_Spell.RequestLoadSpellData
 local IsSpellDataCached = C_Spell.IsSpellDataCached
 local GetQuestTitle = C_QuestLog.GetTitleForQuestID or C_QuestLog.GetQuestInfo
 local RequestLoadQuest = C_QuestLog.RequestLoadQuestByID
+
+--[[
+    The spell and area kinds' own reads, through _G because an add-on whose
+    data holds no spell or area never names them anywhere else.
+]]
+local GetSpellName = C_Spell.GetSpellName
+local DoesSpellExist = C_Spell.DoesSpellExist
+local IsPlayerSpell = _G.IsPlayerSpell
+local IsSpellKnown = _G.IsSpellKnown
+local GetAreaInfo = type(_G.C_Map) == "table" and _G.C_Map.GetAreaInfo or nil
 
 --[[
     Every other reader the clients ship that answers from the id alone, one
@@ -83,7 +89,7 @@ local ITEM_READERS = {
 	{ "C_Item", "IsItemBindToAccountUntilEquip", "IS_BIND_TO_ACCOUNT_UNTIL_EQUIP" },
 }
 
--- Read for a spell row, and for an item's own spell beside its description.
+-- Read for the item's own spell, beside its description.
 local SPELL_READERS = {
 	{ "C_Spell", "GetSpellInfo", "SPELL_INFO" },
 	{ "C_Spell", "GetSpellSubtext", "SPELL_SUBTEXT" },
@@ -140,19 +146,54 @@ local function ReaderHeaders(readers)
 	return headers
 end
 
+local function AddApiCheck(namespace, name)
+	local label = (namespace and (namespace .. "." .. name) or name) .. " (Validate Data)"
+	ns.DIAGNOSTIC_API_CHECKS[#ns.DIAGNOSTIC_API_CHECKS + 1] = {
+		label,
+		function()
+			if not namespace then
+				return type(_G[name]) == "function"
+			end
+			local current = _G[namespace]
+			return type(current) == "table" and type(current[name]) == "function"
+		end,
+	}
+end
+
 for _, readers in ipairs({ ITEM_READERS, SPELL_READERS, QUEST_READERS }) do
 	for _, reader in ipairs(readers) do
 		local namespace, name = reader[1], reader[2]
 		local library = _G[namespace]
 		reader.fn = type(library) == "table" and library[name] or nil
 		reader.count = type(reader[3]) == "table" and #reader[3] or 1
-		ns.DIAGNOSTIC_API_CHECKS[#ns.DIAGNOSTIC_API_CHECKS + 1] = {
-			namespace .. "." .. name .. " (Validate Data)",
-			function()
-				local current = _G[namespace]
-				return type(current) == "table" and type(current[name]) == "function"
-			end,
-		}
+		AddApiCheck(namespace, name)
+	end
+end
+
+--[[
+    The spell and area kinds' reads get API Endpoints rows only when a manifest
+    source uses that kind, so an add-on never probes an API it doesn't use.
+]]
+local KIND_API_CHECKS = {
+	-- { kind, namespace or nil for a global, function }
+	{ "spell", "C_Spell", "DoesSpellExist" },
+	{ "spell", "C_Spell", "GetSpellName" },
+	{ "spell", nil, "IsPlayerSpell" },
+	{ "spell", nil, "IsSpellKnown" },
+	{ "area", "C_Map", "GetAreaInfo" },
+}
+
+do
+	local kindsUsed = {}
+	for _, entry in ipairs(ns.DIAGNOSTIC_DATA_SOURCES) do
+		for _, source in ipairs(entry.sources) do
+			kindsUsed[source.kind] = true
+		end
+	end
+	for _, check in ipairs(KIND_API_CHECKS) do
+		if kindsUsed[check[1]] then
+			AddApiCheck(check[2], check[3])
+		end
 	end
 end
 
@@ -220,25 +261,6 @@ for _, group in ipairs({
 	end
 end
 
-local SPELL_COLUMNS = {
-	"STATUS",
-	"SOURCE",
-	"SPELL_ID",
-	"NAME",
-}
-
--- Follow the DATA_* columns on every spell row; the whole tooltip comes last.
-local EXTRA_SPELL_COLUMNS = {}
-for _, group in ipairs({
-	{ "DESCRIPTION" },
-	ReaderHeaders(SPELL_READERS),
-	{ "IS_PLAYER_SPELL", "IS_SPELL_KNOWN", "TOOLTIP" },
-}) do
-	for _, column in ipairs(group) do
-		EXTRA_SPELL_COLUMNS[#EXTRA_SPELL_COLUMNS + 1] = column
-	end
-end
-
 local QUEST_COLUMNS = {
 	"STATUS",
 	"SOURCE",
@@ -253,6 +275,40 @@ local SPELL_CELL_COUNT = 2 + #ReaderHeaders(SPELL_READERS)
 -- Follow the DATA_* columns on every quest row.
 local QUEST_READER_COLUMNS = ReaderHeaders(QUEST_READERS)
 
+--[[
+    A spell row carries the same spell columns an item's spell does, plus
+    whether this character has the spell, which no other kind can say.
+]]
+local SPELL_COLUMNS = {
+	"STATUS",
+	"SOURCE",
+	"SPELL_ID",
+	"NAME",
+	"IS_PLAYER_SPELL",
+	"IS_SPELL_KNOWN",
+}
+
+-- Follow the DATA_* columns on every spell row.
+local EXTRA_SPELL_COLUMNS = { "SPELL_DESCRIPTION" }
+for _, column in ipairs(ReaderHeaders(SPELL_READERS)) do
+	EXTRA_SPELL_COLUMNS[#EXTRA_SPELL_COLUMNS + 1] = column
+end
+EXTRA_SPELL_COLUMNS[#EXTRA_SPELL_COLUMNS + 1] = "SPELL_TOOLTIP"
+
+local AREA_COLUMNS = {
+	"STATUS",
+	"SOURCE",
+	"AREA_ID",
+	"NAME",
+}
+
+-- An "other" table answers to no lookup, so it prints its row count alone.
+local OTHER_COLUMNS = {
+	"STATUS",
+	"SOURCE",
+	"ROWS",
+}
+
 -- STATUS, SOURCE and the id come first, so the name or title is the fourth cell.
 local NAME_CELL = 4
 
@@ -263,6 +319,7 @@ local STATUS_INCOMPLETE = "INCOMPLETE"
 local STATUS_ERROR = "ERROR"
 local STATUS_TABLE_MISSING = "TABLE MISSING"
 local STATUS_NO_TITLE = "NO TITLE"
+local STATUS_NO_NAME = "NO NAME"
 
 local validations = {}
 
@@ -384,6 +441,19 @@ local function ItemSpellId(itemId)
 end
 
 --[[
+    A spell's description, its readers and its tooltip in one cell, lines
+    joined by " // ": the tail of every spell row and the spell columns of an
+    item that casts one. Returns the first read that threw.
+]]
+local function AppendSpellCells(cells, spellId)
+	local problem = AppendCall(cells, 1, GetSpellDescription, spellId)
+	problem = FirstProblem(problem, AppendReaderCells(cells, SPELL_READERS, spellId))
+	local spellLines, spellProblem = TooltipLines("spell", spellId)
+	cells[#cells + 1] = CellText(table.concat(spellLines, " // "))
+	return FirstProblem(problem, spellProblem)
+end
+
+--[[
     Everything after the DATA_* columns, in EXTRA_ITEM_COLUMNS order. Both
     tooltips go in one cell each, lines joined by " // ". Returns the first read
     that threw.
@@ -393,11 +463,7 @@ local function AppendExtraItemCells(cells, itemId)
 	local problem = FirstProblem(not infoOk and tostring(infoResult) or nil, AppendCall(cells, 2, GetItemSpell, itemId))
 	local spellId = ItemSpellId(itemId)
 	if spellId then
-		problem = FirstProblem(problem, AppendCall(cells, 1, GetSpellDescription, spellId))
-		problem = FirstProblem(problem, AppendReaderCells(cells, SPELL_READERS, spellId))
-		local spellLines, spellProblem = TooltipLines("spell", spellId)
-		cells[#cells + 1] = CellText(table.concat(spellLines, " // "))
-		problem = FirstProblem(problem, spellProblem)
+		problem = FirstProblem(problem, AppendSpellCells(cells, spellId))
 	else
 		AppendBlanks(cells, SPELL_CELL_COUNT)
 	end
@@ -458,41 +524,6 @@ local function BuildItemRow(status, entry, dataHeaders)
 	return cells
 end
 
--- A spell's name, or nil until the client answers with one.
-local function SpellName(spellId)
-	if type(GetSpellName) ~= "function" then
-		return nil
-	end
-	local name = TryRead(GetSpellName, spellId)
-	if type(name) == "string" and name ~= "" then
-		return name
-	end
-	return nil
-end
-
-local function BuildSpellRow(status, entry, dataHeaders)
-	local spellId = entry.id
-	local cells = { status, entry.source, tostring(spellId), CellText(SpellName(spellId)) }
-	local problem = entry.problem
-	AppendDataCells(cells, entry, dataHeaders)
-	if status == STATUS_NOT_ON_CLIENT then
-		AppendBlanks(cells, #EXTRA_SPELL_COLUMNS)
-	else
-		problem = FirstProblem(problem, AppendCall(cells, 1, GetSpellDescription, spellId))
-		problem = FirstProblem(problem, AppendReaderCells(cells, SPELL_READERS, spellId))
-		problem = FirstProblem(problem, AppendCall(cells, 1, IsPlayerSpellRead, spellId))
-		problem = FirstProblem(problem, AppendCall(cells, 1, IsSpellKnownRead, spellId))
-		local tooltipLines, tooltipProblem = TooltipLines("spell", spellId)
-		cells[#cells + 1] = CellText(table.concat(tooltipLines, " // "))
-		problem = FirstProblem(problem, tooltipProblem)
-	end
-	if problem then
-		cells[1] = STATUS_ERROR
-		cells[NAME_CELL] = CellText(problem)
-	end
-	return cells
-end
-
 --[[
     A quest has no existence check to ask, so an unknown quest and an uncached
     one look the same until the polls run out: the title is the only answer,
@@ -522,6 +553,62 @@ local function BuildQuestRow(status, entry, dataHeaders)
 	return cells
 end
 
+-- A name read that answers with a non-empty string, or nil and any message it threw.
+local function ReadName(fn, id)
+	if type(fn) ~= "function" then
+		return nil, nil
+	end
+	local name, problem = TryRead(fn, id)
+	if type(name) == "string" and name ~= "" then
+		return name, nil
+	end
+	return nil, problem
+end
+
+local function AreaName(areaId)
+	return ReadName(GetAreaInfo, areaId)
+end
+
+local function BuildSpellRow(status, entry, dataHeaders)
+	local spellId = entry.id
+	local name, problem = ReadName(GetSpellName, spellId)
+	local cells = { status, entry.source, tostring(spellId), CellText(name) }
+	problem = FirstProblem(entry.problem, problem)
+	problem = FirstProblem(problem, AppendCall(cells, 1, IsPlayerSpell, spellId))
+	problem = FirstProblem(problem, AppendCall(cells, 1, IsSpellKnown, spellId))
+	AppendDataCells(cells, entry, dataHeaders)
+	if status == STATUS_NOT_ON_CLIENT then
+		AppendBlanks(cells, #EXTRA_SPELL_COLUMNS)
+	else
+		problem = FirstProblem(problem, AppendSpellCells(cells, spellId))
+	end
+	if problem then
+		cells[1] = STATUS_ERROR
+		cells[NAME_CELL] = CellText(problem)
+	end
+	return cells
+end
+
+local function BuildAreaRow(status, entry, dataHeaders)
+	local areaId = entry.id
+	local name, problem = AreaName(areaId)
+	local cells = { status, entry.source, tostring(areaId), CellText(name) }
+	AppendDataCells(cells, entry, dataHeaders)
+	problem = FirstProblem(entry.problem, problem)
+	if problem then
+		cells[1] = STATUS_ERROR
+		cells[NAME_CELL] = CellText(problem)
+	end
+	return cells
+end
+
+local ROW_BUILDERS = {
+	item = BuildItemRow,
+	quest = BuildQuestRow,
+	spell = BuildSpellRow,
+	area = BuildAreaRow,
+}
+
 --[[
     Whether this client's item database knows the id at all, which is a
     different question from whether the item's data is cached. A throw comes
@@ -529,15 +616,6 @@ end
 ]]
 local function ItemExistsOnClient(itemId)
 	local exists, problem = TryRead(C_Item.DoesItemExistByID, itemId)
-	return exists and true or false, problem
-end
-
--- The spell twin of ItemExistsOnClient.
-local function SpellExistsOnClient(spellId)
-	if type(DoesSpellExist) ~= "function" then
-		return true, nil
-	end
-	local exists, problem = TryRead(DoesSpellExist, spellId)
 	return exists and true or false, problem
 end
 
@@ -552,29 +630,42 @@ local function CollectEntries(source, rows)
 	return entries
 end
 
+local function CountRows(rows)
+	local count = 0
+	for _ in pairs(rows) do
+		count = count + 1
+	end
+	return count
+end
+
 --[[
     Every id the entry's sources reach, grouped by kind and each in id order,
     with its DATA_* values already read; each kind's DATA_* headers in
     first-seen order, so a file with several sources still gets one header row
-    per block; and every source whose table this client's folder never built.
+    per block; every source whose table this client's folder never built; and
+    each "other" table's row count.
 ]]
 local function CollectIds(entry)
-	local ids, missing = {}, {}
-	local headers = { item = {}, quest = {}, spell = {} }
-	local seenHeaders = { item = {}, quest = {}, spell = {} }
+	local ids, missing, others = {}, {}, {}
+	local headers, seenHeaders = {}, {}
 
 	for _, source in ipairs(entry.sources) do
+		local kindHeaders = headers[source.kind] or {}
+		local kindSeen = seenHeaders[source.kind] or {}
+		headers[source.kind], seenHeaders[source.kind] = kindHeaders, kindSeen
 		local columns = source.dataColumns or {}
 		for _, column in ipairs(columns) do
-			if not seenHeaders[source.kind][column[1]] then
-				seenHeaders[source.kind][column[1]] = true
-				headers[source.kind][#headers[source.kind] + 1] = column[1]
+			if not kindSeen[column[1]] then
+				kindSeen[column[1]] = true
+				kindHeaders[#kindHeaders + 1] = column[1]
 			end
 		end
 
 		local rows = ns[source.table]
 		if type(rows) ~= "table" then
 			missing[#missing + 1] = source
+		elseif source.kind == "other" then
+			others[#others + 1] = { STATUS_OK, source.table, tostring(CountRows(rows)) }
 		else
 			for _, found in ipairs(CollectEntries(source, rows)) do
 				if type(found.id) == "number" then
@@ -597,22 +688,28 @@ local function CollectIds(entry)
 		end
 		return a.id < b.id
 	end)
-	return ids, headers, missing
+	return ids, headers, missing, others
 end
 
--- Asks the client for one id's data: the spell, the item and its spell, or the quest.
+--[[
+    Asks the client for one id's data: the item and its spell, the quest, or
+    the spell. An area has nothing to ask for.
+]]
 local function RequestEntry(entry)
-	if entry.kind == "spell" then
-		if type(RequestLoadSpellData) == "function" then
-			pcall(RequestLoadSpellData, entry.id)
-		end
-		entry.spellRequested = true
-		return
-	end
 	if entry.kind == "quest" then
 		if type(RequestLoadQuest) == "function" then
 			pcall(RequestLoadQuest, entry.id)
 		end
+		return
+	end
+	if entry.kind == "spell" then
+		if type(RequestLoadSpellData) == "function" then
+			pcall(RequestLoadSpellData, entry.id)
+			entry.spellRequested = true
+		end
+		return
+	end
+	if entry.kind == "area" then
 		return
 	end
 	local _, problem = TryRead(C_Item.RequestLoadItemDataByID, entry.id)
@@ -637,44 +734,15 @@ local function SpellDescription(spellId)
 end
 
 --[[
-    Whether an id's row can be written: a spell once its name, its tooltip and
-    its description have loaded, an item once its data, its tooltip and its
-    spell have loaded, a quest once it has a title, and any entry at once
-    when a read has thrown, so the run carries on past it. An item whose spell
-    only shows up once its data arrives gets that spell requested then. Plenty
-    of quest-object spells (keys that cast Opening) have no description at all,
-    so an empty one settles once the client says the spell's data is cached, or
-    where it can't say, one poll after the request. A client without
-    GetSpellDescription can't be waited on for one.
+    Whether a spell's data has landed, for a spell row or an item's spell. A
+    spell not yet requested is requested now. Plenty of quest-object spells
+    (keys that cast Opening) have no description at all, so an empty one
+    settles once the client says the spell's data is cached, or where it can't
+    say, one poll after the request. A client without GetSpellDescription can't
+    be waited on for one.
 ]]
-local IsSpellSettled
-
-local function IsSettled(entry)
-	if entry.problem then
-		return true
-	end
-	if entry.kind == "quest" then
-		return QuestTitle(entry.id) ~= nil
-	end
-	if entry.kind == "spell" then
-		if not SpellName(entry.id) or #TooltipLines("spell", entry.id) == 0 then
-			return false
-		end
-		return IsSpellSettled(entry, entry.id)
-	end
-	local name, problem = TryRead(GetItemInfo, entry.id)
-	if problem then
-		entry.problem = problem
-		return true
-	end
-	if not name or #TooltipLines("item", entry.id) == 0 then
-		return false
-	end
-	return IsSpellSettled(entry, ItemSpellId(entry.id))
-end
-
-function IsSpellSettled(entry, spellId)
-	if not spellId or type(GetSpellDescription) ~= "function" then
+local function IsSpellSettled(entry, spellId)
+	if type(GetSpellDescription) ~= "function" then
 		return true
 	end
 	if not entry.spellRequested then
@@ -701,9 +769,49 @@ function IsSpellSettled(entry, spellId)
 end
 
 --[[
-    A straggler the polls gave up on: a spell or item that loaded without its
-    tooltip or its spell's data is INCOMPLETE, and a quest without a title is
-    NO TITLE.
+    Whether an id's row can be written: an item once its data, its tooltip and
+    its spell have loaded, a spell once its name, its tooltip and its data
+    have, a quest once it has a title, and any entry at once when a read has
+    thrown, so the run carries on past it. An item whose spell only shows up
+    once its data arrives gets that spell requested then.
+]]
+local function IsSettled(entry)
+	if entry.problem then
+		return true
+	end
+	if entry.kind == "quest" then
+		return QuestTitle(entry.id) ~= nil
+	end
+	if entry.kind == "spell" then
+		local name, problem = ReadName(GetSpellName, entry.id)
+		if problem then
+			entry.problem = problem
+			return true
+		end
+		if not name or #TooltipLines("spell", entry.id) == 0 then
+			return false
+		end
+		return IsSpellSettled(entry, entry.id)
+	end
+	local name, problem = TryRead(GetItemInfo, entry.id)
+	if problem then
+		entry.problem = problem
+		return true
+	end
+	if not name or #TooltipLines("item", entry.id) == 0 then
+		return false
+	end
+	local spellId = ItemSpellId(entry.id)
+	if not spellId then
+		return true
+	end
+	return IsSpellSettled(entry, spellId)
+end
+
+--[[
+    A straggler the polls gave up on: an item or spell whose data loaded
+    without its tooltip or its spell's data is INCOMPLETE, and a quest without
+    a title is NO TITLE.
 ]]
 local function UnsettledStatus(entry)
 	if entry.problem then
@@ -713,7 +821,7 @@ local function UnsettledStatus(entry)
 		return STATUS_NO_TITLE
 	end
 	if entry.kind == "spell" then
-		return SpellName(entry.id) and STATUS_INCOMPLETE or STATUS_NOT_ON_CLIENT
+		return ReadName(GetSpellName, entry.id) and STATUS_INCOMPLETE or STATUS_NOT_ON_CLIENT
 	end
 	if TryRead(GetItemInfo, entry.id) then
 		return STATUS_INCOMPLETE
@@ -723,13 +831,7 @@ end
 
 local function ResolveRow(run, index, status)
 	local entry = run.ids[index]
-	if entry.kind == "quest" then
-		run.rows[index] = BuildQuestRow(status, entry, run.headers.quest)
-	elseif entry.kind == "spell" then
-		run.rows[index] = BuildSpellRow(status, entry, run.headers.spell)
-	else
-		run.rows[index] = BuildItemRow(status, entry, run.headers.item)
-	end
+	run.rows[index] = ROW_BUILDERS[entry.kind](status, entry, run.headers[entry.kind])
 	run.resolved = run.resolved + 1
 end
 
@@ -750,6 +852,7 @@ local function ReleaseRun(run)
 	run.rows = {}
 	run.pending = {}
 	run.missing = {}
+	run.others = {}
 end
 
 --[[
@@ -800,8 +903,9 @@ end
 
 --[[
     One kind's TSV block: its header row, a TABLE MISSING row for each of its
-    tables this client never built, then one row per id in id order. A kind
-    with nothing to show prints no block.
+    tables this client never built, then one row per id in id order, or for
+    "other" one row count per table. A kind with nothing to show prints no
+    block.
 ]]
 local function AppendKindBlock(lines, run, kind, header)
 	local rows = {}
@@ -809,6 +913,11 @@ local function AppendKindBlock(lines, run, kind, header)
 		if source.kind == kind then
 			local cells = { STATUS_TABLE_MISSING, source.table }
 			AppendBlanks(cells, #header - #cells)
+			rows[#rows + 1] = cells
+		end
+	end
+	if kind == "other" then
+		for _, cells in ipairs(run.others) do
 			rows[#rows + 1] = cells
 		end
 	end
@@ -835,6 +944,9 @@ local function CountStatuses(run)
 	for _, cells in pairs(run.rows) do
 		counts[cells[1]] = (counts[cells[1]] or 0) + 1
 	end
+	for _, cells in ipairs(run.others) do
+		counts[cells[1]] = (counts[cells[1]] or 0) + 1
+	end
 	if #run.missing > 0 then
 		counts[STATUS_TABLE_MISSING] = #run.missing
 	end
@@ -847,9 +959,12 @@ end
 ]]
 local function FinishValidation(_, run)
 	local lines = { GetClientHeader(), "" }
-	AppendKindBlock(lines, run, "spell", JoinColumns(SPELL_COLUMNS, run.headers.spell, EXTRA_SPELL_COLUMNS))
-	AppendKindBlock(lines, run, "item", JoinColumns(ITEM_COLUMNS, run.headers.item, EXTRA_ITEM_COLUMNS))
-	AppendKindBlock(lines, run, "quest", JoinColumns(QUEST_COLUMNS, run.headers.quest, QUEST_READER_COLUMNS))
+	local headers = run.headers
+	AppendKindBlock(lines, run, "item", JoinColumns(ITEM_COLUMNS, headers.item or {}, EXTRA_ITEM_COLUMNS))
+	AppendKindBlock(lines, run, "quest", JoinColumns(QUEST_COLUMNS, headers.quest or {}, QUEST_READER_COLUMNS))
+	AppendKindBlock(lines, run, "spell", JoinColumns(SPELL_COLUMNS, headers.spell or {}, EXTRA_SPELL_COLUMNS))
+	AppendKindBlock(lines, run, "area", JoinColumns(AREA_COLUMNS, headers.area or {}))
+	AppendKindBlock(lines, run, "other", OTHER_COLUMNS)
 	local counts = CountStatuses(run)
 	local onFinish = run.onFinish
 	run.finished = true
@@ -864,9 +979,9 @@ end
 local PollValidation
 
 --[[
-    Opens the next batch: a spell or item id the client does not know is
-    flagged on the spot, and everything else is requested and left for the
-    polls.
+    Opens the next batch: an item or spell id the client does not know is
+    flagged on the spot, an area settles at once since there is nothing to ask
+    the server for, and everything else is requested and left for the polls.
 ]]
 local function StartBatch(fileIndex, run)
 	run.idlePolls = 0
@@ -877,14 +992,16 @@ local function StartBatch(fileIndex, run)
 		local exists, problem = true, nil
 		if entry.kind == "item" then
 			exists, problem = ItemExistsOnClient(entry.id)
-		elseif entry.kind == "spell" then
-			exists, problem = SpellExistsOnClient(entry.id)
+		elseif entry.kind == "spell" and type(DoesSpellExist) == "function" then
+			exists, problem = TryRead(DoesSpellExist, entry.id)
 		end
 		if problem then
 			entry.problem = problem
 			ResolveRow(run, index, STATUS_ERROR)
 		elseif not exists then
 			ResolveRow(run, index, STATUS_NOT_ON_CLIENT)
+		elseif entry.kind == "area" then
+			ResolveRow(run, index, AreaName(entry.id) and STATUS_OK or STATUS_NO_NAME)
 		else
 			RequestEntry(entry)
 			run.pending[#run.pending + 1] = index
@@ -946,7 +1063,7 @@ function ns:StartDataValidation(fileIndex, onFinish)
 	validations[fileIndex] = run
 
 	run.generation = run.generation + 1
-	run.ids, run.headers, run.missing = CollectIds(entry)
+	run.ids, run.headers, run.missing, run.others = CollectIds(entry)
 	run.rows = {}
 	run.pending = {}
 	run.cursor = 0

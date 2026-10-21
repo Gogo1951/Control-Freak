@@ -84,8 +84,8 @@ end
 ns.TAUNT_KINDS = { "SINGLE", "AOE" }
 
 --[[
-    A taunt counts as Single Target or AOE by its isAoe in Data/Abilities.lua.
-    That decides which alert section reports it, whether it names a mob, and
+    A taunt counts as Single Target or AOE by its isAoe in this flavor's
+    Data/{Game}/Abilities-{Game}.lua. That decides which alert section reports it, whether it names a mob, and
     whether its misses are reported.
 
     Almost every taunt is locked: it takes one mob or everything around it, and

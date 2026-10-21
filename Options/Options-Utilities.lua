@@ -31,6 +31,52 @@ function ns.OptionsRowLabel(text, order, width)
 	}
 end
 
+--[[
+    Lays toggles out two to a line, each pair in its own unnamed inline group so
+    every pair pins its own row. The widths leave slack under
+    ns.OPTIONS_ROW_WIDTH: a row summing exactly to the pane sits on the wrap
+    boundary and can drop its second toggle onto a line of its own. Each
+    toggle's width and order are set here.
+]]
+local TOGGLE_PAIR_WIDTH = 1.6
+
+-- hidden is optional and goes on each pair's group, so a gated block collapses whole.
+function ns.OptionsTogglePairs(args, keyPrefix, startOrder, toggles, hidden)
+	for index = 1, #toggles, 2 do
+		local pair = {}
+		for offset = 0, 1 do
+			local toggle = toggles[index + offset]
+			if toggle then
+				toggle.width = TOGGLE_PAIR_WIDTH
+				toggle.order = offset + 1
+				pair["toggle" .. (offset + 1)] = toggle
+			end
+		end
+		args[keyPrefix .. index] = {
+			type = "group",
+			name = "",
+			inline = true,
+			order = startOrder + index,
+			hidden = hidden,
+			args = pair,
+		}
+	end
+end
+
+--[[
+    A sub-panel's page title names its parent, "Taunts > Tracked Abilities", so
+    a page reached from search still says whose list it is. The tree beside it
+    shows only the short name passed to AddToBlizOptions.
+]]
+function ns.SubPanelTitle(parentName, name)
+	return parentName .. " > " .. name
+end
+
+-- For a sub-panel's blocks: they stay drawn whether or not the feature is on.
+function ns.NeverHidden()
+	return false
+end
+
 function ns.OptionsSubLabel(text)
 	return GetColor("HELP") .. text .. "|r"
 end

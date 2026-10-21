@@ -16,14 +16,14 @@ function ns.BuildTauntsOptions()
 	local args = {}
 	local hidden = ns.AddFeatureScope(args, Feature, "TAUNTS_SUMMARY", "TAUNTS_ENABLE", 1, "taunts")
 
-	local TAUNT = ns.SampleSpell(355, "Taunt")
+	local TAUNT = ns.SampleSpell(ns.SAMPLE_SPELL_IDS.TAUNT)
 
 	--[[
 	    A row for the player's own casts, one for everybody else's, and the
 	    Against ladder beside the switch.
 
-	    Three sections, spaced 20 of order apart, then the ability list well clear
-	    of them at 120.
+	    Three sections, spaced 20 of order apart. The ability list is its own
+	    sub-panel, below.
 	]]
 	ns.AddWhoseAlertSection(args, "success", Section("success"), 20, hidden, {
 		headerKey = "TAUNTS_SUCCESS_HEADER",
@@ -57,33 +57,37 @@ function ns.BuildTauntsOptions()
 		noTarget = true,
 		sample = {
 			key = "TAUNT_AOE",
-			args = { ns.SAMPLE_PLAYER, ns.SampleSpell(1161, "Challenging Shout") },
+			args = { ns.SAMPLE_PLAYER, ns.SampleSpell(ns.SAMPLE_SPELL_IDS.CHALLENGING_SHOUT) },
 		},
 	})
 
-	--[[
-	    One list, every taunt with a Single Target / AOE dropdown beside it. The
-	    pick routes the taunt to the Successful and Failed sections or to the AOE
-	    one, which is the adjustment the data cannot make for everybody: whether
-	    a taunt that grabs a few mobs is worth naming them is the player's call.
-	]]
-	ns.AddGatedHeader(args, "abilities", "TAUNTS_ABILITIES_HEADER", 120, hidden, true)
-
-	-- The one ability list with a description: its dropdowns need explaining, a checkbox does not.
-	args.abilitiesDesc = {
-		type = "description",
-		name = L["TAUNTS_ABILITIES_DESC"],
-		fontSize = "medium",
-		order = 123,
-		hidden = hidden,
+	return {
+		type = "group",
+		name = L["TAB_TAUNTS"],
+		args = args,
 	}
-	args.abilitiesDescSpace = ns.OptionsSpacer(124, hidden)
+end
+
+--[[
+    The Tracked Abilities sub-panel under Taunts: one list, every taunt with a
+    Single Target / AOE dropdown beside it. The pick routes the taunt to the
+    Successful and Failed sections or to the AOE one, which is the adjustment the
+    data cannot make for everybody: whether a taunt that grabs a few mobs is worth
+    naming them is the player's call.
+
+    Not hidden behind the Taunts switch: which taunts count is worth settling
+    before turning the feature on, and the parent panel says whether it is.
+]]
+function ns.BuildTauntsTrackedOptions()
+	local args = {
+		abilitiesDesc = ns.OptionsDesc(L["TAUNTS_ABILITIES_DESC"], 1),
+		abilitiesDescSpace = ns.OptionsSpacer(2),
+	}
 
 	for key, value in
 		pairs(ns.BuildAbilityToggles({
 			categories = { TAUNT = true },
-			order = 125,
-			hidden = hidden,
+			order = 3,
 			kindPicker = true,
 		}))
 	do
@@ -92,7 +96,7 @@ function ns.BuildTauntsOptions()
 
 	return {
 		type = "group",
-		name = L["TAB_TAUNTS"],
+		name = ns.SubPanelTitle(L["TAB_TAUNTS"], L["TRACKED_HEADER"]),
 		args = args,
 	}
 end

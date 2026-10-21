@@ -150,6 +150,16 @@ local function NoEventLogReport()
 	return ns.diagnostics.eventLogReport == nil
 end
 
+-- A CHAT_MSG_* event puts message bodies, whispers included, into the log.
+local function LogsChat()
+	for _, event in ipairs(ns.EVENT_NAMES or {}) do
+		if string.sub(event, 1, 9) == "CHAT_MSG_" then
+			return true
+		end
+	end
+	return false
+end
+
 local function BuildEventLogBox(order)
 	return Box(D.EVENT_LOG_TITLE, order, {
 		descIntro = HelpDesc(
@@ -179,6 +189,7 @@ local function BuildEventLogBox(order)
 			return ns.diagnostics.eventLogReport
 		end, 3, 8, NoEventLogReport),
 		descCopy = HelpDesc(D.COPY_HINT, 4, NoEventLogReport),
+		descPrivacy = LogsChat() and HelpDesc(D.EVENT_LOG_PRIVACY, 5) or nil,
 	})
 end
 
@@ -248,7 +259,7 @@ end
 local SECTION_TEXT = {
 	settings = { tab = D.TAB_SETTINGS, intro = D.SETTINGS_INTRO, runAll = D.SETTINGS_RUN_ALL },
 	code = { tab = D.TAB_CODE, intro = D.CODE_INTRO, runAll = D.CODE_RUN_ALL },
-	data = { tab = D.TAB_DATA, intro = D.DATA_INTRO, runAll = D.DATA_RUN_ALL, hint = D.VALIDATE_HINT },
+	data = { tab = D.TAB_DATA, intro = D.DATA_INTRO, runAll = D.DATA_RUN_ALL },
 	localization = { tab = D.TAB_LOCALIZATION, intro = D.LOCALIZATION_INTRO, runAll = D.LOCALIZATION_RUN_ALL },
 }
 
@@ -368,9 +379,6 @@ local function BuildSectionGroup(section, order)
 
 	for index, id in ipairs(section.reports) do
 		args["row" .. index] = ReportRow(section, id, 6 + index)
-	end
-	if text.hint then
-		args.descHint = HelpDesc(text.hint, 53)
 	end
 
 	return { type = "group", name = text.tab, order = order, args = args }

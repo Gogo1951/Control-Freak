@@ -19,11 +19,13 @@ function ns:BuildDisplayContextReport()
 	local width, height = GetPhysicalScreenSize()
 	lines[#lines + 1] = string.format("Physical screen size: %s x %s", tostring(width), tostring(height))
 	lines[#lines + 1] = string.format("UIParent scale: %s", tostring(UIParent and UIParent:GetScale()))
-	lines[#lines + 1] = string.format("uiScale CVar: %s", tostring(C_CVar.GetCVar("uiScale")))
+	lines[#lines + 1] = string.format("uiScale CVar: %s", tostring(GetCVar("uiScale")))
 
 	lines[#lines + 1] = ""
 	local LibDBIcon = LibStub("LibDBIcon-1.0")
 	local button = LibDBIcon:GetMinimapButton(ns.LOCALE_NAME)
+	-- The broker object ns:RegisterMinimapButton hands LibDBIcon; without it there is no button to draw.
+	lines[#lines + 1] = string.format("Data broker object: %s", ns.LDBObject and "present" or "MISSING")
 	lines[#lines + 1] = string.format("Minimap button created: %s", button and "yes" or "no")
 	if button then
 		lines[#lines + 1] = string.format("Minimap button shown: %s", tostring(button:IsShown()))
@@ -115,8 +117,9 @@ local function DumpTable(value, indent, depth, lines)
 end
 
 --[[
-    Dumps the single AceDB-managed table (profiles, profileKeys, global) so a
-    player can paste their exact configuration: every setting in each profile,
+    Dumps the single AceDB-managed table (profiles and profileKeys; nothing
+    reads ns.db.global or ns.db.char, so neither is ever written) so a player
+    can paste their exact configuration: every setting in each profile,
     the ignored abilities and taunt-kind picks row by row included, since the
     player builds both by hand.
 ]]

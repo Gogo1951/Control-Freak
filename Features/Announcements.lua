@@ -54,11 +54,31 @@ function ns:PrintMessage(message)
 end
 
 --[[
+    The locale formats end as full sentences, but a brand suffix follows them,
+    so the closing period goes: "used [Taunt] on Soulflayer // Control Freak".
+    The CJK full stop is the same mark for zhCN and zhTW.
+]]
+local function TrimClosingPeriod(body)
+	local trimmed = string_gsub(body, "%.$", "")
+	trimmed = string_gsub(trimmed, "。$", "")
+	return trimmed
+end
+
+--[[
     Alerts brand as a suffix so the body's own raid-icon mark reads as the only
     target in the line.
 ]]
 function ns:PrintAlert(body)
-	print(body .. " " .. GetColor("SEPARATOR") .. "//" .. "|r " .. GetColor("INFO") .. L["ADDON_TITLE"] .. "|r")
+	print(
+		TrimClosingPeriod(body)
+			.. " "
+			.. GetColor("SEPARATOR")
+			.. "//"
+			.. "|r "
+			.. GetColor("INFO")
+			.. L["ADDON_TITLE"]
+			.. "|r"
+	)
 end
 
 function ns:PrintWelcome()
@@ -140,7 +160,7 @@ function ns:BuildAnnounceMessage(formatKey, ...)
 		return nil
 	end
 	local body = ns.StripChatFormatting(string_format(template, ...))
-	return body .. " // " .. L["ADDON_TITLE"]
+	return TrimClosingPeriod(body) .. " // " .. L["ADDON_TITLE"]
 end
 
 --[[
@@ -351,7 +371,8 @@ end
     The group test is guaranteed here rather than remembered. Every dispatch in
     Features/Combat-Log.lua also bails early on an outsider, which saves the
     work; this one makes sure a dispatch missing that early test still cannot
-    announce a mob's cast as a group member's.
+    announce a mob's cast as a group member's. A cast from outside the group is
+    never reported, so no section carries a row for one.
 
     A group member's PET counts as the group. The combat log's MINE and PARTY
     affiliation cover it, and a Felhunter's Spell Lock is a real interrupt --

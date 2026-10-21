@@ -76,7 +76,7 @@ function ns.BuildIncapacitatedOptions()
 				L["INCAPACITATED_ROLE_TANK"],
 				string.format(L["INCAPACITATED_SECONDS"], 6),
 				ns.SAMPLE_PLAYER,
-				ns.SampleSpell(5782, "Fear"),
+				ns.SampleSpell(ns.SAMPLE_SPELL_IDS.FEAR),
 				L["DISPEL_MAGIC"],
 				ns.SampleBoss(),
 			},

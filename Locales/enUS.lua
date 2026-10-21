@@ -10,14 +10,13 @@ end
 L["ADDON_TITLE"] = "Control Freak"
 L["OPTIONS_DESCRIPTION"] =
 	"Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, armor debuffs, and other critical fight events. Track who taunted, what failed, who interrupted a cast, and what happened with customizable alerts."
-L["OPTIONS_VERSION"] = "Version %s"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
 --------------------------------------------------------------------------------
 
 L["CHAT_LOADED"] =
-	"Version %s. Settings (including the option to disable this message) can be found under Options > AddOns > Control Freak. Enjoying the add-on? Tell a friend about it! (="
+	"Version %s. Settings (including the option to disable this message) are under Options > AddOns > Control Freak. Enjoying this add-on? Tell a friend, Favorite it on CurseForge, or Star it on GitHub. (="
 L["CHAT_OPTIONS_IN_COMBAT"] = "As a safety precaution, the Options Interface cannot be opened during combat."
 
 --------------------------------------------------------------------------------
@@ -29,29 +28,49 @@ L["ENABLE_WELCOME_MESSAGE_DESC"] = "Show the Control Freak greeting when you log
 L["ENABLE_MINIMAP_BUTTON"] = "Enable Mini-map Button"
 L["ENABLE_MINIMAP_BUTTON_DESC"] = "Show the Control Freak button on your mini-map."
 
+L["OPTIONS_FEATURES_HEADER"] = "Features"
+
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/freak"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Opens the Options Interface for this add-on."
 
 --[[
-    The add-on's own switch, above every feature's. The title names its REACH
-    rather than the act of throwing it, which is what a player cannot read off
-    the box beside it -- every other toggle on this panel governs one thing.
-
-    The title and the ENABLE description are shared with the mini-map button's
-    block for the same toggle, so the two cannot name or describe it differently.
+    The add-on's own switch. KILL_SWITCH titles the mini-map tooltip's block for
+    it, naming its REACH rather than the act of throwing it. KILL_SWITCH_ENABLE
+    captions it as the first of the General panel's Features switches, and
+    KILL_SWITCH_ENABLE_DESC is both that switch's tooltip and the mini-map
+    block's description, so the two cannot describe it differently.
 ]]
 L["KILL_SWITCH"] = "All Alerts"
-L["KILL_SWITCH_SUMMARY"] =
-	"One switch for every alert on every tab: turning it off silences the add-on without changing a setting, and a Left-Click on the mini-map button does the same from anywhere."
 L["KILL_SWITCH_ENABLE"] = "Enable Control Freak"
 L["KILL_SWITCH_ENABLE_DESC"] = "Turn every Control Freak alert on or off."
 
-L["FEEDBACK_HEADER"] = "Feedback & Support"
-L["FEEDBACK_DISCORD"] = "Discord"
-L["FEEDBACK_GITHUB"] = "GitHub"
-L["FEEDBACK_CURSEFORGE"] = "CurseForge"
-L["FEEDBACK_WAGO"] = "Wago"
+--------------------------------------------------------------------------------
+-- Feedback & Support Panel
+--------------------------------------------------------------------------------
+
+L["OPTIONS_LEVEL_UP_TITLE"] = "Help Control Freak Level Up"
+L["OPTIONS_LEVEL_UP_INTRO"] =
+	"This add-on was built by players who love this game and want to make it as fun as possible for everyone. We'll never ask for donations. The real satisfaction comes from knowing our work makes the game a little better for you. If it does, we'd love to hear about it!"
+L["OPTIONS_LEVEL_UP_WAYS"] = "Here are a few ways you can help us reach more players."
+L["OPTIONS_LEVEL_UP_FEEDBACK"] =
+	"• Share Feedback: Found a bug or have an idea? Let us know on Discord. Your feedback helps us improve the add-on, and pull requests are always welcome."
+L["OPTIONS_LEVEL_UP_FRIEND"] =
+	"• Tell a Friend: Know someone who might enjoy this add-on? Tell them about it. Word of mouth helps more players discover great add-ons."
+L["OPTIONS_LEVEL_UP_CURSEFORGE"] =
+	"• Favorite on CurseForge: Open the CurseForge link below, sign in, and click the star beneath the Download button. Favorites help more players discover the add-on."
+L["OPTIONS_LEVEL_UP_GITHUB"] =
+	"• Star on GitHub: Open the GitHub link below, sign in, and click Star in the top right. Stars help the project qualify for more free developer tools."
+L["OPTIONS_LEVEL_UP_THANKS"] = "Thanks for choosing Control Freak!"
+
+L["OPTIONS_FEEDBACK"] = "Feedback & Support"
+L["OPTIONS_FEEDBACK_LINKS_HEADER"] = "Feedback & Support Links"
+L["OPTIONS_CURSEFORGE"] = "CurseForge"
+L["OPTIONS_GITHUB"] = "GitHub"
+L["OPTIONS_DISCORD"] = "Discord"
+L["OPTIONS_WAGO"] = "Wago"
+L["OPTIONS_COPY_LINK"] = "To copy a link, click its box, then press Ctrl+A and Ctrl+C."
+L["OPTIONS_VERSION"] = "Version %s"
 
 --------------------------------------------------------------------------------
 -- Mini-map Button
@@ -260,9 +279,8 @@ L["TAUNTS_AOE_ENABLE"] = "Enable Alerts for AOE Taunts"
 L["TAUNTS_AOE_MINE"] = "My AOE Taunts"
 L["TAUNTS_AOE_OTHERS"] = "Others' AOE Taunts"
 
-L["TAUNTS_ABILITIES_HEADER"] = "Taunt Abilities"
-L["TAUNTS_ABILITIES_DESC"] =
-	"Untick a taunt to ignore it. A Single Target taunt names the mob it took and catches every miss, resist, and immunity under Failed Taunts. An AOE taunt reports only the cast: it lands on a whole pack at once, and one mob shrugging it off says nothing about the rest, so its misses stay quiet. Only a taunt that grabs a few mobs at once can be switched between the two."
+L["TRACKED_HEADER"] = "Tracked Abilities"
+L["TAUNTS_ABILITIES_DESC"] = "Untick a taunt to stop tracking it. The dropdown beside it picks Single Target or AOE."
 L["TAUNTS_KIND_SINGLE"] = "Single Target"
 L["TAUNTS_KIND_AOE"] = "AOE"
 L["TAUNTS_KIND_DESC"] =
@@ -297,7 +315,7 @@ L["FEARS_ALERT_ENABLE"] = "Enable Alerts for Successful Fears"
 L["FEARS_ALERT_MINE"] = "My Successful Fears"
 L["FEARS_ALERT_OTHERS"] = "Others' Successful Fears"
 
-L["FEARS_ABILITIES_HEADER"] = "Fear Abilities"
+L["FEARS_ABILITIES_DESC"] = "Untick a fear to stop tracking it."
 
 --------------------------------------------------------------------------------
 -- Incapacitated
@@ -440,7 +458,7 @@ L["BAD_PETS_WHISPER_ENABLE_DESC"] =
 L["BAD_PETS_COOLDOWN_DESC"] =
 	"How long one pet stays quiet after it sets off an alert. It covers the print, the sound, the announce, and the whisper, so a pet with auto-cast left on cannot fill your window, and its owner is not whispered again every few seconds."
 
-L["BAD_PETS_ABILITIES_HEADER"] = "Bad Pet Abilities"
+L["BAD_PETS_ABILITIES_DESC"] = "Untick a pet ability to stop tracking it."
 
 --------------------------------------------------------------------------------
 -- Tanking Tools
@@ -578,8 +596,9 @@ L["INCAPACITATED_PLAIN_INDEFINITE"] = "%s Incapacitated! %s is afflicted by %s f
     The seat the line opens on, as its own phrase rather than a format per role,
     which would be eight copies of the four above.
 
-    TRANSLATORS: this is the client's own word for the group finder role, and it
-    opens a sentence. "Afflicted by" in the formats above is deliberately the
+    TRANSLATORS: this is our own word for the person in that seat, not the
+    client's group finder role label, which names a role rather than a person.
+    It opens a sentence as its subject. "Afflicted by" in the formats above is deliberately the
     phrasing Blizzard's combat log uses for a debuff landing
     (AURAADDEDOTHERHARMFUL), so a player reads the same words here as in the log
     they already watch -- use your client's wording for both if it has one.
@@ -646,8 +665,9 @@ L["BAD_PET_AOE"] = "Bad Pet! %s's pet %s used %s."
 L["BAD_PET_UNKNOWN_OWNER"] = "Bad Pet! %s used %s on %s."
 L["BAD_PET_UNKNOWN_OWNER_AOE"] = "Bad Pet! %s used %s."
 --[[
-    Kept short on purpose. They render with a spell link and up to two names inside
-    a 255 byte chat limit, and the widest locale runs close to twice the English.
+    Kept short on purpose. They render with a spell link and up to two names
+    inside a 255 byte chat limit, and the widest locale runs close to twice the
+    English.
 ]]
 L["BAD_PET_WHISPER"] = "Your pet %s used %s on %s. Right-click the ability to turn off auto-cast."
 L["BAD_PET_WHISPER_AOE"] = "Your pet %s used %s. Right-click the ability to turn off auto-cast."

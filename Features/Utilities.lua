@@ -169,6 +169,14 @@ end
 
 ns.GetTooltipLines = TOOLTIP_DATA_GETTERS and ReadTooltipData or ReadScanTooltip
 
+--[[
+    An item's stat table from its link. WoW Forever ships C_Item.GetItemStats;
+    Classic Era and TBC Anniversary have only the legacy global GetItemStats,
+    which returns the same table. Resolved once at load, modern first.
+    Diagnostics is the only reader.
+]]
+ns.GetItemStats = C_Item.GetItemStats or GetItemStats
+
 --------------------------------------------------------------------------------
 -- Formatting
 --------------------------------------------------------------------------------

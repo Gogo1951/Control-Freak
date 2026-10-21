@@ -117,6 +117,7 @@ local function DeathClassDefaults()
 	return classes
 end
 
+-- Keys a retired profile shape left in SavedVariables are not migrated: those settings start from these defaults, and the old keys stay unread.
 ns.DATABASE_DEFAULTS = {
 	profile = {
 		showWelcome = true,
@@ -436,7 +437,8 @@ ns.DATABASE_DEFAULTS = {
 		--[[
 		    Single Target or AOE, per taunt, keyed by the entry's first trigger id.
 		    Empty on purpose: a taunt nobody has picked for reads its isAoe from
-		    Data/Abilities.lua, so Reset Profile puts every row back on the data.
+		    this flavor's Data/{Game}/Abilities-{Game}.lua, so Reset Profile puts
+		    every row back on the data.
 		]]
 		tauntKinds = {},
 	},

@@ -208,10 +208,17 @@ ns.ABILITIES = {
 		isAoe = false,
 		triggers = { 3716, 7809, 7810, 7811, 11774, 11775, 27270 },
 	}, -- Torment. 11776 and 11777 share its name but are not castable ranks
+	{
+		class = "WARLOCK",
+		category = "PET_TAUNT",
+		detection = "CAST",
+		isAoe = false,
+		triggers = { 33698, 33699, 33700 },
+	}, -- Anguish
 
 	-- ITEMS
 
-	-- These are the summon spells the item's Use casts, not the item ids.
+	-- triggers are the spells each item's Use casts, which is all the combat log reports.
 	{
 		class = "ITEM",
 		category = "TAUNT",
@@ -240,23 +247,43 @@ ns.ABILITIES = {
 		isAoe = true,
 		triggers = { 5134 },
 	}, -- Flash Bomb
+	{
+		class = "ITEM",
+		category = "FEAR",
+		detection = "CAST",
+		isAoe = true,
+		triggers = { 35474 },
+	}, -- Drums of Panic
+	{
+		class = "ITEM",
+		category = "FEAR",
+		detection = "CAST",
+		isAoe = true,
+		triggers = { 351357 },
+	}, -- Greater Drums of Panic
 }
 
 --[[
 How We Got the Data
 
 Last Validated
-	2026-10-11, TBC Anniversary 2.5.6.69795
+	2026-10-20, TBC Anniversary 2.5.6.70006
 
 Notes
-	- Every ability Control Freak watches on TBC Anniversary, one row per checkbox in the options panel, grouped by class, with the pets' taunts and the engineering items last.
+	- Every ability Control Freak watches on TBC Anniversary, one row per checkbox in the options panel, grouped by class, with the pets' taunts and the items last.
 	- class is the bucket the options panel files the row under; ITEM is its own bucket.
 	- category is TAUNT, FEAR, NOVA, SHIELD or PET_TAUNT, and ns.CATEGORY_FEATURE in Features/Ability-Index.lua maps each to the tab that owns its alert.
-	- detection is how a success is recognised. AURA means the ability lands an aura on its target, so success is that aura applying and a resist produces exactly one failure line. It is usually a debuff; Power Word: Shield's is a buff on a friendly target. CAST means it lands nothing to observe, so the cast itself is the success. Pet taunts are CAST: Growl, Torment and Suffering apply no debuff, and watching for an aura would leave the whole feature silent.
+	- detection is how a success is recognised. AURA means the ability lands an aura on its target, so success is that aura applying and a resist produces exactly one failure line. It is usually a debuff; Power Word: Shield's is a buff on a friendly target. CAST means it lands nothing to observe, so the cast itself is the success. Pet taunts are CAST: Growl, Torment, Suffering and Anguish apply no debuff, and watching for an aura would leave the whole feature silent.
 	- isAoe means the ability hits more than one target. It picks the alert section that reports it and suppresses failure lines, since an AoE taunt fires one miss per immune mob, which is noise rather than information.
 	- kindChoice, taunts only, marks a taunt that takes a few mobs rather than one or a whole pack, so the Taunts tab lets the player report it as Single Target or AOE, with isAoe as the default. Every other taunt's dropdown is locked on its isAoe. It needs AURA detection: a cast names one target at most, where an aura lands on each mob the taunt took. Righteous Defense is the one row that sets it.
 	- renamed marks an ability whose ranks answer to more than one name on this client, so Validate Data reports a differing name as RENAMED rather than as the typo signal NAME MISMATCH. Set it only for a verified rename, never to quiet a surprise. A rename stays one row, and the panel shows whichever name the client gives the highest rank the character has. Turn Undead is the one row that sets it: its third rank (10326) is named Turn Evil on this client.
 	- triggers lists every rank and variant the one checkbox covers, in rank order, and only ids this client knows: an id Validate Data reports NOT ON CLIENT leaves the folder. Unchecking the row ignores every id listed, so levelling preserves the choice.
+	- The items behind the ITEM rows, and every other item worth auditing, live in Data/TBC/Items-TBC.lua, whose spell field names the trigger each one casts.
+	- Drums of Panic and Greater Drums of Panic are leatherworking drums whose Use fears every enemy nearby, so they sit on the Fears tab as AOE fears beside Flash Bomb. Both are crafted (recipes 35538 and 351770). The other items whose Use carries a fear or taunt aura are left out: spell books, drinks and Cowardly Flight Potion fear the player themselves, and Devilsaur Barb (22432) is a quest item.
+	- Quest tools whose Use only puts threat on a quest's own mob are left out too: the Taming Rods and Taming Totems, Morbent's Bane, Torch of Flame, the Alterac Valley collar and muzzle, and Glowing Crystal Prison. No equipped item procs a fear or taunt on an enemy.
+	- Items have no category of their own. An ITEM row takes the category of what its Use does, so the target dummies are AOE taunts and Flash Bomb and the drums are AOE fears.
+	- Anguish is the felguard's Torment: one rank per pet level, its only effect is threat on one target, and its description says it taunts. The pet family test is a spell on a pet's skill line whose only effect is threat on enemies. Intimidation (a stun), Scorpid Poison (a poison) and Warp (a blink) carry threat beside other effects and are left out, and Cower and Soothing Kiss carry only threat but lower it.
+	- The three paladin bubbles are parked, listed in the comment under the PALADIN rows with what bringing them back would take.
 
 SQL (CMaNGOS)
 	TODO: Add SQL Query
@@ -265,11 +292,17 @@ Wowhead
 	None.
 
 wago.tools
-	https://wago.tools/db2/SpellName?build=2.5.6.69795
-	https://wago.tools/db2/Spell?build=2.5.6.69795
-	https://wago.tools/db2/SpellEffect?build=2.5.6.69795
-	https://wago.tools/db2/SpellLevels?build=2.5.6.69795
+	https://wago.tools/db2/SpellName?build=2.5.6.70006
+	https://wago.tools/db2/Spell?build=2.5.6.70006
+	https://wago.tools/db2/SpellEffect?build=2.5.6.70006
+	https://wago.tools/db2/SpellLevels?build=2.5.6.70006
+	https://wago.tools/db2/SkillLineAbility?build=2.5.6.70006
+	https://wago.tools/db2/SkillLine?build=2.5.6.70006
+	https://wago.tools/db2/ItemEffect?build=2.5.6.70006
+	https://wago.tools/db2/ItemSparse?build=2.5.6.70006
 	https://wago.tools/db2/SpellClassOptions?build=2.5.6.69795
-	https://wago.tools/db2/SkillLineAbility?build=2.5.6.69795
 	https://wago.tools/db2/SpellCooldowns?build=2.5.6.69795
+
+QuestieDB
+	None.
 ]]

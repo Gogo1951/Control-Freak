@@ -60,6 +60,29 @@ for option, choice in pairs(SCOPE_CHOICES) do
 end
 
 --[[
+    A feature's on/off switch, built here for its own tab and for the General
+    panel's Features block, so the two copies are one setting with one caption
+    and tooltip. The flag decides whether the combat log is registered, so the
+    write goes through ns:ApplyProfile, which also redraws whichever copy is open.
+]]
+function ns.FeatureEnableToggle(getFeature, enableKey, width, order)
+	return {
+		type = "toggle",
+		name = L[enableKey],
+		desc = L["SCOPE_ENABLE_DESC"],
+		width = width,
+		order = order,
+		get = function()
+			return getFeature().enabled
+		end,
+		set = function(_, value)
+			getFeature().enabled = value
+			ns:ApplyProfile()
+		end,
+	}
+end
+
+--[[
     No header here: AceConfigDialog already draws the tab's own name at the top of
     the page, and a section header repeating it reads as the title printed twice.
     The summary opens the page instead, matching the root General panel.
@@ -98,20 +121,8 @@ function ns.AddFeatureScope(args, getFeature, summaryKey, enableKey, order, scop
 	    when a ladder sits beside it -- the pair totalling a row, the same trade
 	    an alert section makes for its switch.
 	]]
-	args.scopeEnabled = {
-		type = "toggle",
-		name = L[enableKey],
-		desc = L["SCOPE_ENABLE_DESC"],
-		width = choiceOption and ns.OPTIONS_LABEL_WIDTH or "full",
-		order = order + 2,
-		get = function()
-			return getFeature().enabled
-		end,
-		set = function(_, value)
-			getFeature().enabled = value
-			ns:ApplyProfile()
-		end,
-	}
+	args.scopeEnabled =
+		ns.FeatureEnableToggle(getFeature, enableKey, choiceOption and ns.OPTIONS_LABEL_WIDTH or "full", order + 2)
 
 	if choiceOption then
 		local choice = SCOPE_CHOICES[choiceOption]

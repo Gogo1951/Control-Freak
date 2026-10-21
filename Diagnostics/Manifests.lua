@@ -47,21 +47,9 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		end,
 	},
 	{
-		"C_Secrets (in-combat reads go secret on this client)",
-		function()
-			return type(C_Secrets) == "table"
-		end,
-	},
-	{
 		"C_Secrets.ShouldAurasBeSecret (Incapacitated dispel types)",
 		function()
 			return type(C_Secrets) == "table" and type(C_Secrets.ShouldAurasBeSecret) == "function"
-		end,
-	},
-	{
-		"C_CombatLog.IsCombatLogRestricted (combat log restrictions)",
-		function()
-			return type(C_CombatLog) == "table" and type(C_CombatLog.IsCombatLogRestricted) == "function"
 		end,
 	},
 	{
@@ -89,11 +77,12 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		end,
 	},
 	{
-		"C_Spell.GetSpellName (Game Names, Validate Data)",
+		"C_Spell.RequestLoadSpellData (Game Names, Validate Data)",
 		function()
-			return type(C_Spell) == "table" and type(C_Spell.GetSpellName) == "function"
+			return type(C_Spell) == "table" and type(C_Spell.RequestLoadSpellData) == "function"
 		end,
 	},
+	-- Validate Data's spell STATUS: without these every spell row reads NOT ON CLIENT or loses its name.
 	{
 		"C_Spell.DoesSpellExist (Validate Data)",
 		function()
@@ -101,9 +90,87 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		end,
 	},
 	{
-		"C_Spell.RequestLoadSpellData (Game Names, Validate Data)",
+		"C_Spell.GetSpellName (Validate Data)",
 		function()
-			return type(C_Spell) == "table" and type(C_Spell.RequestLoadSpellData) == "function"
+			return type(C_Spell) == "table" and type(C_Spell.GetSpellName) == "function"
+		end,
+	},
+	{
+		"C_Spell.GetSpellDescription (Validate Data)",
+		function()
+			return type(C_Spell) == "table" and type(C_Spell.GetSpellDescription) == "function"
+		end,
+	},
+	{
+		"C_Spell.IsSpellDataCached (Validate Data)",
+		function()
+			return type(C_Spell) == "table" and type(C_Spell.IsSpellDataCached) == "function"
+		end,
+	},
+	--[[
+	    Validate Data's item reads, for the items the Abilities file's ITEM rows
+	    name. One a client lacks leaves its columns blank. The stat read goes
+	    through ns.GetItemStats, which takes C_Item.GetItemStats or the legacy
+	    global, so the pair is listed as both halves.
+	]]
+	{
+		"C_Item.RequestLoadItemDataByID (Validate Data)",
+		function()
+			return type(C_Item) == "table" and type(C_Item.RequestLoadItemDataByID) == "function"
+		end,
+	},
+	{
+		"C_Item.DoesItemExistByID (Validate Data)",
+		function()
+			return type(C_Item) == "table" and type(C_Item.DoesItemExistByID) == "function"
+		end,
+	},
+	{
+		"C_Item.GetItemInfo (Validate Data)",
+		function()
+			return type(C_Item) == "table" and type(C_Item.GetItemInfo) == "function"
+		end,
+	},
+	{
+		"C_Item.GetItemInfoInstant (Validate Data)",
+		function()
+			return type(C_Item) == "table" and type(C_Item.GetItemInfoInstant) == "function"
+		end,
+	},
+	{
+		"C_Item.GetItemSpell (Validate Data)",
+		function()
+			return type(C_Item) == "table" and type(C_Item.GetItemSpell) == "function"
+		end,
+	},
+	{
+		"C_Item.GetDetailedItemLevelInfo (Validate Data)",
+		function()
+			return type(C_Item) == "table" and type(C_Item.GetDetailedItemLevelInfo) == "function"
+		end,
+	},
+	{
+		"C_Item.GetItemStats (Validate Data)",
+		function()
+			return type(C_Item) == "table" and type(C_Item.GetItemStats) == "function"
+		end,
+	},
+	{
+		"GetItemStats (legacy, Validate Data)",
+		function()
+			return type(GetItemStats) == "function"
+		end,
+	},
+	{
+		"C_Item.GetItemClassInfo (Validate Data)",
+		function()
+			return type(C_Item) == "table" and type(C_Item.GetItemClassInfo) == "function"
+		end,
+	},
+	{
+		"C_Item.GetItemSubClassInfo (Validate Data)",
+		function()
+			return type(C_Item) == "table" and type(C_Item.GetItemSubClassInfo) == "function"
 		end,
 	},
 	{
@@ -223,12 +290,6 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		end,
 	},
 	{
-		"C_CVar.GetCVar",
-		function()
-			return type(C_CVar) == "table" and type(C_CVar.GetCVar) == "function"
-		end,
-	},
-	{
 		"C_TooltipInfo.GetItemByID and GetSpellByID (tooltip text, modern path)",
 		function()
 			return type(C_TooltipInfo) == "table"
@@ -293,12 +354,13 @@ ns.DIAGNOSTIC_API_CHECKS = {
 -- Alert Context
 --------------------------------------------------------------------------------
 
--- The add-on's own example reports, and the privacy note its chat capture needs.
+--[[
+    The add-on's own example reports. The privacy note its chat capture needs is
+    the shared EVENT_LOG_PRIVACY line beneath the box.
+]]
 ns.DiagnosticsStrings.EVENT_LOG_EXAMPLES = "Best for 'it never fires' reports. The raw combat log, other add-ons' messages and other units' interrupted casts are left out; the ones "
 	.. ns.ADDON_TITLE
-	.. " acted on are written in as they happen. The capture includes other players' names and "
-	.. ns.ADDON_TITLE
-	.. "'s own messages between clients, so look it over before pasting it anywhere."
+	.. " acted on are written in as they happen."
 
 --[[
     Where an announced line or a whisper can go right now. ns:Alert skips group
@@ -472,9 +534,8 @@ end
 -- Every alert plays on the Master channel, so these two decide whether any sound is heard at all.
 local function AppendSoundContext(lines)
 	lines[#lines + 1] = ""
-	lines[#lines + 1] =
-		string.format("Sound_EnableAllSound CVar = %s", tostring(C_CVar.GetCVar("Sound_EnableAllSound")))
-	lines[#lines + 1] = string.format("Sound_MasterVolume CVar = %s", tostring(C_CVar.GetCVar("Sound_MasterVolume")))
+	lines[#lines + 1] = string.format("Sound_EnableAllSound CVar = %s", tostring(GetCVar("Sound_EnableAllSound")))
+	lines[#lines + 1] = string.format("Sound_MasterVolume CVar = %s", tostring(GetCVar("Sound_MasterVolume")))
 	lines[#lines + 1] =
 		string.format("LibSharedMedia sounds available = %d", #LibStub("LibSharedMedia-3.0"):List("sound"))
 end
@@ -482,7 +543,7 @@ end
 --[[
     What the ability rows hold on this client: the folder they came from, how
     many of its entries this client's spell data answered for, how many rows
-    each tab drew and how many of those it has unticked (a tab with no rows can
+    each tab drew and which of those it has unticked (a tab with no rows can
     never fire here), and how every taunt that can go either way is being
     reported. Incapacitated rides along because its trigger is not an ability
     at all: a client without the loss-of-control pair keeps that tab silent, and
@@ -516,6 +577,16 @@ local function AppendAbilityContext(lines)
 		end
 	end
 	lines[#lines + 1] = "Ability rows per tab (drawn/ignored): " .. table.concat(counts, " ")
+
+	-- By name, since an unticked row is the commonest reason one ability never fires while its tab does.
+	local ignoredNames = {}
+	for _, group in ipairs(ns.ABILITY_GROUPS) do
+		if ns.IsAbilityIgnored(group.entry) then
+			ignoredNames[#ignoredNames + 1] =
+				string.format("%s %s (%d)", ns.CATEGORY_FEATURE[group.category], tostring(group.name), group.maxRankId)
+		end
+	end
+	lines[#lines + 1] = "Unticked ability rows: " .. (#ignoredNames > 0 and table.concat(ignoredNames, ", ") or "none")
 
 	for _, group in ipairs(ns.ABILITY_GROUPS) do
 		if group.entry.kindChoice then
@@ -580,10 +651,12 @@ end
 
 --[[
     Control Freak's own context probe, and the first thing to read on a "nothing
-    ever fires" report. Scope is per feature, so this prints each feature's own
-    scope settings, only the questions its tab asks, and the resulting verdict,
-    then the player's own seat and the live world state they were measured
-    against, and whether COMBAT_LOG_EVENT_UNFILTERED is actually on the frame.
+    ever fires" report. Scope is per feature, so after the active profile and
+    its two top-level switches this prints each feature's own scope settings,
+    only the questions its tab asks, and the resulting verdict, then the
+    player's own seat and the live world state they were measured against --
+    the target's rung and who the combat log last saw it swinging at included
+    -- and whether COMBAT_LOG_EVENT_UNFILTERED is actually on the frame.
     The tanks ride along because the role dropdown's tank rungs and When Group
     Has a Tank both read them, and a tab narrowed by either goes silent without
     one. Then where a line can go, every alert section's settings, the armor
@@ -600,7 +673,10 @@ function ns:BuildAlertContextReport()
 	end
 
 	local inInstance, instanceType = IsInInstance()
+	-- Every setting below is this profile's, so a character on the wrong one reads as settings that never took.
+	lines[#lines + 1] = string.format("profile = %s", tostring(ns.db:GetCurrentProfile()))
 	lines[#lines + 1] = string.format("enabled (all alerts) = %s", tostring(profile.enabled))
+	lines[#lines + 1] = string.format("showWelcome (login line) = %s", tostring(profile.showWelcome))
 	lines[#lines + 1] = ""
 	for _, key in ipairs(ns.FEATURE_KEYS) do
 		local feature = profile[key]
@@ -654,10 +730,16 @@ function ns:BuildAlertContextReport()
 
 	--[[
 	    The player's current target on the Against ladder, which is the cheapest way
-	    to see which rung a given mob lands on before a section is set to it.
+	    to see which rung a given mob lands on before a section is set to it. A mob
+	    nobody targets is classified off its name plate, so with no plates on
+	    screen it goes unanswered and passes every rung.
 	]]
+	if type(C_NamePlate) == "table" and type(C_NamePlate.GetNamePlates) == "function" then
+		lines[#lines + 1] = string.format("Name plates on screen = %d", #C_NamePlate.GetNamePlates())
+	end
 	if UnitExists("target") then
-		local tier = ns.GetEnemyTier(UnitGUID("target"))
+		local targetGUID = UnitGUID("target")
+		local tier = ns.GetEnemyTier(targetGUID)
 		lines[#lines + 1] = string.format(
 			"target = %s (%s, level %s) -> Against rung %s",
 			tostring(GetUnitName("target")),
@@ -665,6 +747,19 @@ function ns:BuildAlertContextReport()
 			tostring(UnitLevel("target")),
 			tier and ns.TARGET_RUNGS[tier] or "nil (not an enemy, or unanswerable)"
 		)
+		--[[
+		    Who the combat log last saw the target swing at. Your taunt on a mob
+		    already on you is a refresh and stays quiet, a parry on a mob with
+		    nobody on record stays quiet, and your cold opener on a mob on somebody
+		    else stays quiet.
+		]]
+		local holder = "nobody yet"
+		if ns.EnemyWasAlreadyOn(targetGUID, ns.playerGUID) then
+			holder = "you"
+		elseif ns.EnemyIsOnSomeoneElse(targetGUID, ns.playerGUID) then
+			holder = "somebody else"
+		end
+		lines[#lines + 1] = "Target last seen swinging at (combat log) = " .. holder
 	else
 		lines[#lines + 1] = "target = none"
 	end
@@ -675,15 +770,7 @@ function ns:BuildAlertContextReport()
 		tostring(ns.eventFrame:IsEventRegistered("COMBAT_LOG_EVENT_UNFILTERED") and true or false)
 	)
 
-	--[[
-	    The Retail engine's restrictions, where this client has them (WoW Forever):
-	    a restricted combat log or secret auras is the answer to "nothing fires
-	    there" that no setting explains.
-	]]
-	if type(C_CombatLog) == "table" and type(C_CombatLog.IsCombatLogRestricted) == "function" then
-		lines[#lines + 1] =
-			string.format("C_CombatLog.IsCombatLogRestricted() = %s", tostring(C_CombatLog.IsCombatLogRestricted()))
-	end
+	-- Secret auras, where this client has them, are why an Incapacitated line drops its dispel type.
 	if type(C_Secrets) == "table" and type(C_Secrets.ShouldAurasBeSecret) == "function" then
 		lines[#lines + 1] =
 			string.format("C_Secrets.ShouldAurasBeSecret() = %s", tostring(C_Secrets.ShouldAurasBeSecret()))
@@ -697,13 +784,22 @@ function ns:BuildAlertContextReport()
 	    counts and the group finder's TANK role is ignored, outside one the role
 	    is the only signal (Features/Utilities.lua says why). In a raid the
 	    ignored tags are listed too, so a healer still wearing a Tank tag from a
-	    dungeon queue shows up as exactly that rather than as a mystery.
+	    dungeon queue shows up as exactly that rather than as a mystery. Each
+	    carries its class, because Bad Priests only ever warns about a shield on a
+	    tank of a rage class.
 	]]
 	local inRaid = IsInRaid()
 	local hasRoles = type(UnitGroupRolesAssigned) == "function"
 	local tanks, ignoredTags = {}, {}
 	local function NoteUnit(unit)
-		local entry = unit .. " (" .. tostring(GetUnitName(unit, true)) .. ")"
+		local _, class = UnitClass(unit)
+		local entry = string.format(
+			"%s (%s, %s%s)",
+			unit,
+			tostring(GetUnitName(unit, true)),
+			tostring(class),
+			class and ns.RAGE_TANK_CLASSES[class] and ", rage" or ""
+		)
 		-- ns.GroupHasTank skips a tank who is dead or offline.
 		if UnitIsDeadOrGhost(unit) then
 			entry = entry .. " dead"
@@ -760,8 +856,8 @@ end
     ns.BuildAbilityIndex labels it (the last trigger this client answers for),
     each class the Tank Deaths tab lists, in both its male and female form,
     through ns.ClassName, and each spell the options panels' sample lines name
-    through ns.SampleSpell. A spell can load late, so its row asks for every
-    trigger and the report polls.
+    (ns.SAMPLE_SPELL_IDS) through ns.SampleSpell. A spell can load late, so its
+    row asks for every trigger and the report polls.
 ]]
 local function AbilityLookup(index, entry)
 	return {
@@ -795,29 +891,20 @@ local function ClassLookup(class, sex)
 end
 
 --[[
-    The ids the Options/ files hand ns.SampleSpell, with the English fallback each
-    passes. A NIL here is a sample line showing that English name on this client.
+    ns.SampleSpell answers L["UNKNOWN_SPELL"] for a spell this client cannot
+    name, so that answer is the NIL here: a sample line showing Unknown Spell.
 ]]
-local SAMPLE_SPELLS = {
-	{ 355, "Taunt" },
-	{ 1161, "Challenging Shout" },
-	{ 6552, "Pummel" },
-	{ 686, "Shadow Bolt" },
-	{ 8122, "Psychic Scream" },
-	{ 5782, "Fear" },
-	{ 17, "Power Word: Shield" },
-	{ 2649, "Growl" },
-	{ 7386, "Sunder Armor" },
-	{ 122, "Frost Nova" },
-}
-
-local function SampleLookup(spellId, fallback)
+local function SampleLookup(key, spellId)
 	return {
-		constant = "SAMPLE " .. fallback,
+		constant = "SAMPLE_SPELL_IDS." .. key,
 		kind = "spell",
 		id = spellId,
 		lookup = function()
-			return ns.SampleSpell(spellId)
+			local name = ns.SampleSpell(spellId)
+			if name == L["UNKNOWN_SPELL"] then
+				return nil
+			end
+			return name
 		end,
 		request = function()
 			C_Spell.RequestLoadSpellData(spellId)
@@ -833,8 +920,8 @@ for _, class in ipairs(ns.DEATH_CLASSES) do
 	ns.DIAGNOSTIC_NAME_LOOKUPS[#ns.DIAGNOSTIC_NAME_LOOKUPS + 1] = ClassLookup(class)
 	ns.DIAGNOSTIC_NAME_LOOKUPS[#ns.DIAGNOSTIC_NAME_LOOKUPS + 1] = ClassLookup(class, 3)
 end
-for _, sample in ipairs(SAMPLE_SPELLS) do
-	ns.DIAGNOSTIC_NAME_LOOKUPS[#ns.DIAGNOSTIC_NAME_LOOKUPS + 1] = SampleLookup(sample[1], sample[2])
+for _, key in ipairs(SortedKeys(ns.SAMPLE_SPELL_IDS)) do
+	ns.DIAGNOSTIC_NAME_LOOKUPS[#ns.DIAGNOSTIC_NAME_LOOKUPS + 1] = SampleLookup(key, ns.SAMPLE_SPELL_IDS[key])
 end
 
 --------------------------------------------------------------------------------
@@ -969,19 +1056,21 @@ end
     One entry per data file, and one report row per entry on the Data tab
     (Diagnostics/Options-Diagnostics.lua). Each entry's label is the table-name
     part of its file name, so ns.DataSourceFileName can name the file this
-    client's folder built. Both files list spell ids inside each row, so each
-    source walks a row's id list and answers once per id, keyed by its rank in
-    that list. dataColumns carries the shipped row's own values beside what the
-    client says. DATA_ROW_NAME is the client's name for the row's first id that
+    client's folder built. The Abilities and Armor Debuffs files list spell
+    ids inside each row, so their sources walk a row's id list and answer once
+    per id, keyed by its rank in that list. The Items file is keyed by item
+    id, one id per row, and the Sample Spells file by name, one spell id per
+    key. dataColumns carries the shipped row's own values beside
+    what the client says. DATA_ROW_NAME is the client's name for the row's first id that
     resolves, so a NAME that disagrees with it is an id belonging to a different
     spell, unless the row is marked renamed.
 ]]
-local function SpellIdCollector(field)
+local function IdCollector(field)
 	return function(rows)
 		local entries = {}
 		for _, row in ipairs(rows) do
-			for rank, spellId in ipairs(row[field] or {}) do
-				entries[#entries + 1] = { id = spellId, key = rank, row = row }
+			for rank, id in ipairs(row[field] or {}) do
+				entries[#entries + 1] = { id = id, key = rank, row = row }
 			end
 		end
 		return entries
@@ -1024,7 +1113,7 @@ ns.DIAGNOSTIC_DATA_SOURCES = {
 			{
 				table = "ABILITIES",
 				kind = "spell",
-				collect = SpellIdCollector("triggers"),
+				collect = IdCollector("triggers"),
 				dataColumns = {
 					{ "DATA_CLASS", RowField("class") },
 					{ "DATA_CATEGORY", RowField("category") },
@@ -1050,7 +1139,7 @@ ns.DIAGNOSTIC_DATA_SOURCES = {
 			{
 				table = "ARMOR_DEBUFFS",
 				kind = "spell",
-				collect = SpellIdCollector("ids"),
+				collect = IdCollector("ids"),
 				dataColumns = {
 					{ "DATA_KEY", RowField("key") },
 					{ "DATA_SATISFIES", RowField("satisfies") },
@@ -1061,6 +1150,60 @@ ns.DIAGNOSTIC_DATA_SOURCES = {
 					{ "DATA_RANK", Rank },
 					{ "DATA_ROW_NAME", RowName("ids") },
 					{ "DATA_TRACKED", Tracked("ids", ns.IsArmorDebuffSpell) },
+				},
+			},
+		},
+	},
+	--[[
+	    Each item prints beside the spell it casts (the item block's own spell
+	    columns), and DATA_SPELL is the spell the row records, so a disagreement
+	    between the two is an item id belonging to some other item. DATA_TRACKED
+	    marks the items whose spell an Abilities row listens for.
+	]]
+	{
+		label = "Items",
+		sources = {
+			{
+				table = "ITEMS",
+				kind = "item",
+				rowId = function(itemId)
+					return itemId
+				end,
+				dataColumns = {
+					{ "DATA_KIND", RowField("kind") },
+					{ "DATA_VIA", RowField("via") },
+					{ "DATA_ON", RowField("on") },
+					{ "DATA_SPELL", RowField("spell") },
+					{
+						"DATA_TRACKED",
+						function(_, row)
+							return ns.ABILITY_MAP[row.spell] ~= nil
+						end,
+					},
+				},
+			},
+		},
+	},
+	--[[
+	    Keyed by the name each Options/ file asks for, one spell id per key. The
+	    key is the row's whole story, so it is the only shipped column.
+	]]
+	{
+		label = "Sample-Spells",
+		sources = {
+			{
+				table = "SAMPLE_SPELL_IDS",
+				kind = "spell",
+				rowId = function(_, spellId)
+					return spellId
+				end,
+				dataColumns = {
+					{
+						"DATA_KEY",
+						function(key)
+							return key
+						end,
+					},
 				},
 			},
 		},

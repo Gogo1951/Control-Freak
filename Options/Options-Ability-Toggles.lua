@@ -199,7 +199,7 @@ end
     options:
       categories  -- set of ability categories to draw
       order       -- the first group's order
-      hidden      -- predicate hung on every group
+      hidden      -- optional predicate hung on every group
       kindPicker  -- draws a Single Target / AOE dropdown beside each row; the
                      Taunts tab's, see ns.GetTauntKind in Features/Ability-Index.lua
 ]]

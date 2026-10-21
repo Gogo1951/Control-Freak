@@ -58,8 +58,12 @@ Data/Flavor.lua
 Data/Data.lua
 Data/Vanilla/Abilities-Vanilla.lua
 Data/Vanilla/Armor-Debuffs-Vanilla.lua
+Data/Vanilla/Items-Vanilla.lua
+Data/Vanilla/Sample-Spells-Vanilla.lua
 Data/Discovery/Abilities-Discovery.lua
 Data/Discovery/Armor-Debuffs-Discovery.lua
+Data/Discovery/Items-Discovery.lua
+Data/Discovery/Sample-Spells-Discovery.lua
 Data/Default-Settings.lua
 
 # Control Freak
@@ -109,6 +113,7 @@ Options/Options-Bad-Priests.lua
 Options/Options-Bad-Pets.lua
 Options/Options-Tanking-Tools.lua
 Options/Options-Profiles.lua
+Options/Options-Feedback-Support.lua
 Diagnostics/Options-Diagnostics.lua
 Options/Options.lua
 

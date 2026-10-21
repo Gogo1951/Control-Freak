@@ -19,27 +19,57 @@ for _, seconds in ipairs(ns.COLD_OPENER_WINDOWS) do
 end
 
 --[[
-    Four warnings sharing a tab rather than four flavors of one alert, drawn as
-    the same block as every other tab's. Two of them bend it:
-
-      Cold Openers reports the player's own opener and nobody else's, so it has a
-      My row and no Others'. Its window -- how long into a pull an avoided
-      ability still counts -- is a parameter of the detection, not a filter, and
-      sits as a caption row under the whose row, "Within [10 Seconds of the Pull]".
-      The slot beside the switch belongs to the target ladder, as everywhere.
-
-      Armor Debuffs has no whose at all: the report is the group's, told to the
-      player, so it draws one row for where that report goes and the handler
-      files every report under it.
-
-    Orders are spaced 20 apart throughout, with room left at the bottom for
-    whatever lands here next.
+    Four separate tools, each on a sub-panel of its own under Tanking Tools. The
+    parent keeps only what they share: the feature's switch and its scope rows.
+    The root panel draws one switch per tool from this same list, bound to the
+    same setting as the tool's own (Options/Options-General.lua), and
+    Options/Options.lua registers the sub-panels in this order.
 ]]
+ns.TANKING_TOOLS = {
+	{ key = "coldOpener", headerKey = "TANKING_TOOLS_COLD_OPENER_HEADER", registry = "TankingToolsColdOpener" },
+	{ key = "armor", headerKey = "TANKING_TOOLS_ARMOR_HEADER", registry = "TankingToolsArmor" },
+	{ key = "parry", headerKey = "TANKING_TOOLS_PARRY_HEADER", registry = "TankingToolsParry" },
+	{ key = "nova", headerKey = "TANKING_TOOLS_NOVA_HEADER", registry = "TankingToolsNova" },
+}
+
 function ns.BuildTankingToolsOptions()
 	local args = {}
-	local hidden = ns.AddFeatureScope(args, Feature, nil, "TANKING_TOOLS_ENABLE", 1, "tankingTools")
+	ns.AddFeatureScope(args, Feature, nil, "TANKING_TOOLS_ENABLE", 1, "tankingTools")
 
-	ns.AddWhoseAlertSection(args, "coldOpener", Section("coldOpener"), 20, hidden, {
+	return {
+		type = "group",
+		name = L["TAB_TANKING_TOOLS"],
+		args = args,
+	}
+end
+
+--[[
+    One tool's sub-panel: its alert block and nothing else, drawn without the
+    block's header because the page title already names it. Not hidden behind
+    the Tanking Tools switch, like the Tracked Abilities sub-panels: the block's
+    own switch still collapses its rows, and the parent panel says whether the
+    feature is on.
+]]
+local function ToolPanel(key, options)
+	local args = {}
+	options.noHeader = true
+	ns.AddWhoseAlertSection(args, key, Section(key), 1, ns.NeverHidden, options)
+	return {
+		type = "group",
+		name = ns.SubPanelTitle(L["TAB_TANKING_TOOLS"], L[options.headerKey]),
+		args = args,
+	}
+end
+
+--[[
+    Cold Openers reports the player's own opener and nobody else's, so it has a
+    My row and no Others'. Its window -- how long into a pull an avoided ability
+    still counts -- is a parameter of the detection, not a filter, and sits as a
+    caption row under the whose row, "Within [10 Seconds of the Pull]". The slot
+    beside the switch belongs to the target ladder, as everywhere.
+]]
+function ns.BuildTankingToolsColdOpenerOptions()
+	return ToolPanel("coldOpener", {
 		headerKey = "TANKING_TOOLS_COLD_OPENER_HEADER",
 		enableKey = "TANKING_TOOLS_COLD_OPENER_ENABLE",
 		descKey = "TANKING_TOOLS_COLD_OPENER_DESC",
@@ -48,7 +78,7 @@ function ns.BuildTankingToolsOptions()
 		-- BLOCK of the six outcomes: the one a tank meets most often on a pull.
 		sample = {
 			key = "COLD_OPENER_BLOCK",
-			args = { ns.SAMPLE_PLAYER, ns.SampleSpell(7386, "Sunder Armor"), ns.SampleBoss() },
+			args = { ns.SAMPLE_PLAYER, ns.SampleSpell(ns.SAMPLE_SPELL_IDS.SUNDER_ARMOR), ns.SampleBoss() },
 		},
 		captionRow = {
 			labelKey = "TANKING_TOOLS_COLD_OPENER_WITHIN",
@@ -72,8 +102,15 @@ function ns.BuildTankingToolsOptions()
 			},
 		},
 	})
+end
 
-	ns.AddWhoseAlertSection(args, "armor", Section("armor"), 40, hidden, {
+--[[
+    Armor Debuffs has no whose at all: the report is the group's, told to the
+    player, so it draws one row for where that report goes and the handler files
+    every report under it.
+]]
+function ns.BuildTankingToolsArmorOptions()
+	return ToolPanel("armor", {
 		headerKey = "TANKING_TOOLS_ARMOR_HEADER",
 		enableKey = "TANKING_TOOLS_ARMOR_ENABLE",
 		descKey = "TANKING_TOOLS_ARMOR_DESC",
@@ -113,14 +150,16 @@ function ns.BuildTankingToolsOptions()
 			end
 		end,
 	})
+end
 
+function ns.BuildTankingToolsParryOptions()
 	--[[
 	    One mob for both of Parries' examples: the warning the group sees and the
 	    whisper its culprit gets describe the same swing.
 	]]
 	local PARRY_BOSS = ns.SampleBoss()
 
-	ns.AddWhoseAlertSection(args, "parry", Section("parry"), 60, hidden, {
+	return ToolPanel("parry", {
 		headerKey = "TANKING_TOOLS_PARRY_HEADER",
 		enableKey = "TANKING_TOOLS_PARRY_ENABLE",
 		descKey = "TANKING_TOOLS_PARRY_DESC",
@@ -189,13 +228,19 @@ function ns.BuildTankingToolsOptions()
 			})
 		end,
 	})
+end
 
-	--[[
-	    Frost Nova is a ring, not a target: nothing for a ladder or a mark to apply
-	    to, so this draws like AOE Taunts, and its example is the AOE line the one
-	    nova in the category actually produces.
-	]]
-	ns.AddWhoseAlertSection(args, "nova", Section("nova"), 80, hidden, {
+--[[
+    Frost Nova is a ring, not a target: nothing for a ladder or a mark to apply
+    to, so this draws like AOE Taunts, and its example is the AOE line the one
+    nova in the category actually produces.
+
+    No ability list, here or on any tool: each warning IS one thing, and its own
+    switch already says whether it fires. A list holding the single Frost Nova
+    row would be the Nova switch printed a second time.
+]]
+function ns.BuildTankingToolsNovaOptions()
+	return ToolPanel("nova", {
 		headerKey = "TANKING_TOOLS_NOVA_HEADER",
 		enableKey = "TANKING_TOOLS_NOVA_ENABLE",
 		descKey = "TANKING_TOOLS_NOVA_DESC",
@@ -204,21 +249,7 @@ function ns.BuildTankingToolsOptions()
 		noTarget = true,
 		sample = {
 			key = "NOVA_AOE",
-			args = { ns.SAMPLE_OTHER, ns.SampleSpell(122, "Frost Nova") },
+			args = { ns.SAMPLE_OTHER, ns.SampleSpell(ns.SAMPLE_SPELL_IDS.FROST_NOVA) },
 		},
 	})
-
-	--[[
-	    No ability list. Every other tab has one because its section covers a whole
-	    category a player might want to thin out -- a dozen taunts, half of which
-	    they do not care about. Here each warning IS one thing, and the section's own
-	    enable already says whether it fires: a list holding the single Frost Nova
-	    row would be the Nova switch printed a second time.
-	]]
-
-	return {
-		type = "group",
-		name = L["TAB_TANKING_TOOLS"],
-		args = args,
-	}
 end

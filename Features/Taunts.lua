@@ -2,6 +2,7 @@ local _, ns = ...
 
 -- No steal detection: a planned taunt swap and a stolen mob are the same combat-log lines (README-Technical.md, Taunts).
 
+-- A failed taunt prints only its failure line, since success is the taunt's aura landing.
 local MISS_FORMATS = {
 	MISS = "TAUNT_MISSED",
 	RESIST = "TAUNT_RESISTED",

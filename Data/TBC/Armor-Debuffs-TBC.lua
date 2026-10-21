@@ -42,7 +42,7 @@ ns.ARMOR_DEBUFFS = {
 How We Got the Data
 
 Last Validated
-	2026-10-11, TBC Anniversary 2.5.6.69795
+	2026-10-20, TBC Anniversary 2.5.6.70006
 
 Notes
 	- The debuffs the Armor Debuffs tool (Features/Tanking-Tools-Armor.lua) waits on before it reports a target's armor as down, and what each one needs before it counts.
@@ -52,6 +52,7 @@ Notes
 	- requiresClass keeps an optional row from stalling the report forever. Waiting on Faerie Fire in a group with no druid would mean the line never prints, so the wait applies only when somebody could cast it, and only once the player has turned on the row's setting, the Tanking Tools option named by setting.
 	- renamed marks Faerie Fire, whose feral ranks are named Faerie Fire (Feral), so Validate Data reads the differing name as RENAMED rather than as the typo signal NAME MISMATCH. Either form satisfies it.
 	- Devastate is deliberately absent. It applies the same debuff, but it is a Wrath ability and this list is matched against the combat log by id.
+	- Items that shave armor are left out: Annihilator's Armor Shatter, the Puncture Armor and Corrosive Poison weapons, Dark Iron Sunderer, the item Faerie Fires and Crystal Yield. They land under spell ids of their own, most at random, so the tool has no way to count on them.
 
 SQL (CMaNGOS)
 	TODO: Add SQL Query
@@ -60,9 +61,14 @@ Wowhead
 	None.
 
 wago.tools
-	https://wago.tools/db2/SpellName?build=2.5.6.69795
+	https://wago.tools/db2/SpellName?build=2.5.6.70006
+	https://wago.tools/db2/SpellEffect?build=2.5.6.70006
+	https://wago.tools/db2/SkillLineAbility?build=2.5.6.70006
+	https://wago.tools/db2/ItemEffect?build=2.5.6.70006
+	https://wago.tools/db2/ItemSparse?build=2.5.6.70006
 	https://wago.tools/db2/Spell?build=2.5.6.69795
-	https://wago.tools/db2/SpellEffect?build=2.5.6.69795
 	https://wago.tools/db2/SpellClassOptions?build=2.5.6.69795
-	https://wago.tools/db2/SkillLineAbility?build=2.5.6.69795
+
+QuestieDB
+	None.
 ]]

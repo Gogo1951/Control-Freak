@@ -81,6 +81,7 @@ ns.DiagnosticsStrings = {
 	EVENT_LOG_STOP_DESCRIPTION = "Stops capturing and keeps what was captured, ready to show.",
 	EVENT_LOG_SHOW = "Show",
 	EVENT_LOG_SHOW_DESCRIPTION = "Prints the captured events in the box below, ready to copy.",
+	EVENT_LOG_PRIVACY = "The log includes the text of chat messages it catches, whispers too. Read it through before you paste it anywhere.",
 	TAINT_TITLE = "Taint Log",
 	TAINT_INTRO = 'Seeing "action blocked" or "interface action failed" errors? Turn this on and the game records the cause to a file. Send the file along with your bug report.',
 	TAINT_STATE = "Taint logging is currently set to level %d (0 = off, 2 = verbose).",
@@ -118,7 +119,7 @@ ns.DiagnosticsStrings = {
 		.. TITLE
 		.. " relies on is present on this client.",
 	CODE_RUN_ALL = "Run All Code Reports",
-	DATA_INTRO = "Checks every spell the add-on ships against this client. Paste a result into a spreadsheet and sort by STATUS to find what needs pruning.",
+	DATA_INTRO = "Checks every spell and item the add-on ships against this client. Paste a result into a spreadsheet and sort by STATUS to find what needs pruning.",
 	DATA_RUN_ALL = "Validate All Data Files",
 	LOCALIZATION_INTRO = "Playing in a language other than English and a name or prompt reads wrong? These show what your client calls everything "
 		.. TITLE
@@ -137,7 +138,6 @@ ns.DiagnosticsStrings = {
 	VALIDATE_TITLE = "Validate Data: %s",
 	VALIDATE_DESCRIPTION = "Checks every id in this data file against this client and exports the results as tab-separated text.",
 	VALIDATE_PROGRESS = "%s / %s IDs",
-	VALIDATE_HINT = "Checks every spell, item and quest id a data file ships against this client and exports what the client knows about each one as tab-separated text, ready to paste into a spreadsheet. Spell rows carry every spell API return, the file's own values in the DATA columns so you can sort for mismatches (DATA_ROW_NAME beside NAME catches an id that belongs to a different spell), IS_PLAYER_SPELL and IS_SPELL_KNOWN, and the whole spell tooltip in one TOOLTIP cell, its lines joined by // and a right-hand text after >>. Item rows carry every item API return and everything the client knows about the item's spell, and quest rows every quest API return the client has. STATUS reads OK, NOT ON CLIENT for an id this client does not have or never answers for, INCOMPLETE when a spell or item loaded but its tooltip or description never did, NO TITLE when a quest's title never loaded (not grounds to prune), ERROR with the message in the name cell when a read throws, or TABLE MISSING when this client's folder never built a table. Each kind follows in a block of its own.",
 	DISPLAY_TITLE = "Display Context",
 	DISPLAY_DESCRIPTION = "Shows your screen size, UI scale and the mini-map button's saved position.",
 	ADDONS_TITLE = "Other Add-ons",
@@ -154,12 +154,12 @@ ns.DiagnosticsStrings = {
 	NAMES_DESCRIPTION = "Shows the name your client gives every game string " .. TITLE .. " shows or matches.",
 	NAMES_ALL_FOUND = "all found",
 	NAMES_SOME_NIL = "%d NIL",
-	MESSAGE_LENGTH_TITLE = "Message Length",
-	MESSAGE_LENGTH_DESCRIPTION = "Builds every line "
+	MESSAGES_TITLE = "Message Length",
+	MESSAGES_DESCRIPTION = "Builds every line "
 		.. TITLE
 		.. " can send to chat with the longest names it knows in your language, and checks each fits the 255-byte chat limit. Nothing is sent.",
-	MESSAGE_LENGTH_ALL_FIT = "all fit",
-	MESSAGE_LENGTH_SOME_OVER = "%d over",
+	MESSAGES_ALL_FIT = "all fit",
+	MESSAGES_SOME_OVER = "%d over",
 
 	STATUS_WAITING = "Waiting",
 	STATUS_RUNNING = "Running",
