@@ -22,30 +22,14 @@
 - **Instead:** Sent lines keep the mob's raid mark (`{rtN}`) on WoW Forever.
 - **Why:** Forever renders raid marks in party, raid and whisper chat, the only channels Control Freak sends to.
 
-### Alert lines keep their closing period
+### Brand last on local alert prints
 
-- **Departs from:** MESSAGES, a time-sensitive sent message's "body drops its closing period".
-- **Instead:** Alert and whisper bodies end on a period after the headline's bang ("Taunt Failed! Joe's Taunt on Maexxna missed.").
-- **Why:** The maintainer's copy choice.
+- **Departs from:** MESSAGES, combat-related prints lead "with its short name, `L["ADDON_SHORT"]`".
+- **Instead:** Alert prints in the player's own window put the brand last, `body // Control Freak`, the same shape the group sees in chat.
+- **Why:** An alert body already opens on its headline and carries its target's raid mark, so leading with any brand only delays the news.
 
-## Decisions
+### Enable Control Freak in Features
 
-- Scope is per feature: every tab carries a role dropdown beside its enable (As a Tank / As a Healer / As a Tank or Healer / Always) and While in Instances; only Taunts, Tanking Tools, Bad Priests and Bad Pets add When Group Has a Tank.
-- Each targeted alert section carries a four-rung Against ladder (Everything / Elites & Bosses / Elites Your Level+ & Bosses / Bosses) plus an Always Alert on Marked Targets override that ships on.
-- Only group-affiliated sources are tracked, and there is no Other category.
-- A resisted taunt prints only the failure line (success is the taunt debuff landing), with Missed / Resisted / Immune variants; AoE taunt misses are not announced.
-- There is no Items category: target dummies count as AoE taunts, and Flash Bomb as a fear.
-- Bad Pets alerts and whispers at most once per pet per cooldown (30 seconds, 1 minute or 5 minutes, shipping at 1 minute), with no per-boss or per-instance mode.
-- "Tank" means an assigned Main Tank in a raid and the group finder's Tank role in a party, never Main Assist; a raid ignores the Tank role, which lingers from dungeon queues, even though a raid with nobody assigned Main Tank then has no tank.
-- Sounds are the add-on's own files under `Includes/Sounds/`, registered with LibSharedMedia so other add-ons' sounds also appear.
-- Cold Opener Warnings report only the player's own avoided abilities, since a pull whose holder is unknown is unreadable for others.
-- Incapacitated lines open on the player's seat: Tank, Healer, or the player's class name for a player in neither seat.
-- The mini-map tooltip's state words are "Enabled / Disabled", by the maintainer's copy choice.
-- The rebuild ships no migration off the pre-rebuild profile schema, the print/announce alert shape, the `badPet` to `badPets` rename, or the `tankRoleOnly` to `roleScope` change; those settings reset to defaults once, and their stale keys stay unread in SavedVariables.
-- Declined: Taunt Overwrite Warnings (Hey That's Mine), because a planned taunt swap and a stolen mob are identical in the combat log.
-- The paladin bubbles stay parked, listed only in a comment in each flavor folder's `Abilities-{Flavor}.lua`, which is not a finding.
-- The Bad Priests tab stays visible on every flavor, Season of Discovery included, where the copy says a priest rune gives the rage back rather than the tab hiding itself.
-- Sent lines keep the mob's raid mark (`{rtN}`) on WoW Forever, since party, raid and whisper chat, the only channels Control Freak sends to, render it there.
-- Alert and whisper lines end their body on a period after the headline's bang ("Taunt Failed! Joe's Taunt on Maexxna missed."), by the maintainer's copy choice.
-- Tank Deaths' My Death row fires only while the player is tanking, and both Tank Deaths rows ship printing, so a fresh install keeps tank deaths out of group chat.
-- `README.md`'s Related Add-ons files add-ons that do one Control Freak job outright, such as interrupt or loss-of-control announcers, as Direct Alternatives, lists WeakAuras as its only Some Overlap entry, and leaves out GeodesicDragon's ThreatWatch as unimportant, all by the maintainer's choice.
+- **Departs from:** OPTIONS → Main Page Layout, "Features never holds a switch for the whole add-on."
+- **Instead:** Enable Control Freak (All Alerts, `ns.db.profile.enabled`) leads the Features block on a line of its own. Below it, the feature switches sit in tiers, two to a line with a blank line between tiers: Taunts, Interrupts and Fears; Incapacitated and Tank Deaths; Bad Pets and Bad Priests; then Tanking Tools on its own. All of them, and the Tanking Tools section, hide while it is off.
+- **Why:** the switch silences every alert without unloading the add-on, and the mini-map button's Left-Click toggles the same setting; the button can be hidden, so the panel keeps a copy.
