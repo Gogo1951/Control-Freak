@@ -4,19 +4,23 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 
 **TL;DR:** Tells you what happened, who caused it, and what needs fixing while the fight is still happening. Less combat-log archaeology after the wipe, more information when it matters, so you can make better decisions and have cleaner runs.
 
-> **🔊 & Self:** Taunt! Gogowarrior used [Taunt] on Patchwerk. // Control Freak 
+> **🔊 & Self:** Taunt! Gogowarrior used [Taunt] on Anub'Rekhan // Control Freak 
 
-> **🔊 & Self:** Interrupt! Fathom's [Kick] on Kel'Thuzad stopped [Frostbolt]. // Control Freak
+> **🔊 & Self:** Interrupt! Fathom's [Kick] on Kel'Thuzad stopped [Frostbolt] // Control Freak
 
-> **Party:** Healer Incapacitated for 5 seconds! Spek is afflicted by [Terrifying Roar] from Gluth. // Control Freak
+> **🔊 & Raid:** Healer Incapacitated for 5 seconds! Spek is afflicted by [Terrifying Roar] from Gluth // Control Freak
+
+> **Message To Robo:** Bad Pet! Robo's pet Fluffy used [Growl] on Grobbulus // Control Freak
+
+> **Self:** Armor Stripped! Thaddius became vulnerable after 2.4 seconds // Control Freak
 
 ## Features
 
-🛡️ **Taunts, Interrupts & Fears** // Know when a mob changes hands, whether a taunt landed or failed, who stopped a cast, and whose fear just scattered the pull.
+🛡️ **Taunts, Fears, & Interrupts** // Know whose taunt grabbed the mob, whose fear just scattered the pull, and who shut down the cast before it landed.
 
-😵 **Incapacitated & Tank Deaths** // Call out dangerous stuns, fears, silences, roots, and other loss-of-control effects with the spell, caster, duration, and dispel type. Get an immediate warning when a tank goes down.
+😵 **Incapacitated & Tank Deaths** // Call out dangerous stuns, fears, silences, and other loss-of-control effects with the spell, and dispel type. Get an immediate warning when a tank goes down.
 
-🐕 **Bad Pets & Bad Shields** // Catch hunter and warlock pets taunting with Growl or Torment enabled, and warn when Power Word: Shield prevents a warrior or druid tank from generating rage. Optional whispers tell the culprit how to fix it.
+🐕 **Bad Pets & Bad Shields** // Alert the owners when a pet is misbehaving in your raid, and warn when Power Word: Shield prevents a high-health warrior or druid tank from generating rage.
 
 🎛️ **Your Alerts, Your Rules** // Control where every alert appears, which enemies count, when each tab speaks, whether marked targets always trigger, and which sound plays. Filter alerts by role, dungeon or raid, and whether your group has a living tank.
 
@@ -53,11 +57,11 @@ Printed or announced, a line leads with the news and ends with the add-on's name
 
 | Alert | Line |
 |---|---|
-| Failed Taunts | Taunt Failed! Gogo's [Taunt] on Patchwerk was resisted. // Control Freak |
-| Successful Interrupts | Interrupt! Gogo's [Pummel] on Gothik the Harvester stopped [Shadow Bolt]. // Control Freak |
-| Being Incapacitated | Tank Incapacitated for 6 seconds! Gogo is afflicted by [Fear] (Magic) from Maexxna. // Control Freak |
-| Tank Deaths | Tank Down! Gogo has died. // Control Freak |
-| Pet Taunts | Bad Pet! Joe's pet Snuffles used [Growl] on Anub'Rekhan. // Control Freak |
+| Failed Taunts | Taunt Failed! Gogo's [Taunt] on Gluth was resisted // Control Freak |
+| Successful Interrupts | Interrupt! Gogo's [Pummel] on Gothik the Harvester stopped [Shadow Bolt] // Control Freak |
+| Being Incapacitated | Tank Incapacitated for 6 seconds! Gogo is afflicted by [Fear] (Magic) from Maexxna // Control Freak |
+| Tank Deaths | Tank Down! Gogo has died // Control Freak |
+| Pet Taunts | Bad Pet! Joe's pet Snuffles used [Growl] on Anub'Rekhan // Control Freak |
 
 ### Mini-Map Button
 
@@ -71,17 +75,18 @@ Hovering the button shows whether All Alerts is on right now, and Tanking Tools 
 
 ### Options
 
-- **Control Freak** // All Alerts, the one switch that silences every tab without changing a setting, plus the welcome message, the mini-map button, and where to reach us.
-- **Taunts** // Successful, failed, and AoE taunts, with one checklist of every taunt your game client knows, each marked Single Target or AOE: class taunts, rune taunts, and engineering target dummies. Waits for a living tank in your group out of the box.
-- **Interrupts** // Successful interrupts: who stopped which cast.
-- **Fears** // Fears that landed, plus the fear checklist, Flash Bomb included.
-- **Incapacitated** // Which effects count (stuns, fears, mind control, confusion, silences, pacifies, spell lockouts, roots, and disarms) and how many seconds make one long. Short ones print for you, long ones announce, and out of the box the tab only speaks while you're a tank or healer.
-- **Tank Deaths** // Your own death while tanking and any other tank's, plus a by-class death log for your own window.
-- **Bad Priests** // Power Word: Shield landing on a warrior or druid tank, with a health line below which a shield counts as a save, an optional whisper to the caster, and a cooldown. Out of the box it only watches shields landing on you while you're tanking.
-- **Bad Pets** // Hunter and warlock pet taunts, a whisper telling the owner how to turn auto-cast off, and how long one pet stays quiet after an alert.
-- **Tanking Tools** // Still in beta, so it ships switched off: Cold Openers (your opening abilities that didn't land, off until you turn them on), Armor Debuffs (how long the group took to strip a target's armor), Parries (somebody standing in front of the boss, whispered to move behind it), and Novas.
-- **Profiles** // The standard profile picker, copy, and reset.
-- **Diagnostic Tools** // Everything a bug report needs, gathered for you. Nothing runs until you press a button.
+* **Control Freak** // The welcome message and the mini-map button, then Enable Control Freak, the one switch that silences every tab without changing a setting, with every tab's own switch below it and a switch per tool while Tanking Tools is on.
+* **Taunts** // Successful, failed, and AoE taunts. Waits for a living tank in your group out of the box. Its Tracked Abilities page lists every taunt your game client knows, each marked Single Target or AOE: class taunts, rune taunts, and engineering target dummies.
+* **Interrupts** // Successful interrupts: who stopped which cast.
+* **Fears** // Fears that landed, with a Tracked Abilities page of every fear, Flash Bomb included.
+* **Incapacitated** // Which effects count (stuns, fears, mind control, confusion, silences, pacifies, spell lockouts, roots, and disarms) and how many seconds make one long. Short ones print for you, long ones announce, and out of the box the tab only speaks while you're a tank or healer.
+* **Tank Deaths** // Your own death while tanking and any other tank's, plus a by-class death log for your own window.
+* **Bad Priests** // Power Word: Shield landing on a warrior or druid tank, with a health line below which a shield counts as a save, an optional whisper to the caster, and a cooldown. Out of the box it only watches shields landing on you while you're tanking.
+* **Bad Pets** // Hunter and warlock pet taunts, a whisper telling the owner how to turn auto-cast off, and how long one pet stays quiet after an alert, with a Tracked Abilities page of the pet taunts it watches.
+* **Tanking Tools** // Still in beta, so it ships switched off. Each tool has its own page: Cold Openers (your opening abilities that didn't land, off until you turn them on), Armor Debuffs (how long the group took to strip a target's armor), Parries (somebody standing in front of the boss, whispered to move behind it), and Novas.
+* **Profiles** // The standard profile picker, copy, and reset.
+* **Feedback & Support** // Where to reach us: Discord, CurseForge, Wago, and GitHub.
+* **Diagnostic Tools** // Everything a bug report needs, gathered for you. Nothing runs until you press a button.
 
 ## Testing & Localization Status
 
@@ -93,7 +98,7 @@ Hovering the button shows whether All Alerts is on right now, and Tanking Tools 
 
 🔴 World of Warcraft: Forever // 1.60.1
 
-🟡 World of Warcraft: Season of Discovery // 1.15.9
+🟢 World of Warcraft: Season of Discovery // 1.15.9
 
 🟢 World of Warcraft: Classic // 1.15.9
 
