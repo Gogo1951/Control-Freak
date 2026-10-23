@@ -91,6 +91,9 @@ read_globals = {
 	"UnitSex",
 
 	-- Spells, sound, and chat
+	"CHAT_PARTY_GET",
+	"CHAT_WHISPER_GET",
+	"ChatTypeInfo",
 	"PlaySoundFile",
 	"SendChatMessage",
 }

@@ -43,7 +43,7 @@ local function RefreshTooltip(anchor)
 	    appears. Tanking Tools is the one tab with a block and a binding, and it
 	    earns them by shipping switched off as an opt-in: Right-Click is the way in
 	    and out mid-run without opening the panel. Its summary is the mini-map's
-	    own two-line one, since the tab itself has none.
+	    own, kept to two lines, rather than the tab's longer one.
 	]]
 	if profile and profile.enabled then
 		tooltip:AddLine(" ")

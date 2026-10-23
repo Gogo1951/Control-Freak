@@ -40,17 +40,152 @@ local L = ns.L
 --------------------------------------------------------------------------------
 
 --[[
-    An "Example:" line, rendered ONCE from { key, args } naming a real locale
-    format and stand-in arguments. It goes through ns:BuildAnnounceMessage -- the
-    same call every sent line uses, whispers included -- so the example is what
-    somebody would actually receive, brand and all, and rewording a message
-    cannot leave a hand-copied example quoting the old text. Helper silver, so
-    it reads as an aside rather than as another setting.
+    The stand-ins from the locale: the pet's name, and the player's for a client
+    that cannot say yet who they are (PlayerName). In the locale because they
+    sit inside a sentence whose grammar a translation may want to agree with.
 ]]
-local function RenderSample(sample)
-	return ns.OptionsSubLabel(
-		string.format(L["SAMPLE_EXAMPLE"], ns:BuildAnnounceMessage(sample.key, unpack(sample.args)))
+ns.SAMPLE_PLAYER = L["SAMPLE_PLAYER"]
+ns.SAMPLE_PET = L["SAMPLE_PET"]
+
+-- Skull: the mark a raid puts on the boss a sample line names.
+ns.SAMPLE_RAID_ICON = 8
+
+--[[
+    How a sample line reaches whoever reads it, which decides how it is drawn:
+    party chat for the line a section puts in front of the group, a whisper for
+    the note one player receives, and the player's own window for a line that
+    never leaves it. Party rather than raid because both are drawn the same way
+    and party is the one every group has.
+
+    chatType is the client's own ChatTypeInfo key, so a player who recoloured
+    party chat sees their own colour. The hex is only for a client that has not
+    filled that table in. prefix is the client's own GlobalStrings line opener,
+    so "[Party]" and "whispers:" read in the player's language.
+]]
+local SAMPLE_FORMS = {
+	ANNOUNCE = { chatType = "PARTY", hex = "AAAAFF", prefix = CHAT_PARTY_GET or "[Party] %s: " },
+	WHISPER = { chatType = "WHISPER", hex = "FF80FF", prefix = CHAT_WHISPER_GET or "%s whispers: " },
+}
+
+local function ChatColor(form)
+	local info = ChatTypeInfo and ChatTypeInfo[form.chatType]
+	if not info then
+		return "|cff" .. form.hex
+	end
+	return string.format(
+		"|cff%02x%02x%02x",
+		math.floor(info.r * 255 + 0.5),
+		math.floor(info.g * 255 + 0.5),
+		math.floor(info.b * 255 + 0.5)
 	)
+end
+
+--[[
+    A chat frame draws a whole line in its channel's colour, so a link's closing
+    |r falls back to that colour. A panel's text falls back to white instead,
+    so the colour is opened again after every |r the line holds.
+]]
+local function Tint(color, text)
+	return color .. (string.gsub(text, "|r", "|r" .. color)) .. "|r"
+end
+
+--[[
+    The character the player is on, read when the line is drawn rather than when
+    the panel is built, so every sample that means "you" names them. The
+    stand-in is only for a client that has not said yet.
+]]
+local function PlayerName()
+	return GetUnitName("player") or ns.SAMPLE_PLAYER
+end
+
+local function PlayerClass()
+	local _, class = UnitClass("player")
+	return class
+end
+
+--[[
+    The sender as a chat frame names them: the player's own character, in their
+    class colour, since every line in a sample is one this player's client
+    would send.
+]]
+local function SampleSender()
+	return "[" .. ns.GetClassColor(nil, PlayerClass()) .. PlayerName() .. "|r]"
+end
+
+--[[
+    The players a sample names, so a printed sample colours them by class the
+    way a real print does; sent chat drops the colour either way. The player's
+    own part is a marker that RenderSample fills in with their character, and
+    somebody else's is the name ns.SAMPLE_NAMES gives the class whose ability
+    the sample names.
+]]
+function ns.SamplePlayer()
+	return { kind = "samplePlayer" }
+end
+
+function ns.SampleOther(class)
+	return ns.PlayerPart(ns.SAMPLE_NAMES[class] or ns.SAMPLE_NAMES.WARRIOR, nil, class)
+end
+
+--[[
+    Who casts a sample line's spell, the spell, and the row the line follows:
+    the player with their own class's spell from ns.SAMPLE_SPELL_IDS
+    ("TAUNT_DRUID"), or, for a class that has none, the roster player of
+    fallbackClass on the Others' row. The Example rule wants the name, its
+    colour and the spell to agree, which a mage casting Pummel does not.
+]]
+function ns.SampleCaster(kind, fallbackClass)
+	local spellId = ns.SAMPLE_SPELL_IDS[kind .. "_" .. (PlayerClass() or "")]
+	if spellId then
+		return ns.SamplePlayer(), ns.SpellPart(spellId), "mine"
+	end
+	return ns.SampleOther(fallbackClass), ns.SpellPart(ns.SAMPLE_SPELL_IDS[kind .. "_" .. fallbackClass]), "others"
+end
+
+--[[
+    An "Example:" line, from { key, args, row }: a real locale format and
+    stand-in arguments, the arguments as the parts ns:Alert takes (PlayerPart,
+    SpellPart, TargetPart) or plain strings, and the row whose dropdown decides
+    the form (AddSample). The label is helper silver, so it reads as an aside;
+    the line after it is drawn the way it will actually arrive, so the player
+    sees what their settings put where before it happens:
+
+      ANNOUNCE  "[Party] [Gogo]: ..." in party colour, through
+                ns:BuildAnnounceMessage -- the same call every sent line uses --
+                with the {rtN} token drawn as the mark the receiving client shows
+      WHISPER   "[Gogo] whispers: ..." in whisper colour, the same call again
+      PRINT     the player's own window, through ns.BuildAlertLine, the string
+                ns:PrintAlert prints
+
+    A spell is its real link in the client's link blue, never a bare name, and
+    rewording a message cannot leave a hand-copied example quoting the old text.
+]]
+local function RenderSample(sample, formKey)
+	local rich = formKey == "PRINT"
+	local count = #sample.args
+	local rendered = {}
+	for index = 1, count do
+		local part = sample.args[index]
+		if type(part) == "table" and part.kind == "samplePlayer" then
+			part = ns.PlayerPart(PlayerName(), nil, PlayerClass())
+		end
+		rendered[index] = ns.RenderAlertPart(part, rich)
+	end
+
+	local line
+	if rich then
+		line = Tint(ns.GetColor("TEXT"), ns.BuildAlertLine(string.format(L[sample.key], unpack(rendered, 1, count))))
+	else
+		local form = SAMPLE_FORMS[formKey or "ANNOUNCE"]
+		local message = ns:BuildAnnounceMessage(sample.key, unpack(rendered, 1, count))
+		message = string.gsub(message, "{rt(%d)}", function(index)
+			return ns.GetRaidIconTexture(tonumber(index))
+		end)
+		line = Tint(ChatColor(form), string.format(form.prefix, SampleSender()) .. message)
+	end
+
+	-- Silver opened again after the line, for a locale whose label runs on past it.
+	return ns.OptionsSubLabel(string.format(L["SAMPLE_EXAMPLE"], line .. ns.GetColor("HELP")))
 end
 
 --[[
@@ -110,21 +245,16 @@ function ns.AddWhisperRow(args, prefix, order, rowsHidden, options)
 		args[prefix .. "WhisperSampleSpace"] = ns.OptionsSpacer(order + 1.5, rowsHidden)
 		args[prefix .. "WhisperSample"] = {
 			type = "description",
-			name = RenderSample(options.sample),
+			-- A function so the sender is the character the panel is opened on.
+			name = function()
+				return RenderSample(options.sample, "WHISPER")
+			end,
 			fontSize = "medium",
 			order = order + 2,
 			hidden = rowsHidden,
 		}
 	end
 end
-
---[[
-    The stand-in names a sample line is rendered with. In the locale because they
-    sit inside a sentence whose grammar a translation may want to agree with.
-]]
-ns.SAMPLE_PLAYER = L["SAMPLE_PLAYER"]
-ns.SAMPLE_OTHER = L["SAMPLE_OTHER"]
-ns.SAMPLE_PET = L["SAMPLE_PET"]
 
 --[[
     The two dropdowns a whose-shaped row and its Against row offer, labelled from
@@ -165,11 +295,20 @@ function ns.SampleBoss()
 end
 
 --[[
-    A spell's name for a sample line, from the client rather than the locale, so
-    the example reads in the player's own language and matches the tooltip they
-    would see. The ids live in ns.SAMPLE_SPELL_IDS, in each flavor's
-    Data/{Game}/Sample-Spells-{Game}.lua. Call it at build time: this client's
-    spell data is not loaded when the options files are.
+    A boss as a sample line's target, under the skull a raid would put on it, so
+    the example shows the mark the real line carries. name is optional: a
+    section whose whisper names the same boss passes the one it dealt.
+]]
+function ns.SampleTarget(name)
+	return ns.TargetPart(name or ns.SampleBoss(), ns.SAMPLE_RAID_ICON)
+end
+
+--[[
+    A spell's name from the client rather than the locale, for Diagnostics'
+    check that every ns.SAMPLE_SPELL_IDS entry resolves. A sample line itself
+    takes ns.SpellPart(id), which renders as the spell's link. The ids live in
+    each flavor's Data/{Game}/Sample-Spells-{Game}.lua. Call it at build time:
+    this client's spell data is not loaded when the options files are.
 ]]
 function ns.SampleSpell(spellId)
 	return (ns.GetSpellNameAndIcon(spellId)) or L["UNKNOWN_SPELL"]
@@ -283,18 +422,23 @@ local function AddSoundRow(args, prefix, order, rowsHidden, getSettings)
 end
 
 --[[
-    The sample under a section. One line, rendered ONCE at build time and never
-    re-read: it says what the alert says, not what the controls around it are
-    set to, so it holds still while the player changes them. It shows the
-    ANNOUNCE form rather than the local print: the print is the player's own
-    window and costs nothing, while what a section puts in front of the whole
-    raid is the thing worth seeing before switching it on.
+    The sample under a section, drawn the way the selected destination will
+    draw it: a row set to Print shows the line in the player's own window, a row
+    set to Announce shows it in party chat. The line belongs to one row --
+    sample.row, "mine" unless the sample names somebody else -- so it is that
+    row's dropdown the sample follows. A function, so the panel redraws it the
+    moment the dropdown changes; the names and the boss in it were dealt at
+    build time and hold still.
 ]]
-local function AddSample(args, prefix, order, hidden, sample)
+local function AddSample(args, prefix, order, hidden, sample, getSettings)
 	args[prefix .. "SampleSpace"] = ns.OptionsSpacer(order, hidden)
 	args[prefix .. "Sample"] = {
 		type = "description",
-		name = RenderSample(sample),
+		name = function()
+			local row = getSettings()[sample.row or "mine"]
+			local output = ns.ResolveChoice(row and row.output, ns.ALERT_OUTPUTS, ns.ALERT_OUTPUT_DEFAULT)
+			return RenderSample(sample, output)
+		end,
 		fontSize = "medium",
 		order = order + 1,
 		hidden = hidden,
@@ -398,8 +542,11 @@ end
                  on the preposition the ladder completes; a noTarget section
                  drops the word
       descKey    one or two sentences between them
-      sample     { key, args } naming a real locale format and stand-in
-                 arguments, rendered once through ns:BuildAnnounceMessage
+      sample     { key, args, row } naming a real locale format and stand-in
+                 arguments. row is optional, "mine" by default, and names the
+                 row whose dropdown picks the form. Redrawn every time the panel
+                 draws, through ns.BuildAlertLine when that row prints and
+                 ns:BuildAnnounceMessage when it announces
       mineKey    the caption of the player's own row, "My <thing>"
       mineDescKey
                  optional. The tooltip of that row, for a section whose row is
@@ -535,7 +682,7 @@ function ns.AddWhoseAlertSection(args, prefix, getSettings, order, hidden, optio
 		AddSoundRow(args, prefix, order + 14, rowsHidden, getSettings)
 	end
 
-	AddSample(args, prefix, order + 15, hidden, options.sample)
+	AddSample(args, prefix, order + 15, hidden, options.sample, getSettings)
 
 	if options.afterSample then
 		options.afterSample(args, order + 17, rowsHidden)

@@ -28,7 +28,18 @@ L["ENABLE_WELCOME_MESSAGE_DESC"] = "Mostra a saudação do Control Freak quando 
 L["ENABLE_MINIMAP_BUTTON"] = "Ativar botão do minimapa"
 L["ENABLE_MINIMAP_BUTTON_DESC"] = "Mostra o botão do Control Freak no seu minimapa."
 
+L["OPTIONS_MASTER_SWITCH_HEADER"] = "Chave geral"
 L["OPTIONS_FEATURES_HEADER"] = "Recursos"
+-- The Features block's switch captions. Each tab's own switch keeps its "Enable" caption.
+L["FEATURES_TAUNTS"] = "Monitorar provocações"
+L["FEATURES_INTERRUPTS"] = "Monitorar interrupções"
+L["FEATURES_FEARS"] = "Monitorar medos"
+L["FEATURES_INCAPACITATED"] = "Monitorar incapacitação"
+L["FEATURES_TANK_DEATHS"] = "Monitorar mortes de tanque"
+L["FEATURES_BAD_PRIESTS"] = "Monitorar sacerdotes danados"
+L["FEATURES_BAD_PETS"] = "Monitorar ajudantes danados"
+L["FEATURES_PEER_PRESSURE"] = "Pressão do grupo"
+L["FEATURES_TANKING_TOOLS"] = "Arsenal do tanque"
 
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/freak"
@@ -37,7 +48,7 @@ L["OPTIONS_COMMAND_DESCRIPTION"] = "Abre a janela de opções deste add-on."
 --[[
     The add-on's own switch. KILL_SWITCH titles the mini-map tooltip's block for
     it, naming its REACH rather than the act of throwing it. KILL_SWITCH_ENABLE
-    captions it as the first of the General panel's Features switches, and
+    captions it under the General panel's Master Switch header, and
     KILL_SWITCH_ENABLE_DESC is both that switch's tooltip and the mini-map
     block's description, so the two cannot describe it differently.
 ]]
@@ -100,6 +111,7 @@ L["TAB_INCAPACITATED"] = "Incapacitado"
 L["TAB_TANK_DEATHS"] = "Mortes de tanque"
 L["TAB_BAD_PRIESTS"] = "Sacerdotes danados"
 L["TAB_BAD_PETS"] = "Ajudantes danados"
+L["TAB_PEER_PRESSURE"] = "Pressão do grupo"
 L["TAB_TANKING_TOOLS"] = "Arsenal do tanque"
 
 --------------------------------------------------------------------------------
@@ -130,6 +142,20 @@ L["SCOPE_GROUP_HAS_TANK_DESC"] =
 	"Só dispara enquanto alguém do seu grupo estiver tanqueando e ainda vivo. Em um raide, isso significa um tanque principal designado, então para o Control Freak um raide sem nenhum não tem tanque. Um tanque caído conta como se não houvesse tanque, porque é justamente aí que ajuda ter outra pessoa segurando a ameaça."
 L["SCOPE_INSTANCE_ONLY"] = "Dentro de instâncias"
 L["SCOPE_INSTANCE_ONLY_DESC"] = "Só dispara dentro de masmorras e raides."
+
+--[[
+    The line at the top of a page that a switch somewhere else has silenced:
+    All Alerts on any feature page, or the feature a sub-page belongs to.
+
+    TRANSLATORS: in both, the first %s is the name of the switch that is off
+    (drawn gold) and the second is STATUS_OFF (drawn red). The rest are plain
+    names: in STATUS_ALL_ALERTS_OFF the switch's caption and then the page it
+    is on, in STATUS_FEATURE_OFF the page it is on. STATUS_OFF is the single
+    word for a switch being off.
+]]
+L["STATUS_OFF"] = "desativado"
+L["STATUS_ALL_ALERTS_OFF"] = "%s: %s, então nada nesta página dispara. A chave, %s, fica na página %s."
+L["STATUS_FEATURE_OFF"] = "%s: %s, então nada nesta página dispara. A chave fica na página %s."
 
 --------------------------------------------------------------------------------
 -- Alert Sections
@@ -212,45 +238,48 @@ L["COOLDOWN_MINUTES"] = "Recarga de %d min"
 
 --[[
     Only the "Example:" frame is written here. The line inside it is rendered
-    from the real message format below with these stand-in names, so a reworded
-    alert cannot leave a hand-copied example quoting the old text. The names are
-    translatable because they sit inside a sentence whose grammar a locale may
-    want to agree with.
+    from the real message format below, so a reworded alert cannot leave a
+    hand-copied example quoting the old text. The player's own name is the
+    character they are on; SAMPLE_PLAYER stands in only until the client knows
+    it. The other players' names are proper names in Data/Data.lua, the same in
+    every locale. The pet's is translatable because it sits inside a sentence
+    whose grammar a locale may want to agree with.
 ]]
 L["SAMPLE_EXAMPLE"] = "Exemplo: %s"
 L["SAMPLE_PLAYER"] = "Gogo"
-L["SAMPLE_OTHER"] = "João"
 L["SAMPLE_PET"] = "Bidu"
 
 --[[
-    The Naxxramas bosses the Example lines name, dealt one per line.
+    The Molten Core and Blackwing Lair bosses the Example lines name, dealt one
+    per line.
 
     TRANSLATORS: use each boss's name exactly as your client writes it, title
     included, not a translation of the English.
 ]]
-L["SAMPLE_BOSS_ANUBREKHAN"] = "Anub'Rekhan"
-L["SAMPLE_BOSS_FAERLINA"] = "Grã-viúva Faerlina"
-L["SAMPLE_BOSS_MAEXXNA"] = "Maexxna"
-L["SAMPLE_BOSS_NOTH"] = "Noth, o Pestífero"
-L["SAMPLE_BOSS_HEIGAN"] = "Heigan, o Sujo"
-L["SAMPLE_BOSS_LOATHEB"] = "Repugnaz"
-L["SAMPLE_BOSS_RAZUVIOUS"] = "Instrutor Razúvio"
-L["SAMPLE_BOSS_GOTHIK"] = "Gothik, o Ceifador"
-L["SAMPLE_BOSS_MOGRAINE"] = "Grão-lorde Mograine"
-L["SAMPLE_BOSS_KORTHAZZ"] = "Thane Korth'azz"
-L["SAMPLE_BOSS_BLAUMEUX"] = "Lady Blaumeux"
-L["SAMPLE_BOSS_ZELIEK"] = "Sir Zeliek"
-L["SAMPLE_BOSS_PATCHWERK"] = "Retalhoso"
-L["SAMPLE_BOSS_GROBBULUS"] = "Grobbulus"
-L["SAMPLE_BOSS_GLUTH"] = "Gluth"
-L["SAMPLE_BOSS_THADDIUS"] = "Thaddius"
-L["SAMPLE_BOSS_SAPPHIRON"] = "Sapphiron"
-L["SAMPLE_BOSS_KELTHUZAD"] = "Kel'Thuzad"
+L["SAMPLE_BOSS_LUCIFRON"] = "Lúcifron"
+L["SAMPLE_BOSS_MAGMADAR"] = "Magmadar"
+L["SAMPLE_BOSS_GEHENNAS"] = "Geena"
+L["SAMPLE_BOSS_GARR"] = "Garr"
+L["SAMPLE_BOSS_SHAZZRAH"] = "Shazzrah"
+L["SAMPLE_BOSS_GEDDON"] = "Barão Geddon"
+L["SAMPLE_BOSS_GOLEMAGG"] = "Golemagg, o Incinerador"
+L["SAMPLE_BOSS_SULFURON"] = "Emissário de Sulfuron"
+L["SAMPLE_BOSS_MAJORDOMO"] = "Senescal Executus"
+L["SAMPLE_BOSS_RAGNAROS"] = "Ragnaros"
+L["SAMPLE_BOSS_RAZORGORE"] = "Violâminus, o Indomado"
+L["SAMPLE_BOSS_VAELASTRASZ"] = "Vaelastrasz, o Corrupto"
+L["SAMPLE_BOSS_BROODLORD"] = "Prolemestre Flagelador"
+L["SAMPLE_BOSS_FIREMAW"] = "Fogorja"
+L["SAMPLE_BOSS_EBONROC"] = "Petrébano"
+L["SAMPLE_BOSS_FLAMEGOR"] = "Flamagor"
+L["SAMPLE_BOSS_CHROMAGGUS"] = "Cromaggus"
+L["SAMPLE_BOSS_NEFARIAN"] = "Nefarian"
 
 --------------------------------------------------------------------------------
 -- Ability Lists
 --------------------------------------------------------------------------------
 
+L["TRACKED_HEADER"] = "Habilidades rastreadas"
 L["ABILITIES_ITEMS"] = "Itens"
 L["ABILITIES_CLASS_PET"] = "Ajudante de %s"
 
@@ -281,15 +310,14 @@ L["TAUNTS_AOE_ENABLE"] = "Avisar provocações em área"
 L["TAUNTS_AOE_MINE"] = "Minhas provocações em área"
 L["TAUNTS_AOE_OTHERS"] = "Provocações em área dos outros"
 
-L["TRACKED_HEADER"] = "Habilidades rastreadas"
 L["TAUNTS_ABILITIES_DESC"] =
 	'Desmarque uma provocação para deixar de rastreá-la. O menu suspenso ao lado escolhe entre "Alvo único" e "Área".'
+-- The same intro on a client where no taunt's kind can be picked, so no row carries a dropdown.
+L["TAUNTS_ABILITIES_DESC_NO_CHOICE"] = "Desmarque uma provocação para deixar de rastreá-la."
 L["TAUNTS_KIND_SINGLE"] = "Alvo único"
 L["TAUNTS_KIND_AOE"] = "Área"
 L["TAUNTS_KIND_DESC"] =
 	'Esta provocação agarra poucos inimigos de uma vez, então pode ser informada dos dois jeitos. A opção "Alvo único" nomeia cada inimigo puxado em "Provocações bem-sucedidas" e informa as falhas em "Provocações falhas". A opção "Área" informa só o lançamento, em "Provocações em área", e deixa as falhas de fora.'
-L["TAUNTS_KIND_LOCKED_SINGLE_DESC"] = "Sempre alvo único: esta provocação só pega um inimigo."
-L["TAUNTS_KIND_LOCKED_AOE_DESC"] = "Sempre em área: esta provocação agarra tudo ao redor de uma vez."
 
 --------------------------------------------------------------------------------
 -- Interrupts
@@ -419,8 +447,10 @@ L["TANK_DEATHS_CLASS_ROW_DESC"] = "Avisa quando um %s do seu grupo morre."
 -- Bad Priests
 --------------------------------------------------------------------------------
 
-L["BAD_PRIESTS_SUMMARY"] =
-	"Curadores fazendo algo que atrapalha o tanque mais do que ajuda. Só no Classic e no Burning Crusade: a Temporada da Descoberta devolve a raiva por meio de uma runa de sacerdote, e nada disso é problema nas versões mais recentes do jogo."
+L["BAD_PRIESTS_SUMMARY"] = "Curadores fazendo algo que atrapalha o tanque mais do que ajuda."
+-- Shown only on a client whose data has no Power Word: Shield row, which among the shipped ones is Season of Discovery's.
+L["BAD_PRIESTS_DISCOVERY_STATUS"] =
+	"A Temporada da Descoberta nunca relata um escudo ruim: a runa Força da Alma devolve a raiva aos tanques, e nenhum add-on consegue ver as runas de outro jogador."
 L["BAD_PRIESTS_ENABLE"] = "Ativar monitoramento de sacerdotes danados"
 
 L["BAD_PRIESTS_HEADER"] = "Escudos ruins"
@@ -467,19 +497,50 @@ L["BAD_PETS_COOLDOWN_DESC"] =
 L["BAD_PETS_ABILITIES_DESC"] = "Desmarque uma habilidade de ajudante para deixar de rastreá-la."
 
 --------------------------------------------------------------------------------
+-- Peer Pressure
+--------------------------------------------------------------------------------
+
+--[[
+    The alert is the whose shape with no target, like Fears: the line names a
+    classmate and a cooldown.
+
+    TRANSLATORS: the two rows' tooltips each say what they count, because
+    neither is "everybody's casts": only the player's own class ever reports,
+    and the My row has no pet to include.
+]]
+L["PEER_PRESSURE_SUMMARY"] =
+	"Receba um aviso quando outros jogadores da sua classe usarem suas habilidades com recarga, para você ceder à pressão do grupo."
+L["PEER_PRESSURE_ENABLE"] = "Ativar pressão do grupo"
+
+L["PEER_PRESSURE_ALERT_HEADER"] = "Recargas"
+L["PEER_PRESSURE_ALERT_DESC"] =
+	"Uma habilidade com recarga usada por um jogador da sua classe no seu grupo: o sinal para usar a sua. Só a sua própria classe é relatada, e Habilidades rastreadas escolhe quais contam."
+L["PEER_PRESSURE_ALERT_ENABLE"] = "Avisar recargas"
+L["PEER_PRESSURE_ALERT_MINE"] = "Minhas recargas"
+L["PEER_PRESSURE_ALERT_MINE_DESC"] =
+	"Relata também as suas próprias habilidades com recarga rastreadas. O menu ao lado diz para onde vai a linha."
+L["PEER_PRESSURE_ALERT_OTHERS"] = "Recargas dos outros"
+L["PEER_PRESSURE_ALERT_OTHERS_DESC"] =
+	"Relata uma habilidade com recarga rastreada usada por qualquer outro jogador da sua classe no seu grupo. O menu ao lado diz para onde vai a linha."
+
+L["PEER_PRESSURE_ABILITIES_DESC"] =
+	"Desmarque uma habilidade com recarga para deixar de rastreá-la. Só as da sua própria classe são relatadas."
+
+--------------------------------------------------------------------------------
 -- Tanking Tools
 --------------------------------------------------------------------------------
 
 --[[
-    No summary line on the tab: Tanking Tools opens on its enable, because the
-    tab is a collection of unrelated warnings rather than one idea a sentence
-    can cover. Each section introduces itself instead.
+    The tab's summary says it ships off and where its four tools live, since
+    each tool is a page of its own and the tab page holds only the switch.
 
-    The mini-map tooltip carries a short one anyway, because the button's
+    The mini-map tooltip carries its own shorter one, because the button's
     Right-Click toggles this tab and the tooltip has to say what it is turning
     on. TRANSLATORS: it lists the four section headers below in your own words
     for them; keep it to two lines in the tooltip.
 ]]
+L["TANKING_TOOLS_SUMMARY"] =
+	"Este recurso ainda está em beta, por isso vem desligado. Aberturas frias, Reduções de armadura, Aparos e Novas Congelantes têm cada um a sua própria página dentro de Arsenal do tanque."
 L["TANKING_TOOLS_ENABLE"] = "Ativar arsenal do tanque"
 L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "Aberturas frias, reduções de armadura, aparos e Novas Congelantes."
 
@@ -523,7 +584,7 @@ L["TANKING_TOOLS_PARRY_OTHERS_DESC"] =
 	"Relata quando um inimigo apara os ataques de qualquer outro do seu grupo. O menu ao lado diz para onde vai a linha."
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "Ignorar tanques"
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"] =
-	"Fica em silêncio quando o jogador aparado é um tanque: designado como tanque principal em um raide, ou com a função de Tanque do localizador de grupos em um grupo. Um tanque secundário fica na frente do chefe para uma troca de provocação, e isso não é um erro para sussurrar. Os seus próprios aparos continuam sendo relatados."
+	"Fica em silêncio quando o jogador aparado é um tanque: designado como tanque principal em um raide, ou com a função de Tanque selecionada no localizador de grupos em um grupo. Um tanque secundário fica na frente do chefe para uma troca de provocação, e isso não é um erro para sussurrar. Os seus próprios aparos continuam sendo relatados."
 L["TANKING_TOOLS_PARRY_IGNORE_PETS"] = "Ignorar ajudantes"
 L["TANKING_TOOLS_PARRY_IGNORE_PETS_DESC"] =
 	"Fica em silêncio quando o golpe aparado veio de um ajudante, o seu incluído. Um ajudante fica onde o dono o mandou, e uma linha com o nome do ajudante não dá nada a fazer a ninguém do grupo. Ajudantes nunca recebem sussurro, de qualquer forma."
@@ -697,3 +758,12 @@ L["PARRY_WHISPER"] =
 
 L["NOVA"] = "Nova! %s usou %s em %s."
 L["NOVA_AOE"] = "Nova em área! %s usou %s."
+
+--[[
+    Opens on a bang naming the news, like every other alert line.
+
+    TRANSLATORS: %s in PEER_PRESSURE_TARGET is, in order: caster, spell, and
+    the friendly player it was cast on. The target is a player, never a mob.
+]]
+L["PEER_PRESSURE"] = "Pressão do grupo! %s usou %s."
+L["PEER_PRESSURE_TARGET"] = "Pressão do grupo! %s usou %s em %s."

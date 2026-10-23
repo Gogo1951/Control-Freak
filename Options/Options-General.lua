@@ -3,25 +3,41 @@ local _, ns = ...
 local L = ns.L
 local GetColor = ns.GetColor
 
--- Each tab's switch caption, keyed like ns.FEATURE_KEYS.
-local FEATURE_ENABLE_KEYS = {
-	taunts = "TAUNTS_ENABLE",
-	interrupts = "INTERRUPTS_ENABLE",
-	fears = "FEARS_ENABLE",
-	incapacitated = "INCAPACITATED_ENABLE",
-	tankDeaths = "TANK_DEATHS_ENABLE",
-	badPriests = "BAD_PRIESTS_ENABLE",
-	badPets = "BAD_PETS_ENABLE",
-	tankingTools = "TANKING_TOOLS_ENABLE",
+-- Each switch's caption, keyed like ns.FEATURE_KEYS.
+local FEATURE_CAPTION_KEYS = {
+	taunts = "FEATURES_TAUNTS",
+	interrupts = "FEATURES_INTERRUPTS",
+	fears = "FEATURES_FEARS",
+	incapacitated = "FEATURES_INCAPACITATED",
+	tankDeaths = "FEATURES_TANK_DEATHS",
+	badPriests = "FEATURES_BAD_PRIESTS",
+	badPets = "FEATURES_BAD_PETS",
+	peerPressure = "FEATURES_PEER_PRESSURE",
+	tankingTools = "FEATURES_TANKING_TOOLS",
+}
+
+-- Each switch's icon, drawn ahead of its caption.
+local FEATURE_ICONS = {
+	taunts = 136080,
+	interrupts = 132219, -- Kick
+	fears = 136183,
+	incapacitated = 135860,
+	tankDeaths = 132293,
+	badPriests = 135940, -- Power Word: Shield
+	badPets = 132270, -- Growl
+	peerPressure = 136146,
+	tankingTools = 134951,
 }
 
 --[[
-    The All Alerts switch alone on top, since it sits above every feature, then
-    the features in tiers with a blank line between each: the three that report
+    The All Alerts switch alone under its own Master Switch header, since it
+    sits above every feature, then the Features header and the features in
+    tiers with a blank line between each: the three that report
     what somebody cast, the two about the player's own seat, the two Bad tabs,
-    and Tanking Tools alone at the bottom, the one that ships off and the one
-    the Tanking Tools section below belongs to. Everything under the top switch
-    hides while it is off, since none of it fires then; the switch re-runs
+    and Peer Pressure and Tanking Tools side by side at the bottom: the one
+    whose news is not about the fight going wrong, and the one that ships off,
+    which the Tanking Tools section below belongs to. Everything under the top
+    switch hides while it is off, since none of it fires then; the switch re-runs
     ns:ApplyProfile, which redraws this panel. The lone switches still go
     through ns.OptionsTogglePairs, so they sit in the same inset as the pairs.
 ]]
@@ -29,7 +45,7 @@ local FEATURE_TIERS = {
 	{ "taunts", "interrupts", "fears" },
 	{ "incapacitated", "tankDeaths" },
 	{ "badPets", "badPriests" },
-	{ "tankingTools" },
+	{ "peerPressure", "tankingTools" },
 }
 
 local function AllAlertsOff()
@@ -53,15 +69,21 @@ local function AddFeatureToggles(args, startOrder)
 		},
 	})
 
+	-- The first tier's blank line doubles as the one under the Features header.
+	args.spaceFeatures0 = ns.OptionsSpacer(startOrder + 2, AllAlertsOff)
+	args.headerFeatures = ns.OptionsHeader(L["OPTIONS_FEATURES_HEADER"], startOrder + 3, AllAlertsOff)
+
 	-- Four orders per tier: its blank line, then up to two rows of pairs.
 	for tier, keys in ipairs(FEATURE_TIERS) do
-		local base = startOrder + 2 + (tier - 1) * 4
+		local base = startOrder + 4 + (tier - 1) * 4
 		args["spaceFeatures" .. tier] = ns.OptionsSpacer(base, AllAlertsOff)
 		local toggles = {}
 		for _, key in ipairs(keys) do
-			toggles[#toggles + 1] = ns.FeatureEnableToggle(function()
+			local toggle = ns.FeatureEnableToggle(function()
 				return ns.db.profile[key]
-			end, FEATURE_ENABLE_KEYS[key])
+			end, FEATURE_CAPTION_KEYS[key])
+			toggle.name = "|T" .. FEATURE_ICONS[key] .. ":16|t " .. toggle.name
+			toggles[#toggles + 1] = toggle
 		end
 		ns.OptionsTogglePairs(args, "rowFeatures" .. tier .. "_", base, toggles, AllAlertsOff)
 	end
@@ -134,9 +156,9 @@ function ns.BuildGeneralOptions()
 			end,
 		},
 
-		spaceFeatures0 = ns.OptionsSpacer(20),
-		headerFeatures = ns.OptionsHeader(L["OPTIONS_FEATURES_HEADER"], 21),
-		spaceFeatures1 = ns.OptionsSpacer(22),
+		spaceMasterSwitch0 = ns.OptionsSpacer(20),
+		headerMasterSwitch = ns.OptionsHeader(L["OPTIONS_MASTER_SWITCH_HEADER"], 21),
+		spaceMasterSwitch1 = ns.OptionsSpacer(22),
 
 		spaceCommands0 = ns.OptionsSpacer(90),
 		headerCommands = ns.OptionsHeader(L["OPTIONS_COMMANDS_HEADER"], 91),
@@ -147,8 +169,9 @@ function ns.BuildGeneralOptions()
 		),
 	}
 
+	-- The switch at 23, the Features header at 24 and 25, then four tiers of four orders from 26 end at 41.
 	AddFeatureToggles(args, 22)
-	AddTankingToolToggles(args, 40)
+	AddTankingToolToggles(args, 42)
 
 	return {
 		type = "group",

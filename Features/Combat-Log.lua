@@ -480,5 +480,17 @@ function ns:COMBAT_LOG_EVENT_UNFILTERED()
 			spellName,
 			ability
 		)
+	elseif category == "COOLDOWN" then
+		ns:HandlePeerPressure(
+			feature,
+			sourceGUID,
+			sourceName,
+			sourceFlags,
+			destGUID,
+			destName,
+			spellId,
+			spellName,
+			ability
+		)
 	end
 end

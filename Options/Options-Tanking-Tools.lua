@@ -34,7 +34,7 @@ ns.TANKING_TOOLS = {
 
 function ns.BuildTankingToolsOptions()
 	local args = {}
-	ns.AddFeatureScope(args, Feature, nil, "TANKING_TOOLS_ENABLE", 1, "tankingTools")
+	ns.AddFeatureScope(args, Feature, "TANKING_TOOLS_SUMMARY", "TANKING_TOOLS_ENABLE", 1, "tankingTools")
 
 	return {
 		type = "group",
@@ -47,11 +47,12 @@ end
     One tool's sub-panel: its alert block and nothing else, drawn without the
     block's header because the page title already names it. Not hidden behind
     the Tanking Tools switch, like the Tracked Abilities sub-panels: the block's
-    own switch still collapses its rows, and the parent panel says whether the
-    feature is on.
+    own switch still collapses its rows, and a status line at the top says when
+    Tanking Tools, or All Alerts, has the tool silenced.
 ]]
 local function ToolPanel(key, options)
 	local args = {}
+	ns.AddQuietStatus(args, 0.4, "tankingTools", "TAB_TANKING_TOOLS")
 	options.noHeader = true
 	ns.AddWhoseAlertSection(args, key, Section(key), 1, ns.NeverHidden, options)
 	return {
@@ -68,17 +69,23 @@ end
     caption row under the whose row, "Within [10 Seconds of the Pull]". The slot
     beside the switch belongs to the target ladder, as everywhere.
 ]]
+-- Classes whose opener in the Example is a melee swing, which a mob blocks; every other class's is a spell, which it resists.
+local MELEE_OPENER_CLASSES = { DRUID = true, ROGUE = true, WARRIOR = true }
+
 function ns.BuildTankingToolsColdOpenerOptions()
+	-- Every class has an OPENER row, so the Example always lands on the My row this section draws.
+	local caster, opener = ns.SampleCaster("OPENER", "WARRIOR")
+	local _, playerClass = UnitClass("player")
 	return ToolPanel("coldOpener", {
 		headerKey = "TANKING_TOOLS_COLD_OPENER_HEADER",
 		enableKey = "TANKING_TOOLS_COLD_OPENER_ENABLE",
 		descKey = "TANKING_TOOLS_COLD_OPENER_DESC",
 		mineKey = "TANKING_TOOLS_COLD_OPENER_MINE",
 		mineDescKey = "TANKING_TOOLS_COLD_OPENER_MINE_DESC",
-		-- BLOCK of the six outcomes: the one a tank meets most often on a pull.
+		-- BLOCK or RESIST of the six outcomes: the one this class's opener meets most often on a pull.
 		sample = {
-			key = "COLD_OPENER_BLOCK",
-			args = { ns.SAMPLE_PLAYER, ns.SampleSpell(ns.SAMPLE_SPELL_IDS.SUNDER_ARMOR), ns.SampleBoss() },
+			key = MELEE_OPENER_CLASSES[playerClass] and "COLD_OPENER_BLOCK" or "COLD_OPENER_RESIST",
+			args = { caster, opener, ns.SampleTarget() },
 		},
 		captionRow = {
 			labelKey = "TANKING_TOOLS_COLD_OPENER_WITHIN",
@@ -117,7 +124,7 @@ function ns.BuildTankingToolsArmorOptions()
 		mineKey = "TANKING_TOOLS_ARMOR_REPORT",
 		mineDescKey = "TANKING_TOOLS_ARMOR_REPORT_DESC",
 		-- Under a second: everything in the first global is the result worth showing.
-		sample = { key = "ARMOR_REPORT", args = { ns.SampleBoss(), "0.8" } },
+		sample = { key = "ARMOR_REPORT", args = { ns.SampleTarget(), "0.8" } },
 		-- Fires once per target, after the fact. Nothing to react to.
 		noSound = true,
 		--[[
@@ -167,7 +174,11 @@ function ns.BuildTankingToolsParryOptions()
 		mineDescKey = "TANKING_TOOLS_PARRY_MINE_DESC",
 		othersKey = "TANKING_TOOLS_PARRY_OTHERS",
 		othersDescKey = "TANKING_TOOLS_PARRY_OTHERS_DESC",
-		sample = { key = "PARRY_WARNING", args = { ns.SAMPLE_OTHER, PARRY_BOSS } },
+		sample = {
+			key = "PARRY_WARNING",
+			row = "others",
+			args = { ns.SampleOther("ROGUE"), ns.SampleTarget(PARRY_BOSS) },
+		},
 		--[[
 		    Under the indent because both narrow who counts: an off-tank in front
 		    of the boss for a taunt swap is not a mistake to whisper about, and a
@@ -249,7 +260,8 @@ function ns.BuildTankingToolsNovaOptions()
 		noTarget = true,
 		sample = {
 			key = "NOVA_AOE",
-			args = { ns.SAMPLE_OTHER, ns.SampleSpell(ns.SAMPLE_SPELL_IDS.FROST_NOVA) },
+			row = "others",
+			args = { ns.SampleOther("MAGE"), ns.SpellPart(ns.SAMPLE_SPELL_IDS.FROST_NOVA) },
 		},
 	})
 end

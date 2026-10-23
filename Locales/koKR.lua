@@ -28,7 +28,18 @@ L["ENABLE_WELCOME_MESSAGE_DESC"] = "접속할 때 Control Freak 인사말을 표
 L["ENABLE_MINIMAP_BUTTON"] = "미니맵 버튼 사용"
 L["ENABLE_MINIMAP_BUTTON_DESC"] = "미니맵에 Control Freak 버튼을 표시합니다."
 
+L["OPTIONS_MASTER_SWITCH_HEADER"] = "전체 스위치"
 L["OPTIONS_FEATURES_HEADER"] = "기능"
+-- The Features block's switch captions. Each tab's own switch keeps its "Enable" caption.
+L["FEATURES_TAUNTS"] = "도발 감시"
+L["FEATURES_INTERRUPTS"] = "차단 감시"
+L["FEATURES_FEARS"] = "공포 감시"
+L["FEATURES_INCAPACITATED"] = "행동 불가 감시"
+L["FEATURES_TANK_DEATHS"] = "탱커 사망 감시"
+L["FEATURES_BAD_PRIESTS"] = "말썽쟁이 사제 감시"
+L["FEATURES_BAD_PETS"] = "말썽쟁이 소환수 감시"
+L["FEATURES_PEER_PRESSURE"] = "또래 압력"
+L["FEATURES_TANKING_TOOLS"] = "탱킹 도구"
 
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/freak"
@@ -37,7 +48,7 @@ L["OPTIONS_COMMAND_DESCRIPTION"] = "이 애드온의 설정 창을 엽니다."
 --[[
     The add-on's own switch. KILL_SWITCH titles the mini-map tooltip's block for
     it, naming its REACH rather than the act of throwing it. KILL_SWITCH_ENABLE
-    captions it as the first of the General panel's Features switches, and
+    captions it under the General panel's Master Switch header, and
     KILL_SWITCH_ENABLE_DESC is both that switch's tooltip and the mini-map
     block's description, so the two cannot describe it differently.
 ]]
@@ -101,6 +112,7 @@ L["TAB_INCAPACITATED"] = "행동 불가"
 L["TAB_TANK_DEATHS"] = "탱커 사망"
 L["TAB_BAD_PRIESTS"] = "말썽쟁이 사제"
 L["TAB_BAD_PETS"] = "말썽쟁이 소환수"
+L["TAB_PEER_PRESSURE"] = "또래 압력"
 L["TAB_TANKING_TOOLS"] = "탱킹 도구"
 
 --------------------------------------------------------------------------------
@@ -131,6 +143,22 @@ L["SCOPE_GROUP_HAS_TANK_DESC"] =
 	"파티에서 누군가 탱킹 중이고 아직 살아 있을 때만 작동합니다. 공격대에서는 지정된 메인 탱커만 해당하므로, 메인 탱커가 지정되지 않은 공격대는 Control Freak에게 탱커가 없는 것과 같습니다. 쓰러진 탱커는 탱커가 없는 것으로 칩니다. 바로 그때가 다른 누군가가 위협 수준을 붙잡아 주는 것이 도움이 되는 순간이기 때문입니다."
 L["SCOPE_INSTANCE_ONLY"] = "인스턴스 안에 있을 때"
 L["SCOPE_INSTANCE_ONLY_DESC"] = "던전과 공격대 안에서만 작동합니다."
+
+--[[
+    The line at the top of a page that a switch somewhere else has silenced:
+    All Alerts on any feature page, or the feature a sub-page belongs to.
+
+    TRANSLATORS: in both, the first %s is the name of the switch that is off
+    (drawn gold) and the second is STATUS_OFF (drawn red). The rest are plain
+    names: in STATUS_ALL_ALERTS_OFF the switch's caption and then the page it
+    is on, in STATUS_FEATURE_OFF the page it is on. STATUS_OFF is the single
+    word for a switch being off.
+]]
+L["STATUS_OFF"] = "꺼짐"
+L["STATUS_ALL_ALERTS_OFF"] =
+	"%s: %s. 그래서 이 페이지에서는 아무것도 알리지 않습니다. '%s' 스위치는 '%s' 페이지에 있습니다."
+L["STATUS_FEATURE_OFF"] =
+	"%s: %s. 그래서 이 페이지에서는 아무것도 알리지 않습니다. 스위치는 '%s' 페이지에 있습니다."
 
 --------------------------------------------------------------------------------
 -- Alert Sections
@@ -213,45 +241,48 @@ L["COOLDOWN_MINUTES"] = "%d분 대기시간"
 
 --[[
     Only the "Example:" frame is written here. The line inside it is rendered
-    from the real message format below with these stand-in names, so a reworded
-    alert cannot leave a hand-copied example quoting the old text. The names are
-    translatable because they sit inside a sentence whose grammar a locale may
-    want to agree with.
+    from the real message format below, so a reworded alert cannot leave a
+    hand-copied example quoting the old text. The player's own name is the
+    character they are on; SAMPLE_PLAYER stands in only until the client knows
+    it. The other players' names are proper names in Data/Data.lua, the same in
+    every locale. The pet's is translatable because it sits inside a sentence
+    whose grammar a locale may want to agree with.
 ]]
 L["SAMPLE_EXAMPLE"] = "예시: %s"
 L["SAMPLE_PLAYER"] = "Gogo"
-L["SAMPLE_OTHER"] = "철수"
 L["SAMPLE_PET"] = "멍멍이"
 
 --[[
-    The Naxxramas bosses the Example lines name, dealt one per line.
+    The Molten Core and Blackwing Lair bosses the Example lines name, dealt one
+    per line.
 
     TRANSLATORS: use each boss's name exactly as your client writes it, title
     included, not a translation of the English.
 ]]
-L["SAMPLE_BOSS_ANUBREKHAN"] = "아눕레칸"
-L["SAMPLE_BOSS_FAERLINA"] = "귀부인 팰리나"
-L["SAMPLE_BOSS_MAEXXNA"] = "맥스나"
-L["SAMPLE_BOSS_NOTH"] = "역병술사 노스"
-L["SAMPLE_BOSS_HEIGAN"] = "부정의 헤이건"
-L["SAMPLE_BOSS_LOATHEB"] = "로데브"
-L["SAMPLE_BOSS_RAZUVIOUS"] = "훈련교관 라주비어스"
-L["SAMPLE_BOSS_GOTHIK"] = "영혼의 착취자 고딕"
-L["SAMPLE_BOSS_MOGRAINE"] = "대영주 모그레인"
-L["SAMPLE_BOSS_KORTHAZZ"] = "영주 코스아즈"
-L["SAMPLE_BOSS_BLAUMEUX"] = "여군주 블라미우스"
-L["SAMPLE_BOSS_ZELIEK"] = "젤리에크 경"
-L["SAMPLE_BOSS_PATCHWERK"] = "패치워크"
-L["SAMPLE_BOSS_GROBBULUS"] = "그라불루스"
-L["SAMPLE_BOSS_GLUTH"] = "글루스"
-L["SAMPLE_BOSS_THADDIUS"] = "타디우스"
-L["SAMPLE_BOSS_SAPPHIRON"] = "사피론"
-L["SAMPLE_BOSS_KELTHUZAD"] = "켈투자드"
+L["SAMPLE_BOSS_LUCIFRON"] = "루시프론"
+L["SAMPLE_BOSS_MAGMADAR"] = "마그마다르"
+L["SAMPLE_BOSS_GEHENNAS"] = "게헨나스"
+L["SAMPLE_BOSS_GARR"] = "가르"
+L["SAMPLE_BOSS_SHAZZRAH"] = "샤즈라"
+L["SAMPLE_BOSS_GEDDON"] = "남작 게돈"
+L["SAMPLE_BOSS_GOLEMAGG"] = "초열의 골레마그"
+L["SAMPLE_BOSS_SULFURON"] = "설퍼론 사자"
+L["SAMPLE_BOSS_MAJORDOMO"] = "청지기 이그젝큐투스"
+L["SAMPLE_BOSS_RAGNAROS"] = "라그나로스"
+L["SAMPLE_BOSS_RAZORGORE"] = "폭군 서슬송곳니"
+L["SAMPLE_BOSS_VAELASTRASZ"] = "타락한 밸라스트라즈"
+L["SAMPLE_BOSS_BROODLORD"] = "용기대장 래쉬레이어"
+L["SAMPLE_BOSS_FIREMAW"] = "화염아귀"
+L["SAMPLE_BOSS_EBONROC"] = "에본로크"
+L["SAMPLE_BOSS_FLAMEGOR"] = "플레임고르"
+L["SAMPLE_BOSS_CHROMAGGUS"] = "크로마구스"
+L["SAMPLE_BOSS_NEFARIAN"] = "네파리안"
 
 --------------------------------------------------------------------------------
 -- Ability Lists
 --------------------------------------------------------------------------------
 
+L["TRACKED_HEADER"] = "추적 중인 기술"
 L["ABILITIES_ITEMS"] = "아이템"
 L["ABILITIES_CLASS_PET"] = "%s 소환수"
 
@@ -283,15 +314,14 @@ L["TAUNTS_AOE_ENABLE"] = "광역 도발 알림 사용"
 L["TAUNTS_AOE_MINE"] = "내 광역 도발"
 L["TAUNTS_AOE_OTHERS"] = "다른 사람의 광역 도발"
 
-L["TRACKED_HEADER"] = "추적 중인 기술"
 L["TAUNTS_ABILITIES_DESC"] =
 	"체크를 해제하면 그 도발을 더 이상 추적하지 않습니다. 옆의 드롭다운에서 '단일 대상' 또는 '광역'을 고릅니다."
+-- The same intro on a client where no taunt's kind can be picked, so no row carries a dropdown.
+L["TAUNTS_ABILITIES_DESC_NO_CHOICE"] = "체크를 해제하면 그 도발을 더 이상 추적하지 않습니다."
 L["TAUNTS_KIND_SINGLE"] = "단일 대상"
 L["TAUNTS_KIND_AOE"] = "광역"
 L["TAUNTS_KIND_DESC"] =
 	"이 도발은 적 몇 명을 한꺼번에 끌어오므로 어느 쪽으로든 알릴 수 있습니다. '단일 대상'은 끌어온 적마다 이름을 '도발 성공'에 알리고, 빗나간 도발은 '도발 실패'에 알립니다. '광역'은 시전만 '광역 도발'에 알리고 빗나간 도발은 알리지 않습니다."
-L["TAUNTS_KIND_LOCKED_SINGLE_DESC"] = "항상 단일 대상: 이 도발은 언제나 적 하나만 끌어옵니다."
-L["TAUNTS_KIND_LOCKED_AOE_DESC"] = "항상 광역: 이 도발은 주위의 모든 적을 한꺼번에 끌어옵니다."
 
 --------------------------------------------------------------------------------
 -- Interrupts
@@ -423,8 +453,10 @@ L["TANK_DEATHS_CLASS_ROW_DESC"] = "파티의 %s 직업 플레이어가 사망하
 -- Bad Priests
 --------------------------------------------------------------------------------
 
-L["BAD_PRIESTS_SUMMARY"] =
-	"탱커에게 도움보다 해가 되는 일을 하는 힐러입니다. 클래식과 불타는 성전 전용입니다. 디스커버리 시즌에서는 사제 룬으로 분노를 돌려받고, 이후 게임 버전에서는 전혀 문제가 되지 않습니다."
+L["BAD_PRIESTS_SUMMARY"] = "탱커에게 도움보다 해가 되는 일을 하는 힐러입니다."
+-- Shown only on a client whose data has no Power Word: Shield row, which among the shipped ones is Season of Discovery's.
+L["BAD_PRIESTS_DISCOVERY_STATUS"] =
+	"디스커버리 시즌에서는 잘못된 보호막을 알리지 않습니다. 굳건한 정신 룬이 탱커에게 분노를 돌려주고, 어떤 애드온도 다른 플레이어의 룬을 볼 수 없기 때문입니다."
 L["BAD_PRIESTS_ENABLE"] = "말썽쟁이 사제 감시 사용"
 
 L["BAD_PRIESTS_HEADER"] = "잘못된 보호막"
@@ -470,19 +502,50 @@ L["BAD_PETS_COOLDOWN_DESC"] =
 L["BAD_PETS_ABILITIES_DESC"] = "체크를 해제하면 그 소환수 기술을 더 이상 추적하지 않습니다."
 
 --------------------------------------------------------------------------------
+-- Peer Pressure
+--------------------------------------------------------------------------------
+
+--[[
+    The alert is the whose shape with no target, like Fears: the line names a
+    classmate and a cooldown.
+
+    TRANSLATORS: the two rows' tooltips each say what they count, because
+    neither is "everybody's casts": only the player's own class ever reports,
+    and the My row has no pet to include.
+]]
+L["PEER_PRESSURE_SUMMARY"] =
+	"같은 직업의 다른 플레이어가 재사용 대기시간 기술을 사용하면 알려 주므로, 또래 압력에 넘어갈 수 있습니다."
+L["PEER_PRESSURE_ENABLE"] = "또래 압력 사용"
+
+L["PEER_PRESSURE_ALERT_HEADER"] = "재사용 대기시간 기술"
+L["PEER_PRESSURE_ALERT_DESC"] =
+	"파티에 있는 같은 직업 플레이어가 재사용 대기시간 기술을 사용했다면 내 기술도 쓰라는 신호입니다. 내 직업만 알리며, 어떤 기술을 셀지는 추적 중인 기술에서 고릅니다."
+L["PEER_PRESSURE_ALERT_ENABLE"] = "재사용 대기시간 기술 알림 사용"
+L["PEER_PRESSURE_ALERT_MINE"] = "내 재사용 대기시간 기술"
+L["PEER_PRESSURE_ALERT_MINE_DESC"] =
+	"추적 중인 내 재사용 대기시간 기술도 알립니다. 옆의 드롭다운에서 이 줄을 보낼 곳을 정합니다."
+L["PEER_PRESSURE_ALERT_OTHERS"] = "다른 사람의 재사용 대기시간 기술"
+L["PEER_PRESSURE_ALERT_OTHERS_DESC"] =
+	"파티에 있는 같은 직업의 다른 사람이 추적 중인 재사용 대기시간 기술을 사용하면 알립니다. 옆의 드롭다운에서 이 줄을 보낼 곳을 정합니다."
+
+L["PEER_PRESSURE_ABILITIES_DESC"] =
+	"체크를 해제하면 그 재사용 대기시간 기술을 더 이상 추적하지 않습니다. 내 직업의 기술만 알립니다."
+
+--------------------------------------------------------------------------------
 -- Tanking Tools
 --------------------------------------------------------------------------------
 
 --[[
-    No summary line on the tab: Tanking Tools opens on its enable, because the
-    tab is a collection of unrelated warnings rather than one idea a sentence
-    can cover. Each section introduces itself instead.
+    The tab's summary says it ships off and where its four tools live, since
+    each tool is a page of its own and the tab page holds only the switch.
 
-    The mini-map tooltip carries a short one anyway, because the button's
+    The mini-map tooltip carries its own shorter one, because the button's
     Right-Click toggles this tab and the tooltip has to say what it is turning
     on. TRANSLATORS: it lists the four section headers below in your own words
     for them; keep it to two lines in the tooltip.
 ]]
+L["TANKING_TOOLS_SUMMARY"] =
+	"아직 베타 단계라 꺼진 상태로 제공됩니다. 초반 공격 실패, 방어도 감소, 무기 막기, 회오리는 탱킹 도구 아래에 각각 별도의 페이지가 있습니다."
 L["TANKING_TOOLS_ENABLE"] = "탱킹 도구 사용"
 L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "초반 공격 실패, 방어도 감소, 무기 막기, 회오리."
 
@@ -526,7 +589,7 @@ L["TANKING_TOOLS_PARRY_OTHERS_DESC"] =
 	"적이 파티의 다른 사람의 공격을 무기 막기하면 알립니다. 옆의 드롭다운에서 이 줄을 보낼 곳을 정합니다."
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "탱커 무시"
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"] =
-	"무기 막기를 당한 플레이어가 탱커, 즉 공격대에서 메인 탱커로 지정되었거나 파티에서 파티 찾기의 방어 전담 역할을 선택한 사람이라면 알리지 않습니다. 보조 탱커는 도발 교대를 위해 우두머리 앞에 서는 것이므로 귓속말을 보낼 실수가 아닙니다. 내가 당한 무기 막기는 그대로 알립니다."
+	"무기 막기를 당한 플레이어가 탱커, 즉 공격대에서 메인 탱커로 지정되었거나 파티에서 파티 찾기의 방어 전담 역할을 선택해 둔 사람이라면 알리지 않습니다. 보조 탱커는 도발 교대를 위해 우두머리 앞에 서는 것이므로 귓속말을 보낼 실수가 아닙니다. 내가 당한 무기 막기는 그대로 알립니다."
 L["TANKING_TOOLS_PARRY_IGNORE_PETS"] = "소환수 무시"
 L["TANKING_TOOLS_PARRY_IGNORE_PETS_DESC"] =
 	"무기 막기를 당한 것이 소환수라면 알리지 않습니다. 내 소환수도 포함됩니다. 소환수는 주인이 보낸 자리에 서 있을 뿐이고, 소환수 이름이 적힌 알림으로는 파티의 누구도 할 수 있는 일이 없습니다. 소환수에게는 어떤 경우에도 귓속말을 보내지 않습니다."
@@ -699,3 +762,12 @@ L["PARRY_WHISPER"] =
 
 L["NOVA"] = "회오리! %s님이 %s 사용, 대상: %s."
 L["NOVA_AOE"] = "광역 회오리! %s님이 %s 사용."
+
+--[[
+    Opens on a bang naming the news, like every other alert line.
+
+    TRANSLATORS: %s in PEER_PRESSURE_TARGET is, in order: caster, spell, and
+    the friendly player it was cast on. The target is a player, never a mob.
+]]
+L["PEER_PRESSURE"] = "또래 압력! %s님이 %s 사용."
+L["PEER_PRESSURE_TARGET"] = "또래 압력! %s님이 %s 사용, 대상: %s."

@@ -82,6 +82,59 @@ function ns.OptionsSubLabel(text)
 end
 
 --[[
+    The status line at the top of a page that a switch elsewhere has silenced:
+    All Alerts off, or, given parentKey, the feature this sub-page belongs to.
+    Without it a player can tick every box here and never learn why nothing
+    fires. tabKey is the parent's TAB_* key. Both switches re-run
+    ns:ApplyProfile, which notifies every panel, so the line follows them.
+]]
+function ns.AddQuietStatus(args, order, parentKey, tabKey)
+	local function Silenced()
+		return not ns.db.profile.enabled or (parentKey and not ns.db.profile[parentKey].enabled)
+	end
+	local function Hidden()
+		return not Silenced()
+	end
+
+	--[[
+	    Silver, reopened after each coloured part: the switch's name in gold, the word off in red.
+	    AceConfigDialog reads every option's name while sorting, hidden ones included, so this
+	    answers blank when there is nothing to say: a feature tab passes no tabKey, and L[nil]
+	    throws, which stops the whole page drawing.
+	]]
+	local function Name()
+		if not Silenced() then
+			return ""
+		end
+		local help = GetColor("HELP")
+		local off = GetColor("OFF") .. L["STATUS_OFF"] .. "|r" .. help
+		local line
+		if not ns.db.profile.enabled then
+			line = string.format(
+				L["STATUS_ALL_ALERTS_OFF"],
+				GetColor("TITLE") .. L["KILL_SWITCH"] .. "|r" .. help,
+				off,
+				L["KILL_SWITCH_ENABLE"],
+				L["ADDON_TITLE"]
+			)
+		else
+			line =
+				string.format(L["STATUS_FEATURE_OFF"], GetColor("TITLE") .. L[tabKey] .. "|r" .. help, off, L[tabKey])
+		end
+		return help .. line .. "|r"
+	end
+
+	args.quietStatus = {
+		type = "description",
+		name = Name,
+		fontSize = "medium",
+		order = order,
+		hidden = Hidden,
+	}
+	args.quietStatusSpace = ns.OptionsSpacer(order + 0.3, Hidden)
+end
+
+--[[
     A blank line and a header: the pair that opens a block on a feature tab. Both
     carry the tab's hidden predicate, because a spacer that outlives the controls
     it separated leaves a switched-off feature as a column of empty rows.

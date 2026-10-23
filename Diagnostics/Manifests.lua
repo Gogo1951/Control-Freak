@@ -193,6 +193,15 @@ ns.DIAGNOSTIC_API_CHECKS = {
 			return type(Settings) == "table" and type(Settings.OpenToCategory) == "function"
 		end,
 	},
+	-- A FAIL here only costs the options panel's Example lines the client's own chat colour and prefix.
+	{
+		"ChatTypeInfo, CHAT_PARTY_GET and CHAT_WHISPER_GET (Example lines)",
+		function()
+			return type(ChatTypeInfo) == "table"
+				and type(CHAT_PARTY_GET) == "string"
+				and type(CHAT_WHISPER_GET) == "string"
+		end,
+	},
 	{
 		"C_NamePlate.GetNamePlates (Against ladder enemy lookup)",
 		function()
@@ -553,10 +562,11 @@ end
 local function AppendAbilityContext(lines)
 	lines[#lines + 1] = ""
 	lines[#lines + 1] = string.format(
-		"Ability rows: %d drawn of %d entries in Data/%s (ns.ABILITY_GROUPS)",
+		"Ability rows: %d drawn of %d entries in Data/%s (ns.ABILITY_GROUPS; %d of them Peer Pressure's)",
 		#ns.ABILITY_GROUPS,
-		#ns.ABILITIES,
-		tostring(ns.DATA_FOLDER)
+		#ns.ABILITIES + #(ns.PEER_PRESSURE_ABILITIES or {}),
+		tostring(ns.DATA_FOLDER),
+		#(ns.PEER_PRESSURE_ABILITIES or {})
 	)
 
 	local drawn, ignored = {}, {}
@@ -578,12 +588,21 @@ local function AppendAbilityContext(lines)
 	end
 	lines[#lines + 1] = "Ability rows per tab (drawn/ignored): " .. table.concat(counts, " ")
 
-	-- By name, since an unticked row is the commonest reason one ability never fires while its tab does.
+	--[[
+	    By name, since an unticked row is the commonest reason one ability never
+	    fires while its tab does. A row whose data ships it unticked says so, so
+	    it is not read as one the player unticked.
+	]]
 	local ignoredNames = {}
 	for _, group in ipairs(ns.ABILITY_GROUPS) do
 		if ns.IsAbilityIgnored(group.entry) then
-			ignoredNames[#ignoredNames + 1] =
-				string.format("%s %s (%d)", ns.CATEGORY_FEATURE[group.category], tostring(group.name), group.maxRankId)
+			ignoredNames[#ignoredNames + 1] = string.format(
+				"%s %s (%d)%s",
+				ns.CATEGORY_FEATURE[group.category],
+				tostring(group.name),
+				group.maxRankId,
+				group.entry.shipsOff and " ships unticked" or ""
+			)
 		end
 	end
 	lines[#lines + 1] = "Unticked ability rows: " .. (#ignoredNames > 0 and table.concat(ignoredNames, ", ") or "none")
@@ -650,6 +669,46 @@ local function AppendArmorContext(lines, profile)
 end
 
 --[[
+    Peer Pressure only ever reports a cooldown of the player's own class, so a
+    tab with every switch on still stays quiet for a class with no rows on this
+    client or every row unticked, and its Others' row stays quiet in a group
+    with no other player of that class in it. Prints both halves.
+]]
+local function AppendPeerPressureContext(lines)
+	local _, playerClass = UnitClass("player")
+	local drawn, ticked = 0, 0
+	for _, group in ipairs(ns.ABILITY_GROUPS) do
+		if ns.CATEGORY_FEATURE[group.category] == "peerPressure" and group.class == playerClass then
+			drawn = drawn + 1
+			if not ns.IsAbilityIgnored(group.entry) then
+				ticked = ticked + 1
+			end
+		end
+	end
+	lines[#lines + 1] = ""
+	lines[#lines + 1] =
+		string.format("Peer Pressure rows for %s: %d drawn, %d ticked", tostring(playerClass), drawn, ticked)
+
+	local prefix, count = "party", 0
+	if IsInRaid() then
+		prefix, count = "raid", GetNumGroupMembers()
+	elseif IsInGroup() then
+		count = 4
+	end
+	local classmates = {}
+	for index = 1, count do
+		local unit = prefix .. index
+		if UnitExists(unit) and UnitGUID(unit) ~= UnitGUID("player") and select(2, UnitClass(unit)) == playerClass then
+			classmates[#classmates + 1] = tostring(GetUnitName(unit, true))
+		end
+	end
+	lines[#lines + 1] = "Other "
+		.. tostring(playerClass)
+		.. " players in the group: "
+		.. (#classmates > 0 and table.concat(classmates, ", ") or "none")
+end
+
+--[[
     Control Freak's own context probe, and the first thing to read on a "nothing
     ever fires" report. Scope is per feature, so after the active profile and
     its two top-level switches this prints each feature's own scope settings,
@@ -660,8 +719,9 @@ end
     The tanks ride along because the role dropdown's tank rungs and When Group
     Has a Tank both read them, and a tab narrowed by either goes silent without
     one. Then where a line can go, every alert section's settings, the armor
-    extras still being waited on, the game's own sound switches, and what the
-    ability rows and any loss of control hold. All reads.
+    extras still being waited on, the game's own sound switches, what the
+    ability rows and any loss of control hold, and whether Peer Pressure has
+    a cooldown and a classmate to report. All reads.
 ]]
 function ns:BuildAlertContextReport()
 	local lines = { GetClientHeader(), "" }
@@ -842,6 +902,7 @@ function ns:BuildAlertContextReport()
 	AppendArmorContext(lines, profile)
 	AppendSoundContext(lines)
 	AppendAbilityContext(lines)
+	AppendPeerPressureContext(lines)
 
 	return table.concat(lines, "\n")
 end
@@ -859,9 +920,9 @@ end
     (ns.SAMPLE_SPELL_IDS) through ns.SampleSpell. A spell can load late, so its
     row asks for every trigger and the report polls.
 ]]
-local function AbilityLookup(index, entry)
+local function AbilityLookup(listName, index, entry)
 	return {
-		constant = string.format("ABILITIES[%d] %s %s", index, entry.class, entry.category),
+		constant = string.format("%s[%d] %s %s", listName, index, entry.class, entry.category),
 		kind = "spell",
 		id = entry.triggers[1],
 		lookup = function()
@@ -913,8 +974,10 @@ local function SampleLookup(key, spellId)
 end
 
 ns.DIAGNOSTIC_NAME_LOOKUPS = {}
-for index, entry in ipairs(ns.ABILITIES) do
-	ns.DIAGNOSTIC_NAME_LOOKUPS[#ns.DIAGNOSTIC_NAME_LOOKUPS + 1] = AbilityLookup(index, entry)
+for _, listName in ipairs({ "ABILITIES", "PEER_PRESSURE_ABILITIES" }) do
+	for index, entry in ipairs(ns[listName] or {}) do
+		ns.DIAGNOSTIC_NAME_LOOKUPS[#ns.DIAGNOSTIC_NAME_LOOKUPS + 1] = AbilityLookup(listName, index, entry)
+	end
 end
 for _, class in ipairs(ns.DEATH_CLASSES) do
 	ns.DIAGNOSTIC_NAME_LOOKUPS[#ns.DIAGNOSTIC_NAME_LOOKUPS + 1] = ClassLookup(class)
@@ -964,6 +1027,8 @@ local ALERT_FORMATS = {
 	{ "INCAPACITATED_INDEFINITE", "seat", "player", "spell", "dispel", "boss" },
 	{ "INCAPACITATED_PLAIN_INDEFINITE", "seat", "player", "spell", "boss" },
 	{ "TANK_DEATHS_TANK_LINE", "player" },
+	{ "PEER_PRESSURE", "player", "spell" },
+	{ "PEER_PRESSURE_TARGET", "player", "spell", "player" },
 	{ "BAD_PET_WHISPER", "name", "spell", "boss" },
 	{ "BAD_PET_WHISPER_AOE", "name", "spell" },
 	{ "SHIELD_WHISPER", "spell", "name" },
@@ -1056,14 +1121,14 @@ end
     One entry per data file, and one report row per entry on the Data tab
     (Diagnostics/Options-Diagnostics.lua). Each entry's label is the table-name
     part of its file name, so ns.DataSourceFileName can name the file this
-    client's folder built. The Abilities and Armor Debuffs files list spell
-    ids inside each row, so their sources walk a row's id list and answer once
-    per id, keyed by its rank in that list. The Items file is keyed by item
-    id, one id per row, and the Sample Spells file by name, one spell id per
-    key. dataColumns carries the shipped row's own values beside
-    what the client says. DATA_ROW_NAME is the client's name for the row's first id that
-    resolves, so a NAME that disagrees with it is an id belonging to a different
-    spell, unless the row is marked renamed.
+    client's folder built. The Abilities, Peer Pressure Abilities and Armor
+    Debuffs files list spell ids inside each row, so their sources walk a
+    row's id list and answer once per id, keyed by its rank in that list. The
+    Items file is keyed by item id, one id per row, and the Sample Spells file
+    by name, one spell id per key. dataColumns carries the shipped row's own
+    values beside what the client says. DATA_ROW_NAME is the client's name for
+    the row's first id that resolves, so a NAME that disagrees with it is an id
+    belonging to a different spell, unless the row is marked renamed.
 ]]
 local function IdCollector(field)
 	return function(rows)
@@ -1121,6 +1186,33 @@ ns.DIAGNOSTIC_DATA_SOURCES = {
 					{ "DATA_IS_AOE", RowField("isAoe") },
 					{ "DATA_KIND_CHOICE", RowField("kindChoice") },
 					{ "DATA_RENAMED", RowField("renamed") },
+					{ "DATA_RANK", Rank },
+					{ "DATA_ROW_NAME", RowName("triggers") },
+					{
+						"DATA_TRACKED",
+						Tracked("triggers", function(spellId)
+							return ns.ABILITY_MAP[spellId] ~= nil
+						end),
+					},
+				},
+			},
+		},
+	},
+	--[[
+	    The same row shape as Abilities, so the same columns, less the three
+	    that never vary here (COOLDOWN, CAST, not AOE) and plus shipsOff, which
+	    only these rows carry.
+	]]
+	{
+		label = "Peer-Pressure-Abilities",
+		sources = {
+			{
+				table = "PEER_PRESSURE_ABILITIES",
+				kind = "spell",
+				collect = IdCollector("triggers"),
+				dataColumns = {
+					{ "DATA_CLASS", RowField("class") },
+					{ "DATA_SHIPS_OFF", RowField("shipsOff") },
 					{ "DATA_RANK", Rank },
 					{ "DATA_ROW_NAME", RowName("triggers") },
 					{

@@ -28,7 +28,8 @@ function ns.BuildFearsOptions()
 		noTarget = true,
 		sample = {
 			key = "FEAR_AOE",
-			args = { ns.SAMPLE_OTHER, ns.SampleSpell(ns.SAMPLE_SPELL_IDS.PSYCHIC_SCREAM) },
+			row = "others",
+			args = { ns.SampleOther("PRIEST"), ns.SpellPart(ns.SAMPLE_SPELL_IDS.PSYCHIC_SCREAM) },
 		},
 	})
 
@@ -45,6 +46,7 @@ function ns.BuildFearsTrackedOptions()
 		abilitiesDesc = ns.OptionsDesc(L["FEARS_ABILITIES_DESC"], 1),
 		abilitiesDescSpace = ns.OptionsSpacer(2),
 	}
+	ns.AddQuietStatus(args, 0.4, "fears", "TAB_FEARS")
 
 	for key, value in
 		pairs(ns.BuildAbilityToggles({

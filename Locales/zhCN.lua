@@ -28,7 +28,18 @@ L["ENABLE_WELCOME_MESSAGE_DESC"] = "登录时显示 Control Freak 的问候语�
 L["ENABLE_MINIMAP_BUTTON"] = "启用小地图按钮"
 L["ENABLE_MINIMAP_BUTTON_DESC"] = "在你的小地图上显示 Control Freak 按钮。"
 
+L["OPTIONS_MASTER_SWITCH_HEADER"] = "总开关"
 L["OPTIONS_FEATURES_HEADER"] = "功能"
+-- The Features block's switch captions. Each tab's own switch keeps its "Enable" caption.
+L["FEATURES_TAUNTS"] = "嘲讽监视"
+L["FEATURES_INTERRUPTS"] = "打断监视"
+L["FEATURES_FEARS"] = "恐惧监视"
+L["FEATURES_INCAPACITATED"] = "失控监视"
+L["FEATURES_TANK_DEATHS"] = "坦克死亡监视"
+L["FEATURES_BAD_PRIESTS"] = "捣蛋牧师监视"
+L["FEATURES_BAD_PETS"] = "捣蛋宠物监视"
+L["FEATURES_PEER_PRESSURE"] = "同伴压力"
+L["FEATURES_TANKING_TOOLS"] = "坦克工具"
 
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/freak"
@@ -37,7 +48,7 @@ L["OPTIONS_COMMAND_DESCRIPTION"] = "打开本插件的选项界面。"
 --[[
     The add-on's own switch. KILL_SWITCH titles the mini-map tooltip's block for
     it, naming its REACH rather than the act of throwing it. KILL_SWITCH_ENABLE
-    captions it as the first of the General panel's Features switches, and
+    captions it under the General panel's Master Switch header, and
     KILL_SWITCH_ENABLE_DESC is both that switch's tooltip and the mini-map
     block's description, so the two cannot describe it differently.
 ]]
@@ -100,6 +111,7 @@ L["TAB_INCAPACITATED"] = "失控"
 L["TAB_TANK_DEATHS"] = "坦克死亡"
 L["TAB_BAD_PRIESTS"] = "捣蛋牧师"
 L["TAB_BAD_PETS"] = "捣蛋宠物"
+L["TAB_PEER_PRESSURE"] = "同伴压力"
 L["TAB_TANKING_TOOLS"] = "坦克工具"
 
 --------------------------------------------------------------------------------
@@ -130,6 +142,20 @@ L["SCOPE_GROUP_HAS_TANK_DESC"] =
 	"只在队伍中有人正在当坦克并且还活着时触发。在团队中，这指的是被指派的主坦克，所以在 Control Freak 看来，没有指派主坦克的团队就没有坦克。倒下的坦克算作没有坦克，因为这时有别人接住仇恨是在帮忙。"
 L["SCOPE_INSTANCE_ONLY"] = "身处副本时"
 L["SCOPE_INSTANCE_ONLY_DESC"] = "只在地下城和团队副本中触发。"
+
+--[[
+    The line at the top of a page that a switch somewhere else has silenced:
+    All Alerts on any feature page, or the feature a sub-page belongs to.
+
+    TRANSLATORS: in both, the first %s is the name of the switch that is off
+    (drawn gold) and the second is STATUS_OFF (drawn red). The rest are plain
+    names: in STATUS_ALL_ALERTS_OFF the switch's caption and then the page it
+    is on, in STATUS_FEATURE_OFF the page it is on. STATUS_OFF is the single
+    word for a switch being off.
+]]
+L["STATUS_OFF"] = "已关闭"
+L["STATUS_ALL_ALERTS_OFF"] = '%s：%s，因此本页的内容都不会触发。它的开关"%s"位于"%s"页面。'
+L["STATUS_FEATURE_OFF"] = '%s：%s，因此本页的内容都不会触发。它的开关位于"%s"页面。'
 
 --------------------------------------------------------------------------------
 -- Alert Sections
@@ -212,45 +238,48 @@ L["COOLDOWN_MINUTES"] = "冷却 %d 分钟"
 
 --[[
     Only the "Example:" frame is written here. The line inside it is rendered
-    from the real message format below with these stand-in names, so a reworded
-    alert cannot leave a hand-copied example quoting the old text. The names are
-    translatable because they sit inside a sentence whose grammar a locale may
-    want to agree with.
+    from the real message format below, so a reworded alert cannot leave a
+    hand-copied example quoting the old text. The player's own name is the
+    character they are on; SAMPLE_PLAYER stands in only until the client knows
+    it. The other players' names are proper names in Data/Data.lua, the same in
+    every locale. The pet's is translatable because it sits inside a sentence
+    whose grammar a locale may want to agree with.
 ]]
 L["SAMPLE_EXAMPLE"] = "示例：%s"
 L["SAMPLE_PLAYER"] = "Gogo"
-L["SAMPLE_OTHER"] = "小明"
 L["SAMPLE_PET"] = "旺财"
 
 --[[
-    The Naxxramas bosses the Example lines name, dealt one per line.
+    The Molten Core and Blackwing Lair bosses the Example lines name, dealt one
+    per line.
 
     TRANSLATORS: use each boss's name exactly as your client writes it, title
     included, not a translation of the English.
 ]]
-L["SAMPLE_BOSS_ANUBREKHAN"] = "阿努布雷坎"
-L["SAMPLE_BOSS_FAERLINA"] = "黑女巫法琳娜"
-L["SAMPLE_BOSS_MAEXXNA"] = "迈克斯纳"
-L["SAMPLE_BOSS_NOTH"] = "瘟疫使者诺斯"
-L["SAMPLE_BOSS_HEIGAN"] = "肮脏的希尔盖"
-L["SAMPLE_BOSS_LOATHEB"] = "洛欧塞布"
-L["SAMPLE_BOSS_RAZUVIOUS"] = "教官拉苏维奥斯"
-L["SAMPLE_BOSS_GOTHIK"] = "收割者戈提克"
-L["SAMPLE_BOSS_MOGRAINE"] = "大领主莫格莱尼"
-L["SAMPLE_BOSS_KORTHAZZ"] = "库尔塔兹领主"
-L["SAMPLE_BOSS_BLAUMEUX"] = "女公爵布劳缪克丝"
-L["SAMPLE_BOSS_ZELIEK"] = "瑟里耶克爵士"
-L["SAMPLE_BOSS_PATCHWERK"] = "帕奇维克"
-L["SAMPLE_BOSS_GROBBULUS"] = "格罗布鲁斯"
-L["SAMPLE_BOSS_GLUTH"] = "格拉斯"
-L["SAMPLE_BOSS_THADDIUS"] = "塔迪乌斯"
-L["SAMPLE_BOSS_SAPPHIRON"] = "萨菲隆"
-L["SAMPLE_BOSS_KELTHUZAD"] = "克尔苏加德"
+L["SAMPLE_BOSS_LUCIFRON"] = "鲁西弗隆"
+L["SAMPLE_BOSS_MAGMADAR"] = "玛格曼达"
+L["SAMPLE_BOSS_GEHENNAS"] = "基赫纳斯"
+L["SAMPLE_BOSS_GARR"] = "加尔"
+L["SAMPLE_BOSS_SHAZZRAH"] = "沙斯拉尔"
+L["SAMPLE_BOSS_GEDDON"] = "迦顿男爵"
+L["SAMPLE_BOSS_GOLEMAGG"] = "焚化者古雷曼格"
+L["SAMPLE_BOSS_SULFURON"] = "萨弗隆先驱者"
+L["SAMPLE_BOSS_MAJORDOMO"] = "管理者埃克索图斯"
+L["SAMPLE_BOSS_RAGNAROS"] = "拉格纳罗斯"
+L["SAMPLE_BOSS_RAZORGORE"] = "狂野的拉佐格尔"
+L["SAMPLE_BOSS_VAELASTRASZ"] = "堕落的瓦拉斯塔兹"
+L["SAMPLE_BOSS_BROODLORD"] = "勒什雷尔"
+L["SAMPLE_BOSS_FIREMAW"] = "费尔默"
+L["SAMPLE_BOSS_EBONROC"] = "埃博诺克"
+L["SAMPLE_BOSS_FLAMEGOR"] = "弗莱格尔"
+L["SAMPLE_BOSS_CHROMAGGUS"] = "克洛玛古斯"
+L["SAMPLE_BOSS_NEFARIAN"] = "奈法利安"
 
 --------------------------------------------------------------------------------
 -- Ability Lists
 --------------------------------------------------------------------------------
 
+L["TRACKED_HEADER"] = "追踪的技能"
 L["ABILITIES_ITEMS"] = "物品"
 L["ABILITIES_CLASS_PET"] = "%s宠物"
 
@@ -281,15 +310,14 @@ L["TAUNTS_AOE_ENABLE"] = "启用群体嘲讽提示"
 L["TAUNTS_AOE_MINE"] = "我的群体嘲讽"
 L["TAUNTS_AOE_OTHERS"] = "他人的群体嘲讽"
 
-L["TRACKED_HEADER"] = "追踪的技能"
 L["TAUNTS_ABILITIES_DESC"] =
 	'取消勾选某个嘲讽即可不再追踪它。旁边的下拉菜单可选择"单体"或"群体"。'
+-- The same intro on a client where no taunt's kind can be picked, so no row carries a dropdown.
+L["TAUNTS_ABILITIES_DESC_NO_CHOICE"] = "取消勾选某个嘲讽即可不再追踪它。"
 L["TAUNTS_KIND_SINGLE"] = "单体"
 L["TAUNTS_KIND_AOE"] = "群体"
 L["TAUNTS_KIND_DESC"] =
 	'这个嘲讽一次抓住少数几个敌人，因此两种方式都可以。选择"单体"时，会在"成功的嘲讽"中逐个报告被嘲讽的目标，并在"失败的嘲讽"中报告失手。选择"群体"时，只在"群体嘲讽"中报告施放，不报告失手。'
-L["TAUNTS_KIND_LOCKED_SINGLE_DESC"] = "始终为单体：这个嘲讽每次只抓一个敌人。"
-L["TAUNTS_KIND_LOCKED_AOE_DESC"] = "始终为群体：这个嘲讽一次抓住周围所有敌人。"
 
 --------------------------------------------------------------------------------
 -- Interrupts
@@ -417,8 +445,10 @@ L["TANK_DEATHS_CLASS_ROW_DESC"] = "队伍中的%s死亡时提示。"
 -- Bad Priests
 --------------------------------------------------------------------------------
 
-L["BAD_PRIESTS_SUMMARY"] =
-	"治疗做了对坦克弊大于利的事。仅限经典旧世和燃烧的远征：探索赛季会通过一个牧师符文把怒气还回来，而在更晚的游戏版本中这些都不成问题。"
+L["BAD_PRIESTS_SUMMARY"] = "治疗做了对坦克弊大于利的事。"
+-- Shown only on a client whose data has no Power Word: Shield row, which among the shipped ones is Season of Discovery's.
+L["BAD_PRIESTS_DISCOVERY_STATUS"] =
+	"探索赛季永远不会提示有害护盾：灵魂之力符文会把怒气还给坦克，而且插件看不到其他玩家的符文。"
 L["BAD_PRIESTS_ENABLE"] = "启用捣蛋牧师监视"
 
 L["BAD_PRIESTS_HEADER"] = "有害护盾"
@@ -464,19 +494,50 @@ L["BAD_PETS_COOLDOWN_DESC"] =
 L["BAD_PETS_ABILITIES_DESC"] = "取消勾选某个宠物技能即可不再追踪它。"
 
 --------------------------------------------------------------------------------
+-- Peer Pressure
+--------------------------------------------------------------------------------
+
+--[[
+    The alert is the whose shape with no target, like Fears: the line names a
+    classmate and a cooldown.
+
+    TRANSLATORS: the two rows' tooltips each say what they count, because
+    neither is "everybody's casts": only the player's own class ever reports,
+    and the My row has no pet to include.
+]]
+L["PEER_PRESSURE_SUMMARY"] =
+	"当你的同职业玩家使用冷却技能时收到通知，好让你也屈服于同伴压力。"
+L["PEER_PRESSURE_ENABLE"] = "启用同伴压力"
+
+L["PEER_PRESSURE_ALERT_HEADER"] = "冷却技能"
+L["PEER_PRESSURE_ALERT_DESC"] =
+	'你队伍里同职业玩家使用了冷却技能，就是提示你也该用上自己的。只报告你自己的职业，哪些冷却技能计入由"追踪的技能"决定。'
+L["PEER_PRESSURE_ALERT_ENABLE"] = "启用冷却技能提示"
+L["PEER_PRESSURE_ALERT_MINE"] = "我的冷却技能"
+L["PEER_PRESSURE_ALERT_MINE_DESC"] =
+	"也报告你自己被追踪的冷却技能。旁边的下拉框决定这条消息发往哪里。"
+L["PEER_PRESSURE_ALERT_OTHERS"] = "他人的冷却技能"
+L["PEER_PRESSURE_ALERT_OTHERS_DESC"] =
+	"报告你队伍里其他同职业玩家使用的被追踪冷却技能。旁边的下拉框决定这条消息发往哪里。"
+
+L["PEER_PRESSURE_ABILITIES_DESC"] =
+	"取消勾选某个冷却技能即可不再追踪它。只会报告你自己职业的冷却技能。"
+
+--------------------------------------------------------------------------------
 -- Tanking Tools
 --------------------------------------------------------------------------------
 
 --[[
-    No summary line on the tab: Tanking Tools opens on its enable, because the
-    tab is a collection of unrelated warnings rather than one idea a sentence
-    can cover. Each section introduces itself instead.
+    The tab's summary says it ships off and where its four tools live, since
+    each tool is a page of its own and the tab page holds only the switch.
 
-    The mini-map tooltip carries a short one anyway, because the button's
+    The mini-map tooltip carries its own shorter one, because the button's
     Right-Click toggles this tab and the tooltip has to say what it is turning
     on. TRANSLATORS: it lists the four section headers below in your own words
     for them; keep it to two lines in the tooltip.
 ]]
+L["TANKING_TOOLS_SUMMARY"] =
+	"仍处于测试阶段，因此默认关闭。开场落空、护甲削弱、招架和新星在坦克工具下各有自己的页面。"
 L["TANKING_TOOLS_ENABLE"] = "启用坦克工具"
 L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "开场落空、护甲削弱、招架和新星。"
 
@@ -519,7 +580,7 @@ L["TANKING_TOOLS_PARRY_OTHERS_DESC"] =
 	"报告你队伍里其他人的攻击被怪物招架。旁边的下拉框决定这条消息发往哪里。"
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "忽略坦克"
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"] =
-	"被招架的玩家是坦克时保持安静：在团队中被指派为主坦克，或在小队中选择了队伍查找器的坦克职责。副坦克站在首领面前是为了换坦时接嘲讽，这不是需要密语提醒的错误。你自己被招架时仍会提示。"
+	"被招架的玩家是坦克时保持安静：在团队中被指派为主坦克，或在小队中于队伍查找器里选择了坦克职责。副坦克站在首领面前是为了换坦时接嘲讽，这不是需要密语提醒的错误。你自己被招架时仍会提示。"
 L["TANKING_TOOLS_PARRY_IGNORE_PETS"] = "忽略宠物"
 L["TANKING_TOOLS_PARRY_IGNORE_PETS_DESC"] =
 	"被招架的是宠物时保持安静，你自己的宠物也算。宠物站在主人派它去的地方，一条写着宠物名字的提示，队伍里没人能据此做什么。无论如何都不会密语宠物。"
@@ -689,3 +750,12 @@ L["PARRY_WHISPER"] = "招架加速！请站到 %s 背后：每次招架都会加
 
 L["NOVA"] = "新星！%s 使用 %s，目标 %s。"
 L["NOVA_AOE"] = "群体新星！%s 使用 %s。"
+
+--[[
+    Opens on a bang naming the news, like every other alert line.
+
+    TRANSLATORS: %s in PEER_PRESSURE_TARGET is, in order: caster, spell, and
+    the friendly player it was cast on. The target is a player, never a mob.
+]]
+L["PEER_PRESSURE"] = "同伴压力！%s 使用 %s。"
+L["PEER_PRESSURE_TARGET"] = "同伴压力！%s 使用 %s，目标 %s。"

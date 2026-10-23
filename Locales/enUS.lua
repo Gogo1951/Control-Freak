@@ -28,7 +28,18 @@ L["ENABLE_WELCOME_MESSAGE_DESC"] = "Show the Control Freak greeting when you log
 L["ENABLE_MINIMAP_BUTTON"] = "Enable Mini-map Button"
 L["ENABLE_MINIMAP_BUTTON_DESC"] = "Show the Control Freak button on your mini-map."
 
+L["OPTIONS_MASTER_SWITCH_HEADER"] = "Master Switch"
 L["OPTIONS_FEATURES_HEADER"] = "Features"
+-- The Features block's switch captions. Each tab's own switch keeps its "Enable" caption.
+L["FEATURES_TAUNTS"] = "Taunt Monitoring"
+L["FEATURES_INTERRUPTS"] = "Interrupt Monitoring"
+L["FEATURES_FEARS"] = "Fear Monitoring"
+L["FEATURES_INCAPACITATED"] = "Incapacitation Monitoring"
+L["FEATURES_TANK_DEATHS"] = "Tank Death Monitoring"
+L["FEATURES_BAD_PRIESTS"] = "Bad Priest Monitoring"
+L["FEATURES_BAD_PETS"] = "Bad Pet Monitoring"
+L["FEATURES_PEER_PRESSURE"] = "Peer Pressure"
+L["FEATURES_TANKING_TOOLS"] = "Tanking Tools"
 
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/freak"
@@ -37,7 +48,7 @@ L["OPTIONS_COMMAND_DESCRIPTION"] = "Opens the Options Interface for this add-on.
 --[[
     The add-on's own switch. KILL_SWITCH titles the mini-map tooltip's block for
     it, naming its REACH rather than the act of throwing it. KILL_SWITCH_ENABLE
-    captions it as the first of the General panel's Features switches, and
+    captions it under the General panel's Master Switch header, and
     KILL_SWITCH_ENABLE_DESC is both that switch's tooltip and the mini-map
     block's description, so the two cannot describe it differently.
 ]]
@@ -100,6 +111,7 @@ L["TAB_INCAPACITATED"] = "Incapacitated"
 L["TAB_TANK_DEATHS"] = "Tank Deaths"
 L["TAB_BAD_PRIESTS"] = "Bad Priests"
 L["TAB_BAD_PETS"] = "Bad Pets"
+L["TAB_PEER_PRESSURE"] = "Peer Pressure"
 L["TAB_TANKING_TOOLS"] = "Tanking Tools"
 
 --------------------------------------------------------------------------------
@@ -130,6 +142,20 @@ L["SCOPE_GROUP_HAS_TANK_DESC"] =
 	"Fire only while somebody in your group is tanking and still alive. In a raid that means an assigned Main Tank, so a raid with none assigned has no tank as far as Control Freak can tell. A tank who is down counts as no tank, because that is when somebody else holding threat is helping."
 L["SCOPE_INSTANCE_ONLY"] = "While in Instances"
 L["SCOPE_INSTANCE_ONLY_DESC"] = "Fire only inside dungeons and raids."
+
+--[[
+    The line at the top of a page that a switch somewhere else has silenced:
+    All Alerts on any feature page, or the feature a sub-page belongs to.
+
+    TRANSLATORS: in both, the first %s is the name of the switch that is off
+    (drawn gold) and the second is STATUS_OFF (drawn red). The rest are plain
+    names: in STATUS_ALL_ALERTS_OFF the switch's caption and then the page it
+    is on, in STATUS_FEATURE_OFF the page it is on. STATUS_OFF is the single
+    word for a switch being off.
+]]
+L["STATUS_OFF"] = "off"
+L["STATUS_ALL_ALERTS_OFF"] = "%s is %s, so nothing on this page fires. Its switch, %s, is on the %s page."
+L["STATUS_FEATURE_OFF"] = "%s is %s, so nothing on this page fires. Its switch is on the %s page."
 
 --------------------------------------------------------------------------------
 -- Alert Sections
@@ -210,45 +236,48 @@ L["COOLDOWN_MINUTES"] = "%d Minute Cooldown"
 
 --[[
     Only the "Example:" frame is written here. The line inside it is rendered
-    from the real message format below with these stand-in names, so a reworded
-    alert cannot leave a hand-copied example quoting the old text. The names are
-    translatable because they sit inside a sentence whose grammar a locale may
-    want to agree with.
+    from the real message format below, so a reworded alert cannot leave a
+    hand-copied example quoting the old text. The player's own name is the
+    character they are on; SAMPLE_PLAYER stands in only until the client knows
+    it. The other players' names are proper names in Data/Data.lua, the same in
+    every locale. The pet's is translatable because it sits inside a sentence
+    whose grammar a locale may want to agree with.
 ]]
 L["SAMPLE_EXAMPLE"] = "Example: %s"
 L["SAMPLE_PLAYER"] = "Gogo"
-L["SAMPLE_OTHER"] = "Joe"
 L["SAMPLE_PET"] = "Snuffles"
 
 --[[
-    The Naxxramas bosses the Example lines name, dealt one per line.
+    The Molten Core and Blackwing Lair bosses the Example lines name, dealt one
+    per line.
 
     TRANSLATORS: use each boss's name exactly as your client writes it, title
     included, not a translation of the English.
 ]]
-L["SAMPLE_BOSS_ANUBREKHAN"] = "Anub'Rekhan"
-L["SAMPLE_BOSS_FAERLINA"] = "Grand Widow Faerlina"
-L["SAMPLE_BOSS_MAEXXNA"] = "Maexxna"
-L["SAMPLE_BOSS_NOTH"] = "Noth the Plaguebringer"
-L["SAMPLE_BOSS_HEIGAN"] = "Heigan the Unclean"
-L["SAMPLE_BOSS_LOATHEB"] = "Loatheb"
-L["SAMPLE_BOSS_RAZUVIOUS"] = "Instructor Razuvious"
-L["SAMPLE_BOSS_GOTHIK"] = "Gothik the Harvester"
-L["SAMPLE_BOSS_MOGRAINE"] = "Highlord Mograine"
-L["SAMPLE_BOSS_KORTHAZZ"] = "Thane Korth'azz"
-L["SAMPLE_BOSS_BLAUMEUX"] = "Lady Blaumeux"
-L["SAMPLE_BOSS_ZELIEK"] = "Sir Zeliek"
-L["SAMPLE_BOSS_PATCHWERK"] = "Patchwerk"
-L["SAMPLE_BOSS_GROBBULUS"] = "Grobbulus"
-L["SAMPLE_BOSS_GLUTH"] = "Gluth"
-L["SAMPLE_BOSS_THADDIUS"] = "Thaddius"
-L["SAMPLE_BOSS_SAPPHIRON"] = "Sapphiron"
-L["SAMPLE_BOSS_KELTHUZAD"] = "Kel'Thuzad"
+L["SAMPLE_BOSS_LUCIFRON"] = "Lucifron"
+L["SAMPLE_BOSS_MAGMADAR"] = "Magmadar"
+L["SAMPLE_BOSS_GEHENNAS"] = "Gehennas"
+L["SAMPLE_BOSS_GARR"] = "Garr"
+L["SAMPLE_BOSS_SHAZZRAH"] = "Shazzrah"
+L["SAMPLE_BOSS_GEDDON"] = "Baron Geddon"
+L["SAMPLE_BOSS_GOLEMAGG"] = "Golemagg the Incinerator"
+L["SAMPLE_BOSS_SULFURON"] = "Sulfuron Harbinger"
+L["SAMPLE_BOSS_MAJORDOMO"] = "Majordomo Executus"
+L["SAMPLE_BOSS_RAGNAROS"] = "Ragnaros"
+L["SAMPLE_BOSS_RAZORGORE"] = "Razorgore the Untamed"
+L["SAMPLE_BOSS_VAELASTRASZ"] = "Vaelastrasz the Corrupt"
+L["SAMPLE_BOSS_BROODLORD"] = "Broodlord Lashlayer"
+L["SAMPLE_BOSS_FIREMAW"] = "Firemaw"
+L["SAMPLE_BOSS_EBONROC"] = "Ebonroc"
+L["SAMPLE_BOSS_FLAMEGOR"] = "Flamegor"
+L["SAMPLE_BOSS_CHROMAGGUS"] = "Chromaggus"
+L["SAMPLE_BOSS_NEFARIAN"] = "Nefarian"
 
 --------------------------------------------------------------------------------
 -- Ability Lists
 --------------------------------------------------------------------------------
 
+L["TRACKED_HEADER"] = "Tracked Abilities"
 L["ABILITIES_ITEMS"] = "Items"
 L["ABILITIES_CLASS_PET"] = "%s Pet"
 
@@ -279,14 +308,13 @@ L["TAUNTS_AOE_ENABLE"] = "Enable Alerts for AOE Taunts"
 L["TAUNTS_AOE_MINE"] = "My AOE Taunts"
 L["TAUNTS_AOE_OTHERS"] = "Others' AOE Taunts"
 
-L["TRACKED_HEADER"] = "Tracked Abilities"
 L["TAUNTS_ABILITIES_DESC"] = "Untick a taunt to stop tracking it. The dropdown beside it picks Single Target or AOE."
+-- The same intro on a client where no taunt's kind can be picked, so no row carries a dropdown.
+L["TAUNTS_ABILITIES_DESC_NO_CHOICE"] = "Untick a taunt to stop tracking it."
 L["TAUNTS_KIND_SINGLE"] = "Single Target"
 L["TAUNTS_KIND_AOE"] = "AOE"
 L["TAUNTS_KIND_DESC"] =
 	"This taunt grabs a few mobs at once, so it can go either way. Single Target names each mob it took, under Successful Taunts, and reports its misses under Failed Taunts. AOE reports only the cast, under AOE Taunts, and leaves its misses out."
-L["TAUNTS_KIND_LOCKED_SINGLE_DESC"] = "Always Single Target: this taunt only ever takes one mob."
-L["TAUNTS_KIND_LOCKED_AOE_DESC"] = "Always AOE: this taunt grabs everything around it at once."
 
 --------------------------------------------------------------------------------
 -- Interrupts
@@ -414,8 +442,10 @@ L["TANK_DEATHS_CLASS_ROW_DESC"] = "Report it when a %s in your group dies."
 -- Bad Priests
 --------------------------------------------------------------------------------
 
-L["BAD_PRIESTS_SUMMARY"] =
-	"Healers doing something that hurts a tank more than it helps. Classic and Burning Crusade only: Season of Discovery gives the rage back through a priest rune, and none of it is a problem on later game versions."
+L["BAD_PRIESTS_SUMMARY"] = "Healers doing something that hurts a tank more than it helps."
+-- Shown only on a client whose data has no Power Word: Shield row, which among the shipped ones is Season of Discovery's.
+L["BAD_PRIESTS_DISCOVERY_STATUS"] =
+	"Season of Discovery never reports a bad shield: the Strength of Soul rune gives tanks their rage back, and no add-on can see another player's runes."
 L["BAD_PRIESTS_ENABLE"] = "Enable Bad Priest Monitoring"
 
 L["BAD_PRIESTS_HEADER"] = "Bad Shields"
@@ -461,19 +491,50 @@ L["BAD_PETS_COOLDOWN_DESC"] =
 L["BAD_PETS_ABILITIES_DESC"] = "Untick a pet ability to stop tracking it."
 
 --------------------------------------------------------------------------------
+-- Peer Pressure
+--------------------------------------------------------------------------------
+
+--[[
+    The alert is the whose shape with no target, like Fears: the line names a
+    classmate and a cooldown.
+
+    TRANSLATORS: the two rows' tooltips each say what they count, because
+    neither is "everybody's casts": only the player's own class ever reports,
+    and the My row has no pet to include.
+]]
+L["PEER_PRESSURE_SUMMARY"] =
+	"Get notified when other players of your class use their cooldowns, so you can give in to Peer Pressure."
+L["PEER_PRESSURE_ENABLE"] = "Enable Peer Pressure"
+
+L["PEER_PRESSURE_ALERT_HEADER"] = "Cooldowns"
+L["PEER_PRESSURE_ALERT_DESC"] =
+	"A cooldown pressed by a player of your class in your group, the cue to press yours. Only your own class reports, and Tracked Abilities picks which cooldowns count."
+L["PEER_PRESSURE_ALERT_ENABLE"] = "Enable Alerts for Cooldowns"
+L["PEER_PRESSURE_ALERT_MINE"] = "My Cooldowns"
+L["PEER_PRESSURE_ALERT_MINE_DESC"] =
+	"Report your own tracked cooldowns too. The dropdown beside it says where the line goes."
+L["PEER_PRESSURE_ALERT_OTHERS"] = "Others' Cooldowns"
+L["PEER_PRESSURE_ALERT_OTHERS_DESC"] =
+	"Report a tracked cooldown used by anybody else of your class in your group. The dropdown beside it says where the line goes."
+
+L["PEER_PRESSURE_ABILITIES_DESC"] =
+	"Untick a cooldown to stop tracking it. Only your own class's cooldowns ever report."
+
+--------------------------------------------------------------------------------
 -- Tanking Tools
 --------------------------------------------------------------------------------
 
 --[[
-    No summary line on the tab: Tanking Tools opens on its enable, because the
-    tab is a collection of unrelated warnings rather than one idea a sentence
-    can cover. Each section introduces itself instead.
+    The tab's summary says it ships off and where its four tools live, since
+    each tool is a page of its own and the tab page holds only the switch.
 
-    The mini-map tooltip carries a short one anyway, because the button's
+    The mini-map tooltip carries its own shorter one, because the button's
     Right-Click toggles this tab and the tooltip has to say what it is turning
     on. TRANSLATORS: it lists the four section headers below in your own words
     for them; keep it to two lines in the tooltip.
 ]]
+L["TANKING_TOOLS_SUMMARY"] =
+	"Still in beta, so it ships switched off. Cold Openers, Armor Debuffs, Parries, and Novas each have a page of their own under Tanking Tools."
 L["TANKING_TOOLS_ENABLE"] = "Enable Tanking Tools"
 L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "Cold openers, armor debuffs, parries, and novas."
 
@@ -517,7 +578,7 @@ L["TANKING_TOOLS_PARRY_OTHERS_DESC"] =
 	"Report a mob parrying anybody else in your group. The dropdown beside it says where the line goes."
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "Ignore Tanks"
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"] =
-	"Stay quiet when the player parried is a tank: assigned Main Tank in a raid, or holding the group finder's Tank role in a party. An off-tank stands in front of the boss for a taunt swap, and that is not a mistake to whisper about. Your own parries still report."
+	"Stay quiet when the player whose attack was parried is a tank: assigned Main Tank in a raid, or with the group finder's Tank role selected in a party. An off-tank stands in front of the boss for a taunt swap, and that is not a mistake to whisper about. Your own parries still report."
 L["TANKING_TOOLS_PARRY_IGNORE_PETS"] = "Ignore Pets"
 L["TANKING_TOOLS_PARRY_IGNORE_PETS_DESC"] =
 	"Stay quiet when the one parried is a pet, yours included. A pet stands where its owner sent it, and a line naming the pet gives nobody in the group anything to do. Pets are never whispered either way."
@@ -686,3 +747,12 @@ L["PARRY_WHISPER"] = "Parry Haste! Please get behind %s: every parry speeds up i
 
 L["NOVA"] = "Nova! %s used %s on %s."
 L["NOVA_AOE"] = "AOE Nova! %s used %s."
+
+--[[
+    Opens on a bang naming the news, like every other alert line.
+
+    TRANSLATORS: %s in PEER_PRESSURE_TARGET is, in order: caster, spell, and
+    the friendly player it was cast on. The target is a player, never a mob.
+]]
+L["PEER_PRESSURE"] = "Peer Pressure! %s used %s."
+L["PEER_PRESSURE_TARGET"] = "Peer Pressure! %s used %s on %s."

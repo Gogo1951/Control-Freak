@@ -64,6 +64,14 @@ for _, event in ipairs(ns.EVENT_NAMES) do
 	end
 end
 
+function ns:UpdateCombatLogRegistration()
+	if ns:IsAlertGateOpen() then
+		frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	else
+		frame:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	end
+end
+
 --------------------------------------------------------------------------------
 -- Saved Variables
 --------------------------------------------------------------------------------

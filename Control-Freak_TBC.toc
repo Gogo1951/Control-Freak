@@ -57,6 +57,7 @@ Locales/zhTW.lua
 Data/Flavor.lua
 Data/Data.lua
 Data/TBC/Abilities-TBC.lua
+Data/TBC/Peer-Pressure-Abilities-TBC.lua
 Data/TBC/Armor-Debuffs-TBC.lua
 Data/TBC/Items-TBC.lua
 Data/TBC/Sample-Spells-TBC.lua
@@ -82,6 +83,7 @@ Features/Tanking-Tools-Parry.lua
 Features/Tanking-Tools-Nova.lua
 Features/Bad-Priests.lua
 Features/Bad-Pets.lua
+Features/Peer-Pressure.lua
 Features/Minimap-Button.lua
 
 # Diagnostics
@@ -107,6 +109,7 @@ Options/Options-Incapacitated.lua
 Options/Options-Tank-Deaths.lua
 Options/Options-Bad-Priests.lua
 Options/Options-Bad-Pets.lua
+Options/Options-Peer-Pressure.lua
 Options/Options-Tanking-Tools.lua
 Options/Options-Profiles.lua
 Options/Options-Feedback-Support.lua

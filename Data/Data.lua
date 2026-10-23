@@ -68,6 +68,8 @@ ns.OPTIONS_REGISTRY = {
 	BadPriests = ADDON_NAME .. "_BadPriests",
 	BadPets = ADDON_NAME .. "_BadPets",
 	BadPetsTracked = ADDON_NAME .. "_BadPetsTracked",
+	PeerPressure = ADDON_NAME .. "_PeerPressure",
+	PeerPressureTracked = ADDON_NAME .. "_PeerPressureTracked",
 	TankingTools = ADDON_NAME .. "_TankingTools",
 	TankingToolsColdOpener = ADDON_NAME .. "_TankingToolsColdOpener",
 	TankingToolsArmor = ADDON_NAME .. "_TankingToolsArmor",
@@ -135,18 +137,37 @@ ns.FEATURE_SCOPE_OPTIONS = {
 	tankingTools = { "roleScope", "groupHasTank", "instanceOnly" },
 	badPriests = { "roleScope", "groupHasTank", "instanceOnly" },
 	badPets = { "roleScope", "groupHasTank", "instanceOnly" },
+	--[[
+	    No groupHasTank: a cooldown is about the player's own class, not a mob a
+	    tank should be holding, and Thanks for the Buff, where this tab came from,
+	    fired it with or without a tank.
+	]]
+	peerPressure = { "roleScope", "instanceOnly" },
 }
 
 --[[
     The feature tabs in tab order. Every loop over the features reads this, so a
     new tab cannot be gated in one place and missed in another.
 
-    Tanking Tools sits last, below the two Bad tabs, because it is the one tab
-    that ships switched off -- its tools are still in beta -- and a tab nobody
-    has opted into does not belong in the middle of the ones that work.
+    Peer Pressure sits after the two Bad tabs because it is the one tab whose
+    news is not about the fight going wrong: it tells the player a classmate
+    has pressed a cooldown, so they can press theirs.
+
+    Tanking Tools sits last, below it, because it is the one tab that ships
+    switched off -- its tools are still in beta -- and a tab nobody has opted
+    into does not belong in the middle of the ones that work.
 ]]
-ns.FEATURE_KEYS =
-	{ "taunts", "interrupts", "fears", "incapacitated", "tankDeaths", "badPriests", "badPets", "tankingTools" }
+ns.FEATURE_KEYS = {
+	"taunts",
+	"interrupts",
+	"fears",
+	"incapacitated",
+	"tankDeaths",
+	"badPriests",
+	"badPets",
+	"peerPressure",
+	"tankingTools",
+}
 
 --[[
     A label-plus-control row. The label half is wide because it carries the longest
@@ -538,30 +559,47 @@ ns.RAID_ICONS = {
 }
 
 --[[
-    The mobs a sample line names. Naxxramas, because every one of them is a name a
-    tank recognises, and a real boss reads as a real alert where a stand-in like
-    "Boss Name" reads as unfinished UI. The names come from the locale, since each
-    client calls these bosses something different.
+    The mobs a sample line names. Molten Core and Blackwing Lair, because every one
+    of them is a name a raider recognises, and a real boss reads as a real alert
+    where a stand-in like "Boss Name" reads as unfinished UI. The names come from
+    the locale, since each client calls these bosses something different.
 ]]
 ns.SAMPLE_BOSSES = {
-	L["SAMPLE_BOSS_ANUBREKHAN"],
-	L["SAMPLE_BOSS_FAERLINA"],
-	L["SAMPLE_BOSS_MAEXXNA"],
-	L["SAMPLE_BOSS_NOTH"],
-	L["SAMPLE_BOSS_HEIGAN"],
-	L["SAMPLE_BOSS_LOATHEB"],
-	L["SAMPLE_BOSS_RAZUVIOUS"],
-	L["SAMPLE_BOSS_GOTHIK"],
-	L["SAMPLE_BOSS_MOGRAINE"],
-	L["SAMPLE_BOSS_KORTHAZZ"],
-	L["SAMPLE_BOSS_BLAUMEUX"],
-	L["SAMPLE_BOSS_ZELIEK"],
-	L["SAMPLE_BOSS_PATCHWERK"],
-	L["SAMPLE_BOSS_GROBBULUS"],
-	L["SAMPLE_BOSS_GLUTH"],
-	L["SAMPLE_BOSS_THADDIUS"],
-	L["SAMPLE_BOSS_SAPPHIRON"],
-	L["SAMPLE_BOSS_KELTHUZAD"],
+	L["SAMPLE_BOSS_LUCIFRON"],
+	L["SAMPLE_BOSS_MAGMADAR"],
+	L["SAMPLE_BOSS_GEHENNAS"],
+	L["SAMPLE_BOSS_GARR"],
+	L["SAMPLE_BOSS_SHAZZRAH"],
+	L["SAMPLE_BOSS_GEDDON"],
+	L["SAMPLE_BOSS_GOLEMAGG"],
+	L["SAMPLE_BOSS_SULFURON"],
+	L["SAMPLE_BOSS_MAJORDOMO"],
+	L["SAMPLE_BOSS_RAGNAROS"],
+	L["SAMPLE_BOSS_RAZORGORE"],
+	L["SAMPLE_BOSS_VAELASTRASZ"],
+	L["SAMPLE_BOSS_BROODLORD"],
+	L["SAMPLE_BOSS_FIREMAW"],
+	L["SAMPLE_BOSS_EBONROC"],
+	L["SAMPLE_BOSS_FLAMEGOR"],
+	L["SAMPLE_BOSS_CHROMAGGUS"],
+	L["SAMPLE_BOSS_NEFARIAN"],
+}
+
+--[[
+    The other players a sample line names, one per class, so the name and the
+    class colour it is drawn in agree. Proper names, like a character's, so they
+    are the same in every locale and never go through L.
+]]
+ns.SAMPLE_NAMES = {
+	DRUID = "Aero",
+	HUNTER = "Spek",
+	MAGE = "Portalrico",
+	PALADIN = "Aiek",
+	PRIEST = "Katz",
+	ROGUE = "Fathom",
+	SHAMAN = "Moondragon",
+	WARLOCK = "Greasy",
+	WARRIOR = "Prima",
 }
 
 ns.SPELL_TOGGLE_WIDGET_TYPE = ADDON_NAME .. "_SpellToggle"
@@ -631,11 +669,13 @@ ns.SOUNDS = {
 	    Spares that became defaults, keeping the names they arrived under: a
 	    name here is a promise, still what the picker shows after the sound has
 	    a job. Failure 4 is Failed Taunts', Magic 2 is Bad Shields', and Game
-	    Over is Tank Deaths'.
+	    Over is Tank Deaths'. Thunder is Peer Pressure's, under the name it had
+	    in Thanks for the Buff, where that tab came from.
 	]]
 	{ "Control Freak: Failure 4", "cf-failure-4.ogg" },
 	{ "Control Freak: Magic 2", "cf-magic-2.ogg" },
 	{ "Control Freak: Game Over", "cf-game-over.ogg" },
+	{ "Control Freak: Thunder", "cf-thunder.ogg" },
 	--[[
 	    Nothing from here down plays out of the box. All of it is in the picker,
 	    and it is the bank an alert draws from when it gets a sound of its own --

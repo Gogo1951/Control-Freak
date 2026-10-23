@@ -6,16 +6,44 @@ end
 
 -- [key] = spellId, -- Spell Name
 ns.SAMPLE_SPELL_IDS = {
-	TAUNT = 355, -- Taunt
-	CHALLENGING_SHOUT = 1161, -- Challenging Shout
-	PUMMEL = 6552, -- Pummel
 	SHADOW_BOLT = 686, -- Shadow Bolt
 	PSYCHIC_SCREAM = 8122, -- Psychic Scream
 	FEAR = 5782, -- Fear
 	POWER_WORD_SHIELD = 17, -- Power Word: Shield
 	GROWL = 2649, -- Growl
-	SUNDER_ARMOR = 7386, -- Sunder Armor
 	FROST_NOVA = 122, -- Frost Nova
+
+	-- The player's own taunt, by class
+	TAUNT_DRUID = 6795, -- Growl
+	TAUNT_PALADIN = 407631, -- Hand of Reckoning
+	TAUNT_ROGUE = 410412, -- Tease
+	TAUNT_SHAMAN = 408681, -- Earth Shock
+	TAUNT_WARLOCK = 403828, -- Menace
+	TAUNT_WARRIOR = 355, -- Taunt
+
+	-- The player's own AOE taunt, by class
+	AOE_TAUNT_DRUID = 5209, -- Challenging Roar
+	AOE_TAUNT_SHAMAN = 5730, -- Stoneclaw Totem
+	AOE_TAUNT_WARLOCK = 412789, -- Demonic Howl
+	AOE_TAUNT_WARRIOR = 1161, -- Challenging Shout
+
+	-- The player's own interrupt, by class
+	INTERRUPT_MAGE = 2139, -- Counterspell
+	INTERRUPT_PRIEST = 15487, -- Silence
+	INTERRUPT_ROGUE = 1766, -- Kick
+	INTERRUPT_SHAMAN = 8042, -- Earth Shock
+	INTERRUPT_WARRIOR = 6552, -- Pummel
+
+	-- The player's own opening ability, by class
+	OPENER_DRUID = 6807, -- Maul
+	OPENER_HUNTER = 3044, -- Arcane Shot
+	OPENER_MAGE = 116, -- Frostbolt
+	OPENER_PALADIN = 20271, -- Judgement
+	OPENER_PRIEST = 585, -- Smite
+	OPENER_ROGUE = 1752, -- Sinister Strike
+	OPENER_SHAMAN = 8042, -- Earth Shock
+	OPENER_WARLOCK = 686, -- Shadow Bolt
+	OPENER_WARRIOR = 7386, -- Sunder Armor
 }
 
 --[[

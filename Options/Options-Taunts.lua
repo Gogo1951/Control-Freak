@@ -16,7 +16,13 @@ function ns.BuildTauntsOptions()
 	local args = {}
 	local hidden = ns.AddFeatureScope(args, Feature, "TAUNTS_SUMMARY", "TAUNTS_ENABLE", 1, "taunts")
 
-	local TAUNT = ns.SampleSpell(ns.SAMPLE_SPELL_IDS.TAUNT)
+	--[[
+	    The player taunting with their own class's taunt, or Prima on the Others'
+	    row for a class with none (ns.SampleCaster). Successful and Failed share
+	    the caster and the spell.
+	]]
+	local caster, taunt, tauntRow = ns.SampleCaster("TAUNT", "WARRIOR")
+	local aoeCaster, aoeTaunt, aoeRow = ns.SampleCaster("AOE_TAUNT", "WARRIOR")
 
 	--[[
 	    A row for the player's own casts, one for everybody else's, and the
@@ -31,7 +37,7 @@ function ns.BuildTauntsOptions()
 		descKey = "TAUNTS_SUCCESS_DESC",
 		mineKey = "TAUNTS_SUCCESS_MINE",
 		othersKey = "TAUNTS_SUCCESS_OTHERS",
-		sample = { key = "TAUNT_SUCCESS", args = { ns.SAMPLE_PLAYER, TAUNT, ns.SampleBoss() } },
+		sample = { key = "TAUNT_SUCCESS", row = tauntRow, args = { caster, taunt, ns.SampleTarget() } },
 	})
 
 	ns.AddWhoseAlertSection(args, "failed", Section("failed"), 40, hidden, {
@@ -41,7 +47,7 @@ function ns.BuildTauntsOptions()
 		mineKey = "TAUNTS_FAILED_MINE",
 		othersKey = "TAUNTS_FAILED_OTHERS",
 		-- RESISTED of the four outcomes: the one a player is most likely to see.
-		sample = { key = "TAUNT_RESISTED", args = { ns.SAMPLE_PLAYER, TAUNT, ns.SampleBoss() } },
+		sample = { key = "TAUNT_RESISTED", row = tauntRow, args = { caster, taunt, ns.SampleTarget() } },
 	})
 
 	--[[
@@ -57,7 +63,8 @@ function ns.BuildTauntsOptions()
 		noTarget = true,
 		sample = {
 			key = "TAUNT_AOE",
-			args = { ns.SAMPLE_PLAYER, ns.SampleSpell(ns.SAMPLE_SPELL_IDS.CHALLENGING_SHOUT) },
+			row = aoeRow,
+			args = { aoeCaster, aoeTaunt },
 		},
 	})
 
@@ -69,20 +76,34 @@ function ns.BuildTauntsOptions()
 end
 
 --[[
-    The Tracked Abilities sub-panel under Taunts: one list, every taunt with a
-    Single Target / AOE dropdown beside it. The pick routes the taunt to the
-    Successful and Failed sections or to the AOE one, which is the adjustment the
-    data cannot make for everybody: whether a taunt that grabs a few mobs is worth
-    naming them is the player's call.
+    The Tracked Abilities sub-panel under Taunts: one list, every taunt with its
+    kind beside it, Single Target or AOE. Where the data offers a choice the kind
+    is a dropdown, and the pick routes the taunt to the Successful and Failed
+    sections or to the AOE one, which is the adjustment the data cannot make for
+    everybody: whether a taunt that grabs a few mobs is worth naming them is the
+    player's call. Everywhere else the kind is fixed and drawn as text, and on a
+    client with no choice at all the intro leaves out the dropdown.
 
     Not hidden behind the Taunts switch: which taunts count is worth settling
-    before turning the feature on, and the parent panel says whether it is.
+    before turning the feature on. A status line at the top says when the
+    Taunts switch, or All Alerts, has the list silenced.
 ]]
 function ns.BuildTauntsTrackedOptions()
+	local anyChoice = false
+	for _, group in ipairs(ns.ABILITY_GROUPS) do
+		if group.category == "TAUNT" and not ns.IsTauntKindLocked(group.entry) then
+			anyChoice = true
+		end
+	end
+
 	local args = {
-		abilitiesDesc = ns.OptionsDesc(L["TAUNTS_ABILITIES_DESC"], 1),
+		abilitiesDesc = ns.OptionsDesc(
+			L[anyChoice and "TAUNTS_ABILITIES_DESC" or "TAUNTS_ABILITIES_DESC_NO_CHOICE"],
+			1
+		),
 		abilitiesDescSpace = ns.OptionsSpacer(2),
 	}
+	ns.AddQuietStatus(args, 0.4, "taunts", "TAB_TAUNTS")
 
 	for key, value in
 		pairs(ns.BuildAbilityToggles({

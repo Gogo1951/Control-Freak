@@ -16,20 +16,14 @@
 - **Instead:** the Tank and Healer words that open an Incapacitated line are Control Freak's own translations rather than the client's role labels.
 - **Why:** the client's role labels name a role rather than a person, so as the subject of a chat line they read wrongly in several locales and stay English in others.
 
-### Raid marks on WoW Forever
-
-- **Departs from:** MESSAGES → Target Marker, "WoW Forever blocks raid-marker tokens in chat".
-- **Instead:** Sent lines keep the mob's raid mark (`{rtN}`) on WoW Forever.
-- **Why:** Forever renders raid marks in party, raid and whisper chat, the only channels Control Freak sends to.
-
 ### Brand last on local alert prints
 
 - **Departs from:** MESSAGES, combat-related prints lead "with its short name, `L["ADDON_SHORT"]`".
 - **Instead:** Alert prints in the player's own window put the brand last, `body // Control Freak`, the same shape the group sees in chat.
 - **Why:** An alert body already opens on its headline and carries its target's raid mark, so leading with any brand only delays the news.
 
-### Enable Control Freak in Features
+### Enable Control Freak under Master Switch
 
-- **Departs from:** OPTIONS → Main Page Layout, "Features never holds a switch for the whole add-on."
-- **Instead:** Enable Control Freak (All Alerts, `ns.db.profile.enabled`) leads the Features block on a line of its own. Below it, the feature switches sit in tiers, two to a line with a blank line between tiers: Taunts, Interrupts and Fears; Incapacitated and Tank Deaths; Bad Pets and Bad Priests; then Tanking Tools on its own. All of them, and the Tanking Tools section, hide while it is off.
+- **Departs from:** OPTIONS PANEL → Main Page Layout, "Features never holds a switch for the whole add-on," and its page order, which has no section above Features.
+- **Instead:** Enable Control Freak (All Alerts, `ns.db.profile.enabled`) sits alone under a Master Switch header, just above Features. In Features, the feature switches sit in tiers, each with its icon ahead of its caption, two to a line with a blank line between tiers: Taunts, Interrupts and Fears; Incapacitated and Tank Deaths; Bad Pets and Bad Priests; then Peer Pressure and Tanking Tools. All of them, and the Tanking Tools section, hide while it is off.
 - **Why:** the switch silences every alert without unloading the add-on, and the mini-map button's Left-Click toggles the same setting; the button can be hidden, so the panel keeps a copy.
