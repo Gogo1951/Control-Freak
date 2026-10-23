@@ -78,22 +78,6 @@ Printed or announced, a line leads with the news and ends with the add-on's name
 
 Hovering the button shows whether All Alerts is on right now, and Tanking Tools too while it is. Right-Click only works while All Alerts is on.
 
-### Options
-
-* **Control Freak** // The welcome message and the mini-map button, then Enable Control Freak, the one switch that silences every tab without changing a setting, with every tab's own switch below it and a switch per tool while Tanking Tools is on.
-* **Taunts** // Successful, failed, and AoE taunts. Waits for a living tank in your group out of the box. Its Tracked Abilities page lists every taunt your game client knows, each marked Single Target or AOE: class taunts, rune taunts, and engineering target dummies.
-* **Interrupts** // Successful interrupts: who stopped which cast.
-* **Fears** // Fears that landed, with a Tracked Abilities page of every fear, Flash Bomb included.
-* **Incapacitated** // Which effects count (stuns, fears, mind control, confusion, silences, pacifies, spell lockouts, roots, and disarms) and how many seconds make one long. Short ones print for you, long ones announce, and out of the box the tab only speaks while you're a tank or healer.
-* **Tank Deaths** // Your own death while tanking and any other tank's, plus a by-class death log for your own window.
-* **Bad Priests** // Power Word: Shield landing on a warrior or druid tank, with a health line below which a shield counts as a save, an optional whisper to the caster, and a cooldown. Out of the box it only watches shields landing on you while you're tanking.
-* **Bad Pets** // Hunter and warlock pet taunts, a whisper telling the owner how to turn auto-cast off, and how long one pet stays quiet after an alert, with a Tracked Abilities page of the pet taunts it watches.
-* **Peer Pressure** // Get pinged when another player of your class pops a cooldown, with a Tracked Abilities page of the cooldowns it watches for every class. Your own cooldowns stay quiet until you turn on My Cooldowns.
-* **Tanking Tools** // Still in beta, so it ships switched off. Each tool has its own page: Cold Openers (your opening abilities that didn't land, off until you turn them on), Armor Debuffs (how long the group took to strip a target's armor), Parries (somebody standing in front of the boss, whispered to move behind it), and Novas.
-* **Profiles** // The standard profile picker, copy, and reset.
-* **Feedback & Support** // Where to reach us: Discord, CurseForge, Wago, and GitHub.
-* **Diagnostic Tools** // Everything a bug report needs, gathered for you. Nothing runs until you press a button.
-
 ## Testing & Localization Status
 
 🔴 World of Warcraft // 12.1.0
