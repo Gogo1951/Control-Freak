@@ -22,6 +22,8 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 
 🐕 **Bad Pets & Bad Shields** // Alert the owners when a pet is misbehaving in your raid, and warn when Power Word: Shield prevents a high-health warrior or druid tank from generating rage.
 
+🚂 **Feel Peer Pressure** // Get pinged the moment another player of your class pops a cooldown, so you can stack yours on top.
+
 🎛️ **Your Alerts, Your Rules** // Control where every alert appears, which enemies count, when each tab speaks, whether marked targets always trigger, and which sound plays. Filter alerts by role, dungeon or raid, and whether your group has a living tank.
 
 🦺 **Quiet by Default** // Most alerts stay in your own window until you decide otherwise. Group announcements stay quiet when you're ungrouped or in PvP, and one-time whispers prevent the same mistake from becoming a chorus of messages.
@@ -62,6 +64,7 @@ Printed or announced, a line leads with the news and ends with the add-on's name
 | Being Incapacitated | Tank Incapacitated for 6 seconds! Gogo is afflicted by [Fear] (Magic) from Maexxna // Control Freak |
 | Tank Deaths | Tank Down! Gogo has died // Control Freak |
 | Pet Taunts | Bad Pet! Joe's pet Snuffles used [Growl] on Anub'Rekhan // Control Freak |
+| Cooldowns | Peer Pressure! Spek used [Rapid Fire] // Control Freak |
 
 ### Mini-Map Button
 
@@ -83,6 +86,7 @@ Hovering the button shows whether All Alerts is on right now, and Tanking Tools 
 * **Tank Deaths** // Your own death while tanking and any other tank's, plus a by-class death log for your own window.
 * **Bad Priests** // Power Word: Shield landing on a warrior or druid tank, with a health line below which a shield counts as a save, an optional whisper to the caster, and a cooldown. Out of the box it only watches shields landing on you while you're tanking.
 * **Bad Pets** // Hunter and warlock pet taunts, a whisper telling the owner how to turn auto-cast off, and how long one pet stays quiet after an alert, with a Tracked Abilities page of the pet taunts it watches.
+* **Peer Pressure** // Get pinged when another player of your class pops a cooldown, with a Tracked Abilities page of the cooldowns it watches for every class. Your own cooldowns stay quiet until you turn on My Cooldowns.
 * **Tanking Tools** // Still in beta, so it ships switched off. Each tool has its own page: Cold Openers (your opening abilities that didn't land, off until you turn them on), Armor Debuffs (how long the group took to strip a target's armor), Parries (somebody standing in front of the boss, whispered to move behind it), and Novas.
 * **Profiles** // The standard profile picker, copy, and reset.
 * **Feedback & Support** // Where to reach us: Discord, CurseForge, Wago, and GitHub.
@@ -116,6 +120,7 @@ Hovering the button shows whether All Alerts is on right now, and Tanking Tools 
 * Vn's [Parry/Dodge/Miss Announcer 63+](https://wago.io/KVtFqses5)
 * ColtDoomhowl's [Parry - You're in the wrong spot dipshit](https://wago.io/yJAzyvcvw)
 * Commander_Snuggles's [Loss of Control Announcer](https://wago.io/qhD2-4WN6)
+* gogo1951's [Thanks for the Buff](https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited)
 
 ## Get Involved
 
@@ -136,12 +141,13 @@ Hovering the button shows whether All Alerts is on right now, and Tanking Tools 
 
 ### 🟡 Overlaps
 
+* Treebonker's [OmniCD](https://www.curseforge.com/wow/addons/omnicd)
 * Stanzilla's [WeakAuras](https://www.curseforge.com/wow/addons/weakauras-2)
 
 ### 🔴 Alternatives
 
 * krzysiek\_7\_5's [InterruptAnnouncer](https://www.curseforge.com/wow/addons/interruptannouncer)
-* OhNoItsGread's [Interruptor](https://www.curseforge.com/wow/addons/interruptor)
 * SpaceCorp's [iTaunted](https://www.curseforge.com/wow/addons/i-taunted)
 * D4KiR's [LossOfControlMessages](https://www.curseforge.com/wow/addons/lossofcontrolmessages)
 * GrumpyPlayers's [TankWarningsClassic](https://www.curseforge.com/wow/addons/tankwarningsclassic)
+* Nitrak's [Vocal Raid Assistant](https://www.curseforge.com/wow/addons/vocalraidassistant)
