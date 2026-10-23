@@ -16,6 +16,15 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 
 > **Self:** Armor Stripped! Thaddius became vulnerable after 2.4 seconds // Control Freak
 
+## Setup
+
+1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/control-freak) or [Wago](https://addons.wago.io/addons/control-freak).
+2. Type `/freak`, or Shift + Middle-Click the mini-map button, to open the Options Interface.
+3. Walk the tabs. Every tab but Tanking Tools is on out of the box, and most lines print only to your own window.
+4. Decide what your group hears. Four of your own lines announce out of the box, because the group needs them the moment they happen: a failed taunt, an AoE taunt, a fear you cast, and a long incapacitation.
+5. Narrow each tab to when it matters, like only while you're tanking or only inside dungeons and raids.
+6. _"When you do things right, people won't be sure you've done anything at all."_
+
 ## Features
 
 🛡️ **Taunts, Fears, & Interrupts** // Know whose taunt grabbed the mob, whose fear just scattered the pull, and who shut down the cast before it landed.
@@ -30,16 +39,7 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 
 🦺 **Quiet by Default** // Most alerts stay in your own window until you decide otherwise. Group announcements stay quiet when you're ungrouped or in PvP, and one-time whispers prevent the same mistake from becoming a chorus of messages.
 
-## Setup
-
-1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/control-freak) or [Wago](https://addons.wago.io/addons/control-freak).
-2. Type `/freak`, or Shift + Middle-Click the mini-map button, to open the Options Interface.
-3. Walk the tabs. Every tab but Tanking Tools is on out of the box, and most lines print only to your own window.
-4. Decide what your group hears. Four of your own lines announce out of the box, because the group needs them the moment they happen: a failed taunt, an AoE taunt, a fear you cast, and a long incapacitation.
-5. Narrow each tab to when it matters, like only while you're tanking or only inside dungeons and raids.
-6. _"When you do things right, people won't be sure you've done anything at all."_
-
-## How It Works
+## Things to Know
 
 ### Every Alert Works the Same Way
 
