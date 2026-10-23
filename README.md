@@ -4,6 +4,8 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 
 **TL;DR:** Tells you what happened, who caused it, and what needs fixing while the fight is still happening. Less combat-log archaeology after the wipe, more information when it matters, so you can make better decisions and have cleaner runs.
 
+<img width="800" src="https://github.com/user-attachments/assets/5fa7a505-26bf-46c0-886a-9016fb1643a0" />
+
 > **🔊 & Self:** Taunt! Gogowarrior used [Taunt] on Anub'Rekhan // Control Freak 
 
 > **🔊 & Self:** Interrupt! Fathom's [Kick] on Kel'Thuzad stopped [Frostbolt] // Control Freak
