@@ -92,11 +92,3 @@ function ns:IsAlertGateOpen()
 	end
 	return false
 end
-
-function ns:UpdateCombatLogRegistration()
-	if ns:IsAlertGateOpen() then
-		ns.eventFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	else
-		ns.eventFrame:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	end
-end

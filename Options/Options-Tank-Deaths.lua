@@ -76,7 +76,7 @@ function ns.BuildTankDeathsOptions()
 		noTarget = true,
 		sample = {
 			key = "TANK_DEATHS_TANK_LINE",
-			args = { ns.SAMPLE_PLAYER },
+			args = { ns.SamplePlayer() },
 		},
 	})
 
@@ -123,8 +123,8 @@ function ns.BuildTankDeathsOptions()
 		type = "description",
 		name = ns.RenderSample({
 			key = "TANK_DEATHS_CLASS_LINE",
-			args = { ns.ClassName("MAGE"), ns.SAMPLE_OTHER },
-		}),
+			args = { ns.ClassName("WARLOCK"), ns.SampleOther("WARLOCK") },
+		}, "PRINT"),
 		fontSize = "medium",
 		order = 48,
 		hidden = hidden,

@@ -30,7 +30,18 @@ L["ENABLE_WELCOME_MESSAGE_DESC"] =
 L["ENABLE_MINIMAP_BUTTON"] = "Включить кнопку на миникарте"
 L["ENABLE_MINIMAP_BUTTON_DESC"] = "Показывать кнопку Control Freak на вашей миникарте."
 
+L["OPTIONS_MASTER_SWITCH_HEADER"] = "Главный переключатель"
 L["OPTIONS_FEATURES_HEADER"] = "Функции"
+-- The Features block's switch captions. Each tab's own switch keeps its "Enable" caption.
+L["FEATURES_TAUNTS"] = "Отслеживание провокаций"
+L["FEATURES_INTERRUPTS"] = "Отслеживание прерываний"
+L["FEATURES_FEARS"] = "Отслеживание страха"
+L["FEATURES_INCAPACITATED"] = "Отслеживание потери контроля"
+L["FEATURES_TANK_DEATHS"] = "Отслеживание смертей танка"
+L["FEATURES_BAD_PRIESTS"] = "Отслеживание плохих жрецов"
+L["FEATURES_BAD_PETS"] = "Отслеживание плохих питомцев"
+L["FEATURES_PEER_PRESSURE"] = "Групповое давление"
+L["FEATURES_TANKING_TOOLS"] = "Инструменты танка"
 
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/freak"
@@ -39,7 +50,7 @@ L["OPTIONS_COMMAND_DESCRIPTION"] = "Открывает окно настроек
 --[[
     The add-on's own switch. KILL_SWITCH titles the mini-map tooltip's block for
     it, naming its REACH rather than the act of throwing it. KILL_SWITCH_ENABLE
-    captions it as the first of the General panel's Features switches, and
+    captions it under the General panel's Master Switch header, and
     KILL_SWITCH_ENABLE_DESC is both that switch's tooltip and the mini-map
     block's description, so the two cannot describe it differently.
 ]]
@@ -104,6 +115,7 @@ L["TAB_INCAPACITATED"] = "Потеря контроля"
 L["TAB_TANK_DEATHS"] = "Смерти танка"
 L["TAB_BAD_PRIESTS"] = "Плохие жрецы"
 L["TAB_BAD_PETS"] = "Плохие питомцы"
+L["TAB_PEER_PRESSURE"] = "Групповое давление"
 L["TAB_TANKING_TOOLS"] = "Инструменты танка"
 
 --------------------------------------------------------------------------------
@@ -134,6 +146,22 @@ L["SCOPE_GROUP_HAS_TANK_DESC"] =
 	"Срабатывает, только пока кто-то в вашей группе танкует и ещё жив. В рейде это значит назначенный главный танк, поэтому для Control Freak рейд без назначенного главного танка остаётся без танка. Павший танк приравнивается к отсутствию танка: именно тогда и полезно, что угрозу держит кто-то другой."
 L["SCOPE_INSTANCE_ONLY"] = "В подземельях и рейдах"
 L["SCOPE_INSTANCE_ONLY_DESC"] = "Срабатывает только в подземельях и рейдах."
+
+--[[
+    The line at the top of a page that a switch somewhere else has silenced:
+    All Alerts on any feature page, or the feature a sub-page belongs to.
+
+    TRANSLATORS: in both, the first %s is the name of the switch that is off
+    (drawn gold) and the second is STATUS_OFF (drawn red). The rest are plain
+    names: in STATUS_ALL_ALERTS_OFF the switch's caption and then the page it
+    is on, in STATUS_FEATURE_OFF the page it is on. STATUS_OFF is the single
+    word for a switch being off.
+]]
+L["STATUS_OFF"] = "выключено"
+L["STATUS_ALL_ALERTS_OFF"] =
+	'%s: %s, поэтому на этой странице ничего не срабатывает. Переключатель "%s" находится на странице "%s".'
+L["STATUS_FEATURE_OFF"] =
+	'%s: %s, поэтому на этой странице ничего не срабатывает. Переключатель находится на странице "%s".'
 
 --------------------------------------------------------------------------------
 -- Alert Sections
@@ -219,45 +247,48 @@ L["COOLDOWN_MINUTES"] = "Задержка %d мин."
 
 --[[
     Only the "Example:" frame is written here. The line inside it is rendered
-    from the real message format below with these stand-in names, so a reworded
-    alert cannot leave a hand-copied example quoting the old text. The names are
-    translatable because they sit inside a sentence whose grammar a locale may
-    want to agree with.
+    from the real message format below, so a reworded alert cannot leave a
+    hand-copied example quoting the old text. The player's own name is the
+    character they are on; SAMPLE_PLAYER stands in only until the client knows
+    it. The other players' names are proper names in Data/Data.lua, the same in
+    every locale. The pet's is translatable because it sits inside a sentence
+    whose grammar a locale may want to agree with.
 ]]
 L["SAMPLE_EXAMPLE"] = "Пример: %s"
 L["SAMPLE_PLAYER"] = "Gogo"
-L["SAMPLE_OTHER"] = "Иван"
 L["SAMPLE_PET"] = "Шарик"
 
 --[[
-    The Naxxramas bosses the Example lines name, dealt one per line.
+    The Molten Core and Blackwing Lair bosses the Example lines name, dealt one
+    per line.
 
     TRANSLATORS: use each boss's name exactly as your client writes it, title
     included, not a translation of the English.
 ]]
-L["SAMPLE_BOSS_ANUBREKHAN"] = "Ануб'Рекан"
-L["SAMPLE_BOSS_FAERLINA"] = "Великая вдова Фарлина"
-L["SAMPLE_BOSS_MAEXXNA"] = "Мексна"
-L["SAMPLE_BOSS_NOTH"] = "Нот Чумной"
-L["SAMPLE_BOSS_HEIGAN"] = "Хейган Нечестивый"
-L["SAMPLE_BOSS_LOATHEB"] = "Мерзот"
-L["SAMPLE_BOSS_RAZUVIOUS"] = "Инструктор Разувиус"
-L["SAMPLE_BOSS_GOTHIK"] = "Готик Жнец"
-L["SAMPLE_BOSS_MOGRAINE"] = "Верховный лорд Могрейн"
-L["SAMPLE_BOSS_KORTHAZZ"] = "Тан Кортазз"
-L["SAMPLE_BOSS_BLAUMEUX"] = "Леди Бломе"
-L["SAMPLE_BOSS_ZELIEK"] = "Сэр Зелиек"
-L["SAMPLE_BOSS_PATCHWERK"] = "Лоскутик"
-L["SAMPLE_BOSS_GROBBULUS"] = "Гроббулус"
-L["SAMPLE_BOSS_GLUTH"] = "Глут"
-L["SAMPLE_BOSS_THADDIUS"] = "Таддиус"
-L["SAMPLE_BOSS_SAPPHIRON"] = "Сапфирон"
-L["SAMPLE_BOSS_KELTHUZAD"] = "Кел'Тузад"
+L["SAMPLE_BOSS_LUCIFRON"] = "Люцифрон"
+L["SAMPLE_BOSS_MAGMADAR"] = "Магмадар"
+L["SAMPLE_BOSS_GEHENNAS"] = "Гееннас"
+L["SAMPLE_BOSS_GARR"] = "Гарр"
+L["SAMPLE_BOSS_SHAZZRAH"] = "Шаззрах"
+L["SAMPLE_BOSS_GEDDON"] = "Барон Геддон"
+L["SAMPLE_BOSS_GOLEMAGG"] = "Големагг Испепелитель"
+L["SAMPLE_BOSS_SULFURON"] = "Предвестник Сульфурон"
+L["SAMPLE_BOSS_MAJORDOMO"] = "Мажордом Экзекутус"
+L["SAMPLE_BOSS_RAGNAROS"] = "Рагнарос"
+L["SAMPLE_BOSS_RAZORGORE"] = "Бритвосмерт Неукротимый"
+L["SAMPLE_BOSS_VAELASTRASZ"] = "Валестраз Порочный"
+L["SAMPLE_BOSS_BROODLORD"] = "Предводитель драконов Разящий Бич"
+L["SAMPLE_BOSS_FIREMAW"] = "Огнечрев"
+L["SAMPLE_BOSS_EBONROC"] = "Черноскал"
+L["SAMPLE_BOSS_FLAMEGOR"] = "Пламегор"
+L["SAMPLE_BOSS_CHROMAGGUS"] = "Хроммагус"
+L["SAMPLE_BOSS_NEFARIAN"] = "Нефариан"
 
 --------------------------------------------------------------------------------
 -- Ability Lists
 --------------------------------------------------------------------------------
 
+L["TRACKED_HEADER"] = "Отслеживаемые способности"
 L["ABILITIES_ITEMS"] = "Предметы"
 L["ABILITIES_CLASS_PET"] = "%s (питомец)"
 
@@ -290,17 +321,15 @@ L["TAUNTS_AOE_ENABLE"] = "Сообщать о провокациях по пло
 L["TAUNTS_AOE_MINE"] = "Мои провокации по площади"
 L["TAUNTS_AOE_OTHERS"] = "Чужие провокации по площади"
 
-L["TRACKED_HEADER"] = "Отслеживаемые способности"
 L["TAUNTS_ABILITIES_DESC"] =
 	'Снимите галочку с провокации, чтобы перестать её отслеживать. В выпадающем списке рядом выбирается "Одна цель" или "По площади".'
+-- The same intro on a client where no taunt's kind can be picked, so no row carries a dropdown.
+L["TAUNTS_ABILITIES_DESC_NO_CHOICE"] =
+	"Снимите галочку с провокации, чтобы перестать её отслеживать."
 L["TAUNTS_KIND_SINGLE"] = "Одна цель"
 L["TAUNTS_KIND_AOE"] = "По площади"
 L["TAUNTS_KIND_DESC"] =
 	'Эта провокация забирает сразу нескольких противников, поэтому о ней можно сообщать любым способом. "Одна цель" называет каждого перехваченного противника в разделе "Удачные провокации", а промахи отмечает в разделе "Неудачные провокации". "По площади" сообщает только о применении, в разделе "Провокации по площади", без промахов.'
-L["TAUNTS_KIND_LOCKED_SINGLE_DESC"] =
-	"Всегда одна цель: эта провокация забирает только одного противника."
-L["TAUNTS_KIND_LOCKED_AOE_DESC"] =
-	"Всегда по площади: эта провокация забирает всех вокруг сразу."
 
 --------------------------------------------------------------------------------
 -- Interrupts
@@ -440,7 +469,10 @@ L["TANK_DEATHS_CLASS_ROW_DESC"] =
 --------------------------------------------------------------------------------
 
 L["BAD_PRIESTS_SUMMARY"] =
-	"Лекари, которые делают то, что вредит танку больше, чем помогает. Только Classic и Burning Crusade: в Сезоне открытий ярость возвращает руна жреца, а в более поздних версиях игры всё это не проблема."
+	"Лекари, которые делают то, что вредит танку больше, чем помогает."
+-- Shown only on a client whose data has no Power Word: Shield row, which among the shipped ones is Season of Discovery's.
+L["BAD_PRIESTS_DISCOVERY_STATUS"] =
+	'В Сезоне открытий о плохих щитах никогда не сообщается: руна "Сила души" возвращает танкам ярость, а ни один аддон не видит чужих рун.'
 L["BAD_PRIESTS_ENABLE"] = "Включить отслеживание плохих жрецов"
 
 L["BAD_PRIESTS_HEADER"] = "Плохие щиты"
@@ -488,19 +520,50 @@ L["BAD_PETS_ABILITIES_DESC"] =
 	"Снимите галочку со способности питомца, чтобы перестать её отслеживать."
 
 --------------------------------------------------------------------------------
+-- Peer Pressure
+--------------------------------------------------------------------------------
+
+--[[
+    The alert is the whose shape with no target, like Fears: the line names a
+    classmate and a cooldown.
+
+    TRANSLATORS: the two rows' tooltips each say what they count, because
+    neither is "everybody's casts": only the player's own class ever reports,
+    and the My row has no pet to include.
+]]
+L["PEER_PRESSURE_SUMMARY"] =
+	"Получайте уведомления, когда другие игроки вашего класса используют свои кулдауны, чтобы поддаться групповому давлению."
+L["PEER_PRESSURE_ENABLE"] = "Включить групповое давление"
+
+L["PEER_PRESSURE_ALERT_HEADER"] = "Кулдауны"
+L["PEER_PRESSURE_ALERT_DESC"] =
+	'Кулдаун, использованный игроком вашего класса в вашей группе: сигнал использовать свой. Сообщается только о вашем классе, а в разделе "Отслеживаемые способности" выбирается, какие кулдауны учитываются.'
+L["PEER_PRESSURE_ALERT_ENABLE"] = "Сообщать о кулдаунах"
+L["PEER_PRESSURE_ALERT_MINE"] = "Мои кулдауны"
+L["PEER_PRESSURE_ALERT_MINE_DESC"] =
+	"Сообщает и о ваших собственных отслеживаемых кулдаунах. Список рядом задаёт, куда уходит строка."
+L["PEER_PRESSURE_ALERT_OTHERS"] = "Чужие кулдауны"
+L["PEER_PRESSURE_ALERT_OTHERS_DESC"] =
+	"Сообщает об отслеживаемом кулдауне, использованном любым другим игроком вашего класса в вашей группе. Список рядом задаёт, куда уходит строка."
+
+L["PEER_PRESSURE_ABILITIES_DESC"] =
+	"Снимите галочку с кулдауна, чтобы перестать его отслеживать. Сообщается только о кулдаунах вашего класса."
+
+--------------------------------------------------------------------------------
 -- Tanking Tools
 --------------------------------------------------------------------------------
 
 --[[
-    No summary line on the tab: Tanking Tools opens on its enable, because the
-    tab is a collection of unrelated warnings rather than one idea a sentence
-    can cover. Each section introduces itself instead.
+    The tab's summary says it ships off and where its four tools live, since
+    each tool is a page of its own and the tab page holds only the switch.
 
-    The mini-map tooltip carries a short one anyway, because the button's
+    The mini-map tooltip carries its own shorter one, because the button's
     Right-Click toggles this tab and the tooltip has to say what it is turning
     on. TRANSLATORS: it lists the four section headers below in your own words
     for them; keep it to two lines in the tooltip.
 ]]
+L["TANKING_TOOLS_SUMMARY"] =
+	'Пока в бета-версии, поэтому по умолчанию выключено. У каждого из инструментов ("Холодное начало", "Снижение брони", "Парирования" и "Кольца льда") есть своя страница в разделе "Инструменты танка".'
 L["TANKING_TOOLS_ENABLE"] = "Включить инструменты танка"
 L["TANKING_TOOLS_MINIMAP_SUMMARY"] =
 	"Холодное начало, снижение брони, парирования и кольца льда."
@@ -545,7 +608,7 @@ L["TANKING_TOOLS_PARRY_OTHERS_DESC"] =
 	"Сообщает, когда противник парирует атаки любого другого участника вашей группы. Список рядом задаёт, куда уходит строка."
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "Не учитывать танков"
 L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"] =
-	"Молчать, если парировали атаку танка: назначенного главным танком в рейде или игрока с ролью танка из поиска группы в группе. Второй танк стоит перед боссом ради смены танков, и это не та ошибка, о которой стоит шептать. О ваших собственных парированиях сообщается по-прежнему."
+	"Молчать, если парировали атаку танка: назначенного главным танком в рейде, а в группе игрока, выбравшего роль танка в поиске группы. Второй танк стоит перед боссом ради смены танков, и это не та ошибка, о которой стоит шептать. О ваших собственных парированиях сообщается по-прежнему."
 L["TANKING_TOOLS_PARRY_IGNORE_PETS"] = "Не учитывать питомцев"
 L["TANKING_TOOLS_PARRY_IGNORE_PETS_DESC"] =
 	"Молчать, если парировали атаку питомца, в том числе вашего. Питомец стоит там, куда его послал хозяин, а строка с именем питомца никому в группе ничего не даёт. Питомцам в любом случае никогда не шепчут."
@@ -719,3 +782,12 @@ L["PARRY_WHISPER"] =
 
 L["NOVA"] = "Кольцо льда! %s: %s на %s."
 L["NOVA_AOE"] = "Кольцо льда по площади! %s: %s."
+
+--[[
+    Opens on a bang naming the news, like every other alert line.
+
+    TRANSLATORS: %s in PEER_PRESSURE_TARGET is, in order: caster, spell, and
+    the friendly player it was cast on. The target is a player, never a mob.
+]]
+L["PEER_PRESSURE"] = "Групповое давление! %s применяет %s."
+L["PEER_PRESSURE_TARGET"] = "Групповое давление! %s применяет %s на %s."

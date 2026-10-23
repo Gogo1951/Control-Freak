@@ -211,13 +211,11 @@ ns.DATABASE_DEFAULTS = {
 			    affiliation would pick the same row every time; how long the effect
 			    lasts is the question that actually has two answers here.
 
-			    That split replaced a minimum-duration filter, and it is a better
-			    answer to the same problem. The filter threw the short ones away;
-			    this routes them. A one-second stun is still worth SEEING -- it
-			    explains the global you just lost -- it is only not worth putting
-			    in front of the whole group. So Short prints to the player's own
-			    window and Long announces, and the threshold between them is one
-			    dropdown rather than a wall the short ones fall off.
+			    A one-second stun is still worth SEEING -- it explains the global
+			    you just lost -- it is only not worth putting in front of the
+			    whole group. So Short prints to the player's own window and Long
+			    announces, and the threshold between them is one dropdown rather
+			    than a wall the short ones fall off.
 
 			    Long announcing is the fourth alert in the add-on to do so for the
 			    reason the other three do: the person reading their own window is
@@ -328,6 +326,31 @@ ns.DATABASE_DEFAULTS = {
 			cooldown = ns.BAD_PET_COOLDOWN_DEFAULT,
 		}),
 		--[[
+		    Ships the way Thanks for the Buff ran it, where this tab came from: on
+		    everywhere, in any seat, printing to the player's own window with the
+		    Thunder sound. Saved choices stayed in that add-on's profile, so a
+		    player who had tuned it there starts again from these.
+
+		    Names no mob, so noTarget: the line is a classmate and a cooldown,
+		    and a target, when it names one, is a friendly player.
+
+		    The My row ships OFF, as Thanks for the Buff's "Trigger on Own
+		    Casts" did: the point is hearing a classmate press a cooldown, and
+		    the player already knows when they press their own. Announce stays
+		    on offer for the player who wants that row: a tank calling Shield
+		    Wall or Last Stand in group chat is the one line here the group
+		    can use.
+
+		    Which cooldowns count is the Tracked Abilities page, read from the
+		    rows in this flavor's Peer-Pressure-Abilities file, where a row's
+		    shipsOff starts it unticked.
+		]]
+		peerPressure = FeatureDefaults("peerPressure", {
+			alert = WhoseAlertDefaults("Control Freak: Thunder", {
+				mine = { enabled = false, output = ns.ALERT_OUTPUT_DEFAULT },
+			}, true),
+		}),
+		--[[
 		    Every targeted section on this tab ships narrowed: Armor Debuffs and
 		    Parries at BOSS, Cold Openers at ELITE_0.
 		    All three fire on ordinary combat outcomes rather than on a tracked
@@ -432,6 +455,11 @@ ns.DATABASE_DEFAULTS = {
 			nova = WhoseAlertDefaults("Control Freak: Nova", nil, true),
 		}),
 
+		--[[
+		    Keyed by spell id: true unticks a row, and false ticks a row whose
+		    data ships it unticked (shipsOff, Peer Pressure's rows only). Empty
+		    on purpose, so Reset Profile puts every row back on the data.
+		]]
 		ignoredSpells = {},
 
 		--[[

@@ -39,6 +39,30 @@ function ns.BuildBadPriestsOptions()
 	local args = {}
 	local hidden = ns.AddFeatureScope(args, Feature, "BAD_PRIESTS_SUMMARY", "BAD_PRIESTS_ENABLE", 1, "badPriests")
 
+	--[[
+	    A client whose data carries no Power Word: Shield row can never fire this
+	    tab, so it says so between the summary and the switch. Read from the data
+	    rather than the flavor (COMPATIBILITY: data first); Season of Discovery is
+	    the shipping client that leaves the row out, which is why the line names it.
+	]]
+	local hasShield = false
+	for _, group in ipairs(ns.ABILITY_GROUPS) do
+		if group.category == "SHIELD" then
+			hasShield = true
+		end
+	end
+	local function StatusHidden()
+		return hasShield
+	end
+	args.discoveryStatus = {
+		type = "description",
+		name = ns.OptionsSubLabel(L["BAD_PRIESTS_DISCOVERY_STATUS"]),
+		fontSize = "medium",
+		order = 2.3,
+		hidden = StatusHidden,
+	}
+	args.discoveryStatusSpace = ns.OptionsSpacer(2.6, StatusHidden)
+
 	ns.AddWhoseAlertSection(args, "alert", Section, 20, hidden, {
 		headerKey = "BAD_PRIESTS_HEADER",
 		enableKey = "BAD_PRIESTS_ALERT_ENABLE",
@@ -48,7 +72,7 @@ function ns.BuildBadPriestsOptions()
 		noTarget = true,
 		sample = {
 			key = "SHIELD_WARNING",
-			args = { ns.SAMPLE_OTHER, ns.SampleSpell(ns.SAMPLE_SPELL_IDS.POWER_WORD_SHIELD), ns.SAMPLE_PLAYER },
+			args = { ns.SampleOther("PRIEST"), ns.SpellPart(ns.SAMPLE_SPELL_IDS.POWER_WORD_SHIELD), ns.SamplePlayer() },
 		},
 		control = {
 			type = "select",
@@ -102,7 +126,7 @@ function ns.BuildBadPriestsOptions()
 				cooldowns = ns.BAD_PET_COOLDOWNS,
 				sample = {
 					key = "SHIELD_WHISPER",
-					args = { ns.SampleSpell(ns.SAMPLE_SPELL_IDS.POWER_WORD_SHIELD), ns.SAMPLE_PLAYER },
+					args = { ns.SpellPart(ns.SAMPLE_SPELL_IDS.POWER_WORD_SHIELD), ns.SamplePlayer() },
 				},
 				getWhisper = function()
 					return Section().whisper

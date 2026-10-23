@@ -66,19 +66,22 @@ end
 
 --[[
     Alerts brand as a suffix so the body's own raid-icon mark reads as the only
-    target in the line.
+    target in the line. Built apart from the print so the options panel's
+    Example line for a print-only alert is this exact string.
 ]]
+function ns.BuildAlertLine(body)
+	return TrimClosingPeriod(body)
+		.. " "
+		.. GetColor("SEPARATOR")
+		.. "//"
+		.. "|r "
+		.. GetColor("INFO")
+		.. L["ADDON_TITLE"]
+		.. "|r"
+end
+
 function ns:PrintAlert(body)
-	print(
-		TrimClosingPeriod(body)
-			.. " "
-			.. GetColor("SEPARATOR")
-			.. "//"
-			.. "|r "
-			.. GetColor("INFO")
-			.. L["ADDON_TITLE"]
-			.. "|r"
-	)
+	print(ns.BuildAlertLine(body))
 end
 
 function ns:PrintWelcome()

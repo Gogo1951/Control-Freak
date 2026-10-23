@@ -120,8 +120,8 @@ end
     Dumps the single AceDB-managed table (profiles and profileKeys; nothing
     reads ns.db.global or ns.db.char, so neither is ever written) so a player
     can paste their exact configuration: every setting in each profile,
-    the ignored abilities and taunt-kind picks row by row included, since the
-    player builds both by hand.
+    every ability row ticked or unticked against its data and every taunt-kind
+    pick included, since the player builds both by hand.
 ]]
 function ns:BuildSavedVariablesReport()
 	local lines = { GetClientHeader(), "", ns.SAVED_VARIABLES_NAME .. " = {" }

@@ -18,7 +18,7 @@ function ns.BuildBadPetsOptions()
 	    One pet, one growl, one mob for both examples: the line the group sees and
 	    the whisper its owner gets describe the same event.
 	]]
-	local GROWL = ns.SampleSpell(ns.SAMPLE_SPELL_IDS.GROWL)
+	local GROWL = ns.SpellPart(ns.SAMPLE_SPELL_IDS.GROWL)
 	local BOSS = ns.SampleBoss()
 
 	--[[
@@ -35,7 +35,8 @@ function ns.BuildBadPetsOptions()
 		othersKey = "BAD_PETS_ALERT_OTHERS",
 		sample = {
 			key = "BAD_PET",
-			args = { ns.SAMPLE_OTHER, ns.SAMPLE_PET, GROWL, BOSS },
+			row = "others",
+			args = { ns.SampleOther("HUNTER"), ns.SAMPLE_PET, GROWL, ns.SampleTarget(BOSS) },
 		},
 		--[[
 		    The whisper goes to the pet's owner rather than into the player's own
@@ -80,6 +81,7 @@ function ns.BuildBadPetsTrackedOptions()
 		abilitiesDesc = ns.OptionsDesc(L["BAD_PETS_ABILITIES_DESC"], 1),
 		abilitiesDescSpace = ns.OptionsSpacer(2),
 	}
+	ns.AddQuietStatus(args, 0.4, "badPets", "TAB_BAD_PETS")
 
 	for key, value in
 		pairs(ns.BuildAbilityToggles({

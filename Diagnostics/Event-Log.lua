@@ -17,7 +17,10 @@ local EVENT_LOG_MAX_ARG_LENGTH = 255
     still separates "the event never fired" from "it fired and nothing happened":
 
       COMBAT_LOG_EVENT_UNFILTERED  every swing in the zone; Features/Combat-Log.lua
-                                   writes back the lines it matched
+                                   writes back the interrupts and tracked-ability
+                                   casts it matched, but not the misses, armor
+                                   auras and deaths the Tanking Tools and Tank
+                                   Deaths read
       CHAT_MSG_ADDON               every add-on's messages in the group and guild;
                                    Features/Whisper-Election.lua writes back
                                    Control Freak's own

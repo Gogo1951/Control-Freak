@@ -72,11 +72,13 @@ function ns.BuildIncapacitatedOptions()
 		]]
 		sample = {
 			key = "INCAPACITATED",
+			-- Six seconds is past the shipped Long threshold, so the Long row decides the form.
+			row = "long",
 			args = {
 				L["INCAPACITATED_ROLE_TANK"],
 				string.format(L["INCAPACITATED_SECONDS"], 6),
-				ns.SAMPLE_PLAYER,
-				ns.SampleSpell(ns.SAMPLE_SPELL_IDS.FEAR),
+				ns.SamplePlayer(),
+				ns.SpellPart(ns.SAMPLE_SPELL_IDS.FEAR),
 				L["DISPEL_MAGIC"],
 				ns.SampleBoss(),
 			},

@@ -62,8 +62,8 @@ function ns.RegisterOptionsPanels()
 	    happened.
 	]]
 	--[[
-	    Registered on every flavor, Season of Discovery included, where its summary
-	    says a priest rune gives the rage back, rather than the tab hiding itself.
+	    Registered on every flavor, Season of Discovery included, where a status
+	    line says a priest rune gives the rage back, rather than the tab hiding itself.
 	]]
 	AceConfig:RegisterOptionsTable(registry.BadPriests, ns.BuildBadPriestsOptions())
 	AceConfigDialog:AddToBlizOptions(registry.BadPriests, L["TAB_BAD_PRIESTS"], L["ADDON_TITLE"])
@@ -73,7 +73,16 @@ function ns.RegisterOptionsPanels()
 	AddSubPanel(registry.BadPetsTracked, ns.BuildBadPetsTrackedOptions(), L["TRACKED_HEADER"], badPetsID)
 
 	--[[
-	    Last of the feature tabs, below the Bad pair, because it is the only one
+	    After the Bad pair, because its news is not the fight going wrong: a
+	    classmate pressed a cooldown, so the player can press theirs.
+	]]
+	AceConfig:RegisterOptionsTable(registry.PeerPressure, ns.BuildPeerPressureOptions())
+	local _, peerPressureID =
+		AceConfigDialog:AddToBlizOptions(registry.PeerPressure, L["TAB_PEER_PRESSURE"], L["ADDON_TITLE"])
+	AddSubPanel(registry.PeerPressureTracked, ns.BuildPeerPressureTrackedOptions(), L["TRACKED_HEADER"], peerPressureID)
+
+	--[[
+	    Last of the feature tabs, below Peer Pressure, because it is the only one
 	    that ships switched off -- its tools are still in beta. A tab nobody has
 	    opted into yet does not belong in the middle of the ones that work.
 	    ns.FEATURE_KEYS carries the same order; keep the two in step.

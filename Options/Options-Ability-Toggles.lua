@@ -200,8 +200,10 @@ end
       categories  -- set of ability categories to draw
       order       -- the first group's order
       hidden      -- optional predicate hung on every group
-      kindPicker  -- draws a Single Target / AOE dropdown beside each row; the
-                     Taunts tab's, see ns.GetTauntKind in Features/Ability-Index.lua
+      kindPicker  -- draws each row's kind beside it: a Single Target / AOE
+                     dropdown where the data offers a choice, the fixed kind as
+                     text elsewhere; the Taunts tab's, see ns.GetTauntKind in
+                     Features/Ability-Index.lua
 ]]
 function ns.BuildAbilityToggles(options)
 	local args = {}
@@ -239,8 +241,6 @@ function ns.BuildAbilityToggles(options)
 					if group.icon then
 						label = "|T" .. group.icon .. ":16|t " .. group.name
 					end
-					local ids = group.ids
-
 					local function IsTracked()
 						return not ns.IsAbilityIgnored(group.entry)
 					end
@@ -256,32 +256,39 @@ function ns.BuildAbilityToggles(options)
 						    is not enough for the longest ability names -- "Masterwork
 						    Target Dummy" wrapped onto a second line and left the row
 						    ragged. Sorted by name within the class, so the column reads
-						    alphabetically. A row with a dropdown beside it takes the
-						    label half instead, so the dropdown lines up with the ones
+						    alphabetically. A row with its kind beside it takes the
+						    label half instead, so the kind lines up with the dropdowns
 						    above the list.
 						]]
 						width = options.kindPicker and ns.OPTIONS_GROUP_LABEL_WIDTH or "full",
 						order = index * 2 - 1,
 						get = IsTracked,
 						set = function(_, value)
-							local ignored = ns.db.profile.ignoredSpells
-							for _, id in ipairs(ids) do
-								if value then
-									ignored[id] = nil
-								else
-									ignored[id] = true
-								end
-							end
+							ns.SetAbilityTracked(group.entry, value)
 						end,
 					}
 
-					if options.kindPicker then
+					--[[
+					    A taunt whose kind is fixed shows it as silver text in the
+					    dropdown's column: a greyed dropdown on every row read as broken.
+					    Only an entry the data marks kindChoice gets the dropdown.
+					]]
+					if options.kindPicker and ns.IsTauntKindLocked(group.entry) then
+						classArgs["kind" .. index] = {
+							type = "description",
+							name = ns.OptionsSubLabel(
+								L[group.entry.isAoe and "TAUNTS_KIND_AOE" or "TAUNTS_KIND_SINGLE"]
+							),
+							fontSize = "medium",
+							width = ns.OPTIONS_CONTROL_WIDTH,
+							order = index * 2,
+						}
+					elseif options.kindPicker then
 						local entry = group.entry
-						local locked = ns.IsTauntKindLocked(entry)
 						classArgs["kind" .. index] = {
 							type = "select",
 							name = "",
-							desc = L[not locked and "TAUNTS_KIND_DESC" or entry.isAoe and "TAUNTS_KIND_LOCKED_AOE_DESC" or "TAUNTS_KIND_LOCKED_SINGLE_DESC"],
+							desc = L["TAUNTS_KIND_DESC"],
 							width = ns.OPTIONS_CONTROL_WIDTH,
 							order = index * 2,
 							values = {
@@ -291,7 +298,7 @@ function ns.BuildAbilityToggles(options)
 							sorting = ns.TAUNT_KINDS,
 							-- Greyed while the row is unticked: an ignored taunt reports nothing either way.
 							disabled = function()
-								return locked or not IsTracked()
+								return not IsTracked()
 							end,
 							get = function()
 								return ns.GetTauntKind(entry)

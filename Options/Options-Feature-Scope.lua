@@ -61,8 +61,8 @@ end
 
 --[[
     A feature's on/off switch, built here for its own tab and for the General
-    panel's Features block, so the two copies are one setting with one caption
-    and tooltip. The flag decides whether the combat log is registered, so the
+    panel's Features block, so the two copies are one setting with one tooltip.
+    Each caller passes its own caption key. The flag decides whether the combat log is registered, so the
     write goes through ns:ApplyProfile, which also redraws whichever copy is open.
 ]]
 function ns.FeatureEnableToggle(getFeature, enableKey, width, order)
@@ -97,13 +97,13 @@ function ns.AddFeatureScope(args, getFeature, summaryKey, enableKey, order, scop
 	end
 
 	--[[
-	    Optional. A tab whose sections each introduce themselves has nothing left
-	    for one sentence at the top to say, so it opens on the enable instead.
+	    Above everything, for All Alerts only: this feature's own switch being off
+	    already collapses the page to the switch that says so.
 	]]
-	if summaryKey then
-		args.scopeSummary = ns.OptionsDesc(L[summaryKey], order)
-		args.scopeSpace0 = ns.OptionsSpacer(order + 1)
-	end
+	ns.AddQuietStatus(args, order - 0.6)
+
+	args.scopeSummary = ns.OptionsDesc(L[summaryKey], order)
+	args.scopeSpace0 = ns.OptionsSpacer(order + 1)
 
 	--[[
 	    Whichever of this tab's scope questions is a choice rather than a switch.
