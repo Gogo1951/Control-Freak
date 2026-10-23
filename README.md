@@ -45,29 +45,6 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 
 Plenty of add-ons and WeakAuras already handled announcements, but each had its own interface and its own filter settings. Wanting a callout only on bosses, or only while you're tanking or healing, meant hunting for that option in every one of them, when it existed at all. Control Freak brings those great ideas under one roof, with one consistent layout and plenty of easy settings: every alert on every tab is built from the same block, so once you've set one, you know how to set them all.
 
-- **Enable Alerts** // The alert's own switch. An alert aimed at one mob carries the enemies it counts beside it: Everything, Elites & Bosses, Elites Your Level+ & Bosses, or Bosses. Each choice includes the ones after it, and since a dungeon boss carries no skull, the third choice is the one that keeps it while dropping the lower-level trash around it.
-- **My and Others' Rows** // Your own casts, your pet's included, and everybody else's in your group. Each row says where its line goes: Print (Self Only) or Announce.
-- **Always Alert on Marked Targets** // A mob carrying a raid mark always counts, whatever the enemy choice says. On by default.
-- **Play Sound** // Control Freak's own sounds, plus any your other add-ons share.
-- **Example** // Every block shows a sample of exactly what your group would see.
-
-A few alerts bend the block. Incapacitated splits its rows into short and long, Tank Deaths into your own death and other tanks', and Bad Shields and Armor Debuffs report through a single row. Bad Pets, Bad Shields, and Parries can also whisper the person responsible, once per cooldown.
-
-Above its alerts, each tab asks when it should speak at all: which seat you're in (As a Tank, As a Healer, As a Tank or Healer, or Always), whether you're inside a dungeon or raid, and on Taunts, Bad Priests, Bad Pets, and Tanking Tools, whether the group has a living tank.
-
-### What the Lines Look Like
-
-Printed or announced, a line leads with the news and ends with the add-on's name. Spells are real links, and a marked mob keeps its raid mark.
-
-| Alert | Line |
-|---|---|
-| Failed Taunts | Taunt Failed! Gogo's [Taunt] on Gluth was resisted // Control Freak |
-| Successful Interrupts | Interrupt! Gogo's [Pummel] on Gothik the Harvester stopped [Shadow Bolt] // Control Freak |
-| Being Incapacitated | Tank Incapacitated for 6 seconds! Gogo is afflicted by [Fear] (Magic) from Maexxna // Control Freak |
-| Tank Deaths | Tank Down! Gogo has died // Control Freak |
-| Pet Taunts | Bad Pet! Joe's pet Snuffles used [Growl] on Anub'Rekhan // Control Freak |
-| Cooldowns | Peer Pressure! Spek used [Rapid Fire] // Control Freak |
-
 ### Mini-Map Button
 
 | Click | What It Does |
