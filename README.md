@@ -39,7 +39,7 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 
 🦺 **Quiet by Default** // Most alerts stay in your own window until you decide otherwise. Group announcements stay quiet when you're ungrouped or in PvP, and one-time whispers prevent the same mistake from becoming a chorus of messages.
 
-## Things to Know
+## Advanced
 
 ### Every Alert Works the Same Way
 
