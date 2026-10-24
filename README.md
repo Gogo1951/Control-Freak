@@ -35,9 +35,7 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 
 🚂 **Feel Peer Pressure** // Get pinged the moment another player of your class pops a cooldown, so you can stack yours on top.
 
-🎛️ **Your Alerts, Your Rules** // Control where every alert appears, which enemies count, when each tab speaks, whether marked targets always trigger, and which sound plays. Filter alerts by role, dungeon or raid, and whether your group has a living tank.
-
-🦺 **Quiet by Default** // Most alerts stay in your own window until you decide otherwise. Group announcements stay quiet when you're ungrouped or in PvP, and one-time whispers prevent the same mistake from becoming a chorus of messages.
+🦺 **Your Alerts, Your Rules** // Customize where alerts appear, which enemies count, and which sounds play. Most alerts stay in your own window, while group announcements stay quiet when you're ungrouped or in PvP. One-time whispers prevent repeat mistakes from becoming a chorus.
 
 ## Advanced
 
