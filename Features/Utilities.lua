@@ -70,7 +70,7 @@ local function AsSpellLink(answer, spellId)
 	return "|cff" .. ns.SPELL_LINK_COLOR .. "|Hspell:" .. spellId .. ":0|h[" .. name .. "]|h|r"
 end
 
-function ns.GetSpellLink(spellId)
+local function GetSpellLink(spellId)
 	return AsSpellLink(C_Spell.GetSpellLink(spellId), spellId)
 end
 
@@ -93,7 +93,7 @@ end
 function ns.GetSpellDisplay(spellId, fallbackName)
 	local known = spellId and spellId ~= 0
 	if known then
-		local link = ns.GetSpellLink(spellId)
+		local link = GetSpellLink(spellId)
 		if link then
 			return link
 		end
@@ -307,12 +307,7 @@ end
     this add-on can tell, so a tab narrowed to healers stays quiet for them.
 ]]
 function ns.IsPlayerHealer()
-	return ns.IsUnitHealer("player")
-end
-
--- The per-unit form, kept as the pair to ns.IsUnitTank.
-function ns.IsUnitHealer(unit)
-	return HAS_ROLES and UnitGroupRolesAssigned(unit) == "HEALER"
+	return HAS_ROLES and UnitGroupRolesAssigned("player") == "HEALER"
 end
 
 --[[
@@ -443,7 +438,7 @@ function ns.FindTankUnit(guid)
 end
 
 --------------------------------------------------------------------------------
--- Cooldowns
+-- Choices
 --------------------------------------------------------------------------------
 
 --[[

@@ -105,16 +105,17 @@ function ns:HandleUnitDeath(destGUID, destName, destFlags)
 	    anybody cares -- "Tank Down!" says everything the Warrior line would have
 	    and the thing it would not.
 
-	    The row is named outright rather than left to the flags, and its switch
-	    is read here rather than left to ns:Alert, because a tank death the
-	    section is not going to report falls through to the log below. Somebody
-	    who switched Others' Tank Deaths off and ticked Warrior asked to hear
-	    about warriors, and a warrior who happened to be tanking is still one.
+	    The row is named outright rather than left to the flags, and where it
+	    sends the line is asked here rather than left to ns:Alert, because a
+	    tank death the section is not going to report falls through to the log
+	    below. Somebody who switched Others' Tank Deaths off and ticked Warrior
+	    asked to hear about warriors, and a warrior who happened to be tanking is
+	    still one.
 	]]
 	local settings = feature.alert
 	local rowKey = isMine and "mine" or "others"
-	local row = settings[rowKey]
-	if IsTank(unit) and settings.enabled and row and row.enabled then
+	local doPrint, channel = ns.ResolveAlertDestination(settings, destFlags, rowKey)
+	if IsTank(unit) and settings.enabled and (doPrint or channel) then
 		ns:Alert(settings, "TANK_DEATHS_TANK_LINE", { playerPart }, destFlags, nil, nil, rowKey)
 		return
 	end

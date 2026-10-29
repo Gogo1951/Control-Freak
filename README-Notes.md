@@ -18,12 +18,30 @@
 
 ### Brand last on local alert prints
 
-- **Departs from:** MESSAGES, combat-related prints lead "with its short name, `L["ADDON_SHORT"]`".
+- **Departs from:** MESSAGES, "Every print leads with the Full Name, `L["ADDON_TITLE"]`."
 - **Instead:** Alert prints in the player's own window put the brand last, `body // Control Freak`, the same shape the group sees in chat.
 - **Why:** An alert body already opens on its headline and carries its target's raid mark, so leading with any brand only delays the news.
 
 ### Enable Control Freak under Master Switch
 
 - **Departs from:** OPTIONS PANEL → Main Page Layout, "Features never holds a switch for the whole add-on," and its page order, which has no section above Features.
-- **Instead:** Enable Control Freak (All Alerts, `ns.db.profile.enabled`) sits alone under a Master Switch header, just above Features. In Features, the feature switches sit in tiers, each with its icon ahead of its caption, two to a line with a blank line between tiers: Taunts, Interrupts and Fears; Incapacitated and Tank Deaths; Bad Pets and Bad Priests; then Peer Pressure and Tanking Tools. All of them, and the Tanking Tools section, hide while it is off.
-- **Why:** the switch silences every alert without unloading the add-on, and the mini-map button's Left-Click toggles the same setting; the button can be hidden, so the panel keeps a copy.
+- **Instead:** Enable Control Freak (All Alerts, `ns.db.profile.enabled`) sits alone under a Master Switch header, just above Features. In Features, each feature switch carries its tab's own name with its icon ahead of it, two to a line, in blocks with a blank line between them: a gold Monitoring switch over Taunts, Interrupts, Fears, Incapacitated, Tank Deaths and Peer Pressure; a gold Naughty List switch over Bad Mages, Bad Parry Monkeys, Bad Pets and Bad Priests; then a gold Tanking Tools switch over Cold Openers and Armor Debuffs. Each gold switch silences the switches indented under it, which grey out rather than hide. All of them hide while it is off.
+- **Why:** the switch silences every alert in one click without unloading the add-on or changing any group's or feature's own switch, so switching it back on restores exactly what was on.
+
+### Group pages in the settings tree
+
+- **Departs from:** OPTIONS PANEL → Panels and Registration, "General (root) → feature panels, each followed by its sub-panels."
+- **Instead:** Monitoring and Naughty List each have a page under the root with their feature tabs nested beneath it, and Tanking Tools stays directly under the root.
+- **Why:** the tree mirrors the General panel's Features groups, so a player finds each tab under the switch that silences it.
+
+### Mini-map tooltip while All Alerts is off
+
+- **Departs from:** MINIMAP BUTTON → Tooltip Structure, the per-feature blocks.
+- **Instead:** while All Alerts is off, the tooltip replaces its click blocks with one line saying nothing fires, and every click but Shift + Middle-Click does nothing.
+- **Why:** with every alert silenced, those blocks would advertise clicks that change nothing.
+
+### Sub-panels nest by category ID
+
+- **Departs from:** OPTIONS PANEL → Panels and Registration, "registered with that panel's display name as the parent."
+- **Instead:** group pages, feature tabs and their sub-panels register under the category ID their parent's registration returned, while Profiles, Feedback & Support and Diagnostic Tools pass the Full Name.
+- **Why:** the tree nests more than one level deep, and a lookup by display name does not reliably find a parent below the top level on every client.

@@ -11,8 +11,9 @@ local L = ns.L
         One or two sentences on what it is and why it is worth having.
 
         [ ] Enable Alerts for Name of the alert On  [ Everything v]
-            [ ] My Name of the alert            [ Print (Self Only) v]
-            [ ] Others' Name of the alert       [ Print (Self Only) v]
+                                    Print (Self Only)  Announce
+            My Name of the alert           [ ]         [ Never v]
+            Others' Name of the alert      [ ]         [ Never v]
             [ ] Always Alert on Marked Targets
             [ ] Play Sound                      [ Control Freak: ... v]
 
@@ -55,7 +56,8 @@ ns.SAMPLE_RAID_ICON = 8
     party chat for the line a section puts in front of the group, a whisper for
     the note one player receives, and the player's own window for a line that
     never leaves it. Party rather than raid because both are drawn the same way
-    and party is the one every group has.
+    and party is the one every group has, so In a Party and In a Party or Raid
+    draw alike.
 
     chatType is the client's own ChatTypeInfo key, so a player who recoloured
     party chat sees their own colour. The hex is only for a client that has not
@@ -63,7 +65,7 @@ ns.SAMPLE_RAID_ICON = 8
     so "[Party]" and "whispers:" read in the player's language.
 ]]
 local SAMPLE_FORMS = {
-	ANNOUNCE = { chatType = "PARTY", hex = "AAAAFF", prefix = CHAT_PARTY_GET or "[Party] %s: " },
+	PARTY = { chatType = "PARTY", hex = "AAAAFF", prefix = CHAT_PARTY_GET or "[Party] %s: " },
 	WHISPER = { chatType = "WHISPER", hex = "FF80FF", prefix = CHAT_WHISPER_GET or "%s whispers: " },
 }
 
@@ -150,7 +152,7 @@ end
     the line after it is drawn the way it will actually arrive, so the player
     sees what their settings put where before it happens:
 
-      ANNOUNCE  "[Party] [Gogo]: ..." in party colour, through
+      PARTY     "[Party] [Gogo]: ..." in party colour, through
                 ns:BuildAnnounceMessage -- the same call every sent line uses --
                 with the {rtN} token drawn as the mark the receiving client shows
       WHISPER   "[Gogo] whispers: ..." in whisper colour, the same call again
@@ -162,10 +164,12 @@ end
 ]]
 local function RenderSample(sample, formKey)
 	local rich = formKey == "PRINT"
-	local count = #sample.args
+	-- A function for a line built from the player's own settings, read each time the panel draws.
+	local args = type(sample.args) == "function" and sample.args() or sample.args
+	local count = #args
 	local rendered = {}
 	for index = 1, count do
-		local part = sample.args[index]
+		local part = args[index]
 		if type(part) == "table" and part.kind == "samplePlayer" then
 			part = ns.PlayerPart(PlayerName(), nil, PlayerClass())
 		end
@@ -176,7 +180,7 @@ local function RenderSample(sample, formKey)
 	if rich then
 		line = Tint(ns.GetColor("TEXT"), ns.BuildAlertLine(string.format(L[sample.key], unpack(rendered, 1, count))))
 	else
-		local form = SAMPLE_FORMS[formKey or "ANNOUNCE"]
+		local form = SAMPLE_FORMS[formKey or "PARTY"]
 		local message = ns:BuildAnnounceMessage(sample.key, unpack(rendered, 1, count))
 		message = string.gsub(message, "{rt(%d)}", function(index)
 			return ns.GetRaidIconTexture(tonumber(index))
@@ -261,9 +265,9 @@ end
     the locale once. Sorting comes from the ladders in Data/Data.lua, so each
     dropdown lists its choices in the order the ladder is written.
 ]]
-local OUTPUT_VALUES = {}
-for _, output in ipairs(ns.ALERT_OUTPUTS) do
-	OUTPUT_VALUES[output] = L["ALERT_OUTPUT_" .. output]
+local ANNOUNCE_VALUES = {}
+for _, scope in ipairs(ns.ANNOUNCE_SCOPES) do
+	ANNOUNCE_VALUES[scope] = L["ALERT_ANNOUNCE_" .. scope]
 end
 
 local RUNG_VALUES = {}
@@ -422,10 +426,10 @@ local function AddSoundRow(args, prefix, order, rowsHidden, getSettings)
 end
 
 --[[
-    The sample under a section, drawn the way the selected destination will
-    draw it: a row set to Print shows the line in the player's own window, a row
-    set to Announce shows it in party chat. The line belongs to one row --
-    sample.row, "mine" unless the sample names somebody else -- so it is that
+    The sample under a section, drawn the way the row will draw it in a group: a
+    row that announces anywhere shows the line in party chat, and one that never
+    announces shows it in the player's own window. The line belongs to one row
+    -- sample.row, "mine" unless the sample names somebody else -- so it is that
     row's dropdown the sample follows. A function, so the panel redraws it the
     moment the dropdown changes; the names and the boss in it were dealt at
     build time and hold still.
@@ -436,8 +440,8 @@ local function AddSample(args, prefix, order, hidden, sample, getSettings)
 		type = "description",
 		name = function()
 			local row = getSettings()[sample.row or "mine"]
-			local output = ns.ResolveChoice(row and row.output, ns.ALERT_OUTPUTS, ns.ALERT_OUTPUT_DEFAULT)
-			return RenderSample(sample, output)
+			local announce = ns.ResolveChoice(row and row.announce, ns.ANNOUNCE_SCOPES, ns.ANNOUNCE_SCOPE_DEFAULT)
+			return RenderSample(sample, announce == "NEVER" and "PRINT" or "PARTY")
 		end,
 		fontSize = "medium",
 		order = order + 1,
@@ -450,9 +454,40 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    One row of the whose shape: a switch naming whose casts, and beside it where
-    their line goes. The pair is one sentence -- report my taunts, to my window --
-    which is why the dropdown sits beside the switch rather than under it.
+    The whose rows are three columns under the indent: the row's caption, its
+    Print (Self Only) box, and its Announce dropdown. The dropdown keeps the
+    sub-option control width so it starts in the column every dropdown above it
+    shares; the print column comes out of the caption's half, wide enough for
+    its header.
+]]
+local PRINT_COLUMN_WIDTH = 0.75
+local ROW_CAPTION_WIDTH = ns.OPTIONS_SUB_LABEL_WIDTH - PRINT_COLUMN_WIDTH
+
+-- The column headers over a section's whose rows.
+local function WhoseHeaderRow(order, hidden)
+	return ns.OptionsSubRow(order, hidden, {
+		caption = { type = "description", name = " ", width = ROW_CAPTION_WIDTH, order = 1 },
+		print = {
+			type = "description",
+			name = ns.OptionsSubLabel(L["ALERT_PRINT_HEADER"]),
+			fontSize = "medium",
+			width = PRINT_COLUMN_WIDTH,
+			order = 2,
+		},
+		announce = {
+			type = "description",
+			name = ns.OptionsSubLabel(L["ALERT_ANNOUNCE_HEADER"]),
+			fontSize = "medium",
+			width = ns.OPTIONS_SUB_CONTROL_WIDTH,
+			order = 3,
+		},
+	})
+end
+
+--[[
+    One row of the whose shape: a caption naming whose casts, whether its line
+    prints, and where it is announced. The box carries the row's own tooltip
+    ahead of what printing does, since the caption beside it cannot show one.
 ]]
 local function WhoseRow(order, hidden, getSettings, key, labelKey, descKey)
 	local function Row()
@@ -460,32 +495,39 @@ local function WhoseRow(order, hidden, getSettings, key, labelKey, descKey)
 	end
 
 	return ns.OptionsSubRow(order, hidden, {
-		[key] = {
-			type = "toggle",
+		[key .. "Caption"] = {
+			type = "description",
 			name = ns.OptionsSubLabel(L[labelKey]),
-			desc = L[descKey],
-			width = ns.OPTIONS_SUB_LABEL_WIDTH,
+			fontSize = "medium",
+			width = ROW_CAPTION_WIDTH,
 			order = 1,
+		},
+		[key .. "Print"] = {
+			type = "toggle",
+			name = "",
+			desc = L[descKey] .. "\n\n" .. L["ALERT_PRINT_DESC"],
+			width = PRINT_COLUMN_WIDTH,
+			order = 2,
 			get = function()
-				return Row().enabled
+				return Row().print
 			end,
 			set = function(_, value)
-				Row().enabled = value
+				Row().print = value
 			end,
 		},
-		[key .. "Output"] = {
+		[key .. "Announce"] = {
 			type = "select",
 			name = "",
-			desc = L["ALERT_OUTPUT_DESC"],
+			desc = L["ALERT_ANNOUNCE_DESC"],
 			width = ns.OPTIONS_SUB_CONTROL_WIDTH,
-			order = 2,
-			values = OUTPUT_VALUES,
-			sorting = ns.ALERT_OUTPUTS,
+			order = 3,
+			values = ANNOUNCE_VALUES,
+			sorting = ns.ANNOUNCE_SCOPES,
 			get = function()
-				return ns.ResolveChoice(Row().output, ns.ALERT_OUTPUTS, ns.ALERT_OUTPUT_DEFAULT)
+				return ns.ResolveChoice(Row().announce, ns.ANNOUNCE_SCOPES, ns.ANNOUNCE_SCOPE_DEFAULT)
 			end,
 			set = function(_, value)
-				Row().output = value
+				Row().announce = value
 			end,
 		},
 	})
@@ -522,9 +564,10 @@ end
     the slot beside the switch, then the rows under it
 
         [ ] Enable Alerts for <thing> On              [ Everything v]
-            [ ] My <thing>              [ Print (Self Only)  v]
-            [ ] Others' <thing>         [ Print (Self Only)  v]
-                <caption>               [ ...                v]   (captionRow)
+                                   Print (Self Only)  Announce
+                My <thing>                [ ]         [ Never              v]
+                Others' <thing>           [ ]         [ Never              v]
+                <caption>                             [ ...                v]   (captionRow)
             [ ] Always Alert on Marked Targets
             [ ] ...                                                (extraRow)
             [ ] Play Sound              [ Control Freak: ... v] (speaker)
@@ -543,10 +586,11 @@ end
                  drops the word
       descKey    one or two sentences between them
       sample     { key, args, row } naming a real locale format and stand-in
-                 arguments. row is optional, "mine" by default, and names the
-                 row whose dropdown picks the form. Redrawn every time the panel
-                 draws, through ns.BuildAlertLine when that row prints and
-                 ns:BuildAnnounceMessage when it announces
+                 arguments, or a function returning them for a line built from
+                 the player's own settings. row is optional, "mine" by default, and names the
+                 row whose Announce dropdown picks the form. Redrawn every time
+                 the panel draws, through ns.BuildAlertLine when that row never
+                 announces and ns:BuildAnnounceMessage when it does
       mineKey    the caption of the player's own row, "My <thing>"
       mineDescKey
                  optional. The tooltip of that row, for a section whose row is
@@ -632,6 +676,8 @@ function ns.AddWhoseAlertSection(args, prefix, getSettings, order, hidden, optio
 				descKey = options.othersDescKey or "ALERT_OTHERS_DESC",
 			} or nil,
 		}
+
+	args[prefix .. "WhoseHeaderRow"] = WhoseHeaderRow(order + 6.8, rowsHidden)
 
 	for index, row in ipairs(rows) do
 		-- MineRow, OthersRow, ShortRow, LongRow: the stored key, capitalized.

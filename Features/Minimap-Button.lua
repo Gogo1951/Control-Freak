@@ -7,6 +7,64 @@ local LibDataBroker = LibStub("LibDataBroker-1.1")
 local LibDBIcon = LibStub("LibDBIcon-1.0")
 
 --------------------------------------------------------------------------------
+-- Blocks
+--------------------------------------------------------------------------------
+
+--[[
+    One block per click, in tooltip order: the two General panel groups and
+    Tanking Tools, the three switches the Features block draws in gold. Each
+    summary names everything its switch reaches, so a player sees what there is
+    to turn on before opening the panel.
+]]
+local function GroupBlock(groupKey, labelKey, summaryKey, bindingKey, button, shift)
+	return {
+		labelKey = labelKey,
+		summaryKey = summaryKey,
+		bindingKey = bindingKey,
+		button = button,
+		shift = shift,
+		isOn = function(profile)
+			return profile.featureGroups[groupKey] ~= false
+		end,
+		toggle = function(profile)
+			profile.featureGroups[groupKey] = profile.featureGroups[groupKey] == false
+		end,
+	}
+end
+
+local BLOCKS = {
+	GroupBlock(
+		"monitoring",
+		"OPTIONS_MONITORING_LABEL",
+		"MONITORING_MINIMAP_SUMMARY",
+		"LEFT_CLICK",
+		"LeftButton",
+		false
+	),
+	GroupBlock(
+		"naughtyList",
+		"OPTIONS_NAUGHTY_LIST_LABEL",
+		"NAUGHTY_LIST_MINIMAP_SUMMARY",
+		"RIGHT_CLICK",
+		"RightButton",
+		false
+	),
+	{
+		labelKey = "TAB_TANKING_TOOLS",
+		summaryKey = "TANKING_TOOLS_MINIMAP_SUMMARY",
+		bindingKey = "MINIMAP_SHIFT_LEFT_CLICK",
+		button = "LeftButton",
+		shift = true,
+		isOn = function(profile)
+			return profile.tankingTools.enabled
+		end,
+		toggle = function(profile)
+			profile.tankingTools.enabled = not profile.tankingTools.enabled
+		end,
+	},
+}
+
+--------------------------------------------------------------------------------
 -- Tooltip
 --------------------------------------------------------------------------------
 
@@ -29,36 +87,26 @@ local function RefreshTooltip(anchor)
 
 	local profile = ns.db and ns.db.profile
 
-	tooltip:AddDoubleLine(GetColor("TITLE") .. L["KILL_SWITCH"] .. "|r", StateText(profile and profile.enabled))
-	tooltip:AddLine(GetColor("BODY") .. L["KILL_SWITCH_ENABLE_DESC"] .. "|r", 1, 1, 1, true)
-	tooltip:AddDoubleLine(GetColor("INFO") .. L["LEFT_CLICK"] .. "|r", GetColor("INFO") .. L["ACTION_TOGGLE"] .. "|r")
-
 	--[[
-	    The add-on's own switch unregisters the combat log outright, so with it off
-	    Tanking Tools cannot fire whatever its own setting says. Its block would
-	    then advertise a toggle that changes nothing, so it goes with everything
-	    else.
-
-	    The tooltip lists only what a click on the button changes, so no other tab
-	    appears. Tanking Tools is the one tab with a block and a binding, and it
-	    earns them by shipping switched off as an opt-in: Right-Click is the way in
-	    and out mid-run without opening the panel. Its summary is the mini-map's
-	    own, kept to two lines, rather than the tab's longer one.
+	    All Alerts has no binding, so it has no block. With it off nothing fires
+	    whatever the three switches say, so their blocks would advertise clicks
+	    that change nothing: they go, and one line says why.
 	]]
 	if profile and profile.enabled then
+		for _, block in ipairs(BLOCKS) do
+			tooltip:AddDoubleLine(GetColor("TITLE") .. L[block.labelKey] .. "|r", StateText(block.isOn(profile)))
+			tooltip:AddLine(GetColor("BODY") .. L[block.summaryKey] .. "|r", 1, 1, 1, true)
+			tooltip:AddDoubleLine(
+				GetColor("INFO") .. L[block.bindingKey] .. "|r",
+				GetColor("INFO") .. L["ACTION_TOGGLE"] .. "|r"
+			)
+			tooltip:AddLine(" ")
+		end
+	else
+		tooltip:AddLine(GetColor("OFF") .. L["MINIMAP_ALL_ALERTS_OFF"] .. "|r", 1, 1, 1, true)
 		tooltip:AddLine(" ")
-		tooltip:AddDoubleLine(
-			GetColor("TITLE") .. L["TAB_TANKING_TOOLS"] .. "|r",
-			StateText(profile.tankingTools.enabled)
-		)
-		tooltip:AddLine(GetColor("BODY") .. L["TANKING_TOOLS_MINIMAP_SUMMARY"] .. "|r", 1, 1, 1, true)
-		tooltip:AddDoubleLine(
-			GetColor("INFO") .. L["RIGHT_CLICK"] .. "|r",
-			GetColor("INFO") .. L["ACTION_TOGGLE"] .. "|r"
-		)
 	end
 
-	tooltip:AddLine(" ")
 	tooltip:AddLine(GetColor("TITLE") .. L["MINIMAP_OPTIONS"] .. "|r")
 	tooltip:AddLine(GetColor("INFO") .. L["SHIFT_MIDDLE_CLICK"] .. "|r")
 
@@ -97,40 +145,31 @@ ns.LDBObject = LibDataBroker:NewDataObject(ns.LOCALE_NAME, {
 		end
 
 		--[[
-		    Both bindings flip an `enabled` and therefore go through
-		    ns:ApplyProfile rather than a bare NotifyChange. That flag decides
-		    whether COMBAT_LOG_EVENT_UNFILTERED is registered at all, so setting it
-		    without re-running the registration test would leave the add-on hooked
-		    into every combat line for a feature the player just switched off -- or
-		    unhooked from one they just switched on. ApplyProfile also notifies every
-		    panel, so the open options page follows along.
+		    Every binding flips a switch that decides whether
+		    COMBAT_LOG_EVENT_UNFILTERED is registered at all, so it goes through
+		    ns:ApplyProfile rather than a bare NotifyChange: setting it without
+		    re-running the registration test would leave the add-on hooked into
+		    every combat line for a feature the player just switched off, or
+		    unhooked from one they just switched on. ApplyProfile also notifies
+		    every panel, so the open options page follows along.
 
-		    Right-Click is ignored while the add-on's own switch is off, matching
-		    the tooltip: the block is not drawn, so the binding is not on offer.
-
-		    A shifted Left- or Right-Click is ignored rather than read as the plain
-		    click: the tooltip advertises three bindings, and a click that matches
-		    none of them does nothing.
+		    Every binding is ignored while All Alerts is off, matching the tooltip,
+		    which draws no blocks then. A click that matches no block, a shifted
+		    Right-Click included, does nothing.
 		]]
-		if IsShiftKeyDown() then
+		local profile = ns.db.profile
+		if not profile.enabled then
 			return
 		end
 
-		local profile = ns.db.profile
-
-		if button == "RightButton" then
-			if profile.enabled then
-				profile.tankingTools.enabled = not profile.tankingTools.enabled
+		local shift = IsShiftKeyDown()
+		for _, block in ipairs(BLOCKS) do
+			if block.button == button and block.shift == shift then
+				block.toggle(profile)
 				ns:ApplyProfile()
 				Refresh()
+				return
 			end
-			return
-		end
-
-		if button == "LeftButton" then
-			profile.enabled = not profile.enabled
-			ns:ApplyProfile()
-			Refresh()
 		end
 	end,
 

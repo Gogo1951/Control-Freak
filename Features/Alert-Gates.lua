@@ -18,8 +18,41 @@ local _, ns = ...
     log unhooked with no event to put it right. Zone has an event that fires, so it
     can gate registration and save the work when nothing could match.
 ]]
+--[[
+    Whether the General panel's group switch over this feature is on
+    (ns.FEATURE_GROUPS). A feature in no group answers yes. Anything but a
+    stored false is on, so a profile saved before the groups existed fires as
+    it did.
+]]
+function ns.IsFeatureGroupOn(featureKey)
+	local group = ns.FEATURE_GROUP_OF[featureKey]
+	if not group then
+		return true
+	end
+	local groups = ns.db.profile.featureGroups
+	return not groups or groups[group.key] ~= false
+end
+
+--[[
+    The gates are handed the feature's table rather than its key, so the key is
+    found by identity. Ten comparisons at most, which is nothing beside the
+    seat questions the gate asks next.
+]]
+local function FeatureGroupIsOn(feature)
+	local profile = ns.db.profile
+	for featureKey in pairs(ns.FEATURE_GROUP_OF) do
+		if profile[featureKey] == feature then
+			return ns.IsFeatureGroupOn(featureKey)
+		end
+	end
+	return true
+end
+
 local function FeatureCouldFire(feature)
 	if not feature or not feature.enabled then
+		return false
+	end
+	if not FeatureGroupIsOn(feature) then
 		return false
 	end
 	if feature.instanceOnly then
@@ -67,14 +100,19 @@ local function PassesRoleFilter(feature)
 	return false
 end
 
-function ns:IsFeatureGateOpen(feature)
+--[[
+    skipTankCheck lets one alert through the tab's groupHasTank: an AOE taunt,
+    a maintainer decision, since the press that matters most comes the moment
+    the tank dies, which is exactly when the group stops having one.
+]]
+function ns:IsFeatureGateOpen(feature, skipTankCheck)
 	if not FeatureCouldFire(feature) then
 		return false
 	end
 	if not PassesRoleFilter(feature) then
 		return false
 	end
-	if feature.groupHasTank and not ns.GroupHasTank() then
+	if not skipTankCheck and feature.groupHasTank and not ns.GroupHasTank() then
 		return false
 	end
 	return true

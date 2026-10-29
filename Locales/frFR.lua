@@ -8,6 +8,7 @@ end
 --------------------------------------------------------------------------------
 
 L["ADDON_TITLE"] = "Control Freak"
+L["ADDON_SHORT_NAME"] = "Control Freak"
 L["OPTIONS_DESCRIPTION"] =
 	"Annonceur de combat pour les provocations, les interruptions, les peurs, les morts de tank, les vilains familiers, les parades, les affaiblissements d'armure et d'autres événements critiques du combat. Suivez qui a provoqué, ce qui a échoué, qui a interrompu une incantation et ce qui s'est passé, grâce à des alertes personnalisables."
 
@@ -30,27 +31,25 @@ L["ENABLE_MINIMAP_BUTTON_DESC"] = "Affiche le bouton Control Freak sur votre min
 
 L["OPTIONS_MASTER_SWITCH_HEADER"] = "Interrupteur général"
 L["OPTIONS_FEATURES_HEADER"] = "Fonctionnalités"
--- The Features block's switch captions. Each tab's own switch keeps its "Enable" caption.
-L["FEATURES_TAUNTS"] = "Suivi des provocations"
-L["FEATURES_INTERRUPTS"] = "Suivi des interruptions"
-L["FEATURES_FEARS"] = "Suivi des peurs"
-L["FEATURES_INCAPACITATED"] = "Suivi des neutralisations"
-L["FEATURES_TANK_DEATHS"] = "Suivi des morts de tank"
-L["FEATURES_BAD_PRIESTS"] = "Suivi des vilains prêtres"
-L["FEATURES_BAD_PETS"] = "Suivi des vilains familiers"
-L["FEATURES_PEER_PRESSURE"] = "Pression sociale"
-L["FEATURES_TANKING_TOOLS"] = "Outils de tank"
+-- The Features block's group switches and their tooltip, whose %s is the group's own name, then each group's page summary. Its other switches read each tab's own name (TAB_*).
+L["OPTIONS_MONITORING_LABEL"] = "Surveillance"
+L["OPTIONS_NAUGHTY_LIST_LABEL"] = "Liste des vilains"
+L["OPTIONS_GROUP_ENABLE_DESC"] =
+	"Désactive d'un coup tout ce qui figure sous %s, ou le réactive. Chaque fonction garde son propre interrupteur : en réactivant celui-ci, vous retrouvez exactement ce que vous aviez."
+L["OPTIONS_MONITORING_SUMMARY"] =
+	"Ce qui s'est passé pendant le combat : provocations, interruptions, peurs, perte de contrôle de votre personnage, morts du tank et temps de recharge d'un camarade de classe. Désactiver \"Surveillance\" les fait taire toutes les six d'un coup, et chacune garde son propre interrupteur."
+L["OPTIONS_NAUGHTY_LIST_SUMMARY"] =
+	"Quelqu'un dans le groupe qui complique la tâche du tank : la nova d'un mage, quelqu'un qui ne tanke pas et se fait parer par un boss, un familier laissé en provocation, le bouclier d'un prêtre sur un tank à rage. Désactiver \"Liste des vilains\" les fait taire toutes les quatre d'un coup, et chacune garde son propre interrupteur."
 
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/freak"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Ouvre la fenêtre des options de cet add-on."
 
 --[[
-    The add-on's own switch. KILL_SWITCH titles the mini-map tooltip's block for
-    it, naming its REACH rather than the act of throwing it. KILL_SWITCH_ENABLE
-    captions it under the General panel's Master Switch header, and
-    KILL_SWITCH_ENABLE_DESC is both that switch's tooltip and the mini-map
-    block's description, so the two cannot describe it differently.
+    The add-on's own switch. KILL_SWITCH names it in the status line a silenced
+    page opens on, naming its REACH rather than the act of throwing it.
+    KILL_SWITCH_ENABLE captions it under the General panel's Master Switch
+    header, and KILL_SWITCH_ENABLE_DESC is that switch's tooltip.
 ]]
 L["KILL_SWITCH"] = "Toutes les alertes"
 L["KILL_SWITCH_ENABLE"] = "Activer Control Freak"
@@ -95,9 +94,21 @@ L["STATE_ON"] = "Activé"
 L["STATE_OFF"] = "Désactivé"
 L["LEFT_CLICK"] = "Clic gauche"
 L["RIGHT_CLICK"] = "Clic droit"
+L["MINIMAP_SHIFT_LEFT_CLICK"] = "Maj + clic gauche"
 L["SHIFT_MIDDLE_CLICK"] = "Maj + clic du milieu"
 L["ACTION_TOGGLE"] = "Activer/désactiver"
 L["MINIMAP_OPTIONS"] = "Options de Control Freak"
+--[[
+    Each block's summary names everything its switch reaches, to show a player
+    what there is to turn on. TRANSLATORS: keep each to two lines in the
+    tooltip. TANKING_TOOLS_MINIMAP_SUMMARY, the third, sits with its tab below.
+]]
+L["MONITORING_MINIMAP_SUMMARY"] =
+	"Provocations, interruptions, peurs, neutralisation, morts de tank et pression sociale."
+L["NAUGHTY_LIST_MINIMAP_SUMMARY"] =
+	"Novas de givre, singes à parades, familiers laissés en provocation et boucliers sur les tanks à rage."
+-- Replaces the three blocks while All Alerts is off, since none of their clicks would do anything.
+L["MINIMAP_ALL_ALERTS_OFF"] = '"Toutes les alertes" est désactivé, rien ne se déclenche donc.'
 
 --------------------------------------------------------------------------------
 -- Feature Tabs
@@ -109,9 +120,11 @@ L["TAB_INTERRUPTS"] = "Interruptions"
 L["TAB_FEARS"] = "Peurs"
 L["TAB_INCAPACITATED"] = "Neutralisé"
 L["TAB_TANK_DEATHS"] = "Morts de tank"
-L["TAB_BAD_PRIESTS"] = "Vilains prêtres"
-L["TAB_BAD_PETS"] = "Vilains familiers"
 L["TAB_PEER_PRESSURE"] = "Pression sociale"
+L["TAB_BAD_MAGES"] = "Vilains mages"
+L["TAB_BAD_PARRY_MONKEYS"] = "Vilains singes à parades"
+L["TAB_BAD_PETS"] = "Vilains familiers"
+L["TAB_BAD_PRIESTS"] = "Vilains prêtres"
 L["TAB_TANKING_TOOLS"] = "Outils de tank"
 
 --------------------------------------------------------------------------------
@@ -145,7 +158,8 @@ L["SCOPE_INSTANCE_ONLY_DESC"] = "Ne se déclenche que dans les donjons et les ra
 
 --[[
     The line at the top of a page that a switch somewhere else has silenced:
-    All Alerts on any feature page, or the feature a sub-page belongs to.
+    All Alerts on any feature page, the group a feature tab sits under, or the
+    feature a sub-page belongs to. A group uses STATUS_FEATURE_OFF too.
 
     TRANSLATORS: in both, the first %s is the name of the switch that is off
     (drawn gold) and the second is STATUS_OFF (drawn red). The rest are plain
@@ -184,33 +198,39 @@ L["ALERT_SOUND_PREVIEW_DESC"] = "Joue ce son maintenant, que le son soit activé
 L["SOUND_NONE"] = "Aucun"
 
 --[[
-    The block every tab draws: whose cast is the row, where its line goes is
-    the dropdown beside it, and the target filter is a ladder rather than a
+    The block every tab draws: whose cast is the row, beside it a Print box and
+    an Announce dropdown, and the target filter is a ladder rather than a
     switch. Each section names its own two rows -- see
     TAUNTS_SUCCESS_MINE below -- because "My" and "Others'" agree with the noun
     in some languages and a shared "%s" template could not.
 
     TRANSLATORS: ALERT_AGAINST_DESC quotes one rung and one row by name; that
     wording must match your TARGET_RUNG_ELITE_0 and ALERT_MARKED_ALWAYS, or the
-    tooltip explains a choice the player cannot find. The four rungs are a
-    threshold, widest first: each one counts itself and the ones after it,
-    which is why every rung that includes bosses says so. Keep that in your
-    translations -- a rung reading only "Elites" beside a separate "Bosses"
-    reads as two disjoint sets.
+    tooltip explains a choice the player cannot find. ALERT_PRINT_DESC and
+    ALERT_ANNOUNCE_DESC quote the Announce choices the same way. Keep
+    ALERT_PRINT_HEADER short: it heads a narrow column of boxes. The four
+    rungs are a threshold, widest first: each one counts itself and the ones
+    after it, which is why every rung that includes bosses says so. Keep that
+    in your translations -- a rung reading only "Elites" beside a separate
+    "Bosses" reads as two disjoint sets.
 
     ALERT_MARKED_ALWAYS is the one control that WIDENS a section rather than
     narrowing it: a marked target counts whatever the rung says. Keep "Always"
-    in it, and keep it distinct from ALERT_OUTPUT_ANNOUNCE -- this row decides
+    in it, and keep it distinct from the Announce choices -- this row decides
     WHETHER the alert fires, never where its line goes.
 ]]
-L["ALERT_MINE_DESC"] =
-	"Signale vos propres sorts, y compris ceux de votre familier. Le menu déroulant à côté indique où va la ligne."
-L["ALERT_OTHERS_DESC"] =
-	"Signale les sorts de tous les autres membres de votre groupe. Le menu déroulant à côté indique où va la ligne."
-L["ALERT_OUTPUT_PRINT"] = "Afficher (moi seulement)"
-L["ALERT_OUTPUT_ANNOUNCE"] = "Annoncer"
-L["ALERT_OUTPUT_DESC"] =
-	'Où va cette ligne : un seul endroit, jamais les deux. "Afficher (moi seulement)", c\'est votre propre fenêtre, et cela ne coûte rien à personne. "Annoncer" l\'envoie plutôt sur le canal de groupe ou de raid, et commenter les faits et gestes des autres devant tout le raid, c\'est ainsi qu\'un add-on finit par lasser tout le monde : ce choix mérite donc réflexion. "Annoncer" reste muet quand vous n\'êtes pas en groupe, ainsi que dans les champs de bataille et les arènes.'
+L["ALERT_MINE_DESC"] = "Vos propres sorts, y compris ceux de votre familier."
+L["ALERT_OTHERS_DESC"] = "Les sorts de tous les autres membres de votre groupe."
+-- The two column headers over a section's rows, then the Announce dropdown's three choices.
+L["ALERT_PRINT_HEADER"] = "Afficher (moi seul)"
+L["ALERT_ANNOUNCE_HEADER"] = "Annoncer"
+L["ALERT_ANNOUNCE_NEVER"] = "Jamais"
+L["ALERT_ANNOUNCE_PARTY"] = "En groupe"
+L["ALERT_ANNOUNCE_GROUP"] = "En groupe ou raid"
+L["ALERT_PRINT_DESC"] =
+	'Cochée, la ligne s\'affiche dans votre propre fenêtre chaque fois qu\'elle n\'est pas annoncée : quand vous êtes seul, quand "Annoncer" est sur "Jamais", quand "En groupe" rencontre un raid, ou dans un champ de bataille ou une arène. Une ligne annoncée apparaît déjà dans votre discussion, elle n\'est donc jamais affichée deux fois.'
+L["ALERT_ANNOUNCE_DESC"] =
+	"Qui d'autre voit la ligne. \"En groupe\" l'envoie sur le canal de groupe dans un groupe de cinq ou moins, et reste muet en raid. \"En groupe ou raid\" l'envoie sur le canal de groupe ou de raid, selon celui où vous êtes. Commenter les faits et gestes des autres devant tout le raid, c'est ainsi qu'un add-on finit par lasser tout le monde : ce choix mérite donc réflexion. Rien n'est annoncé quand vous n'êtes pas en groupe, ni dans les champs de bataille et les arènes."
 L["ALERT_AGAINST_DESC"] =
 	'Quels ennemis comptent, chaque choix incluant ceux qui le suivent. Les boss sont les ennemis de niveau crâne (??). Un boss de donjon n\'affiche pas de crâne, il compte donc parmi les élites : "Élites de votre niv+ et boss" est le choix qui le garde tout en écartant le menu fretin de niveau inférieur au vôtre qui l\'entoure. Une marque de raid l\'emporte sur tout cela tant que la case "Toujours alerter sur les cibles marquées" est cochée.'
 L["TARGET_RUNG_ALL"] = "Tout"
@@ -306,7 +326,8 @@ L["TAUNTS_FAILED_MINE"] = "Mes provocations ratées"
 L["TAUNTS_FAILED_OTHERS"] = "Provocations ratées des autres"
 
 L["TAUNTS_AOE_HEADER"] = "Provocations de zone"
-L["TAUNTS_AOE_DESC"] = "Une provocation qui attire tout ce qui l'entoure d'un coup, plutôt qu'une seule cible."
+L["TAUNTS_AOE_DESC"] =
+	"Une provocation qui attire tout ce qui l'entoure d'un coup, plutôt qu'une seule cible. Chaque incantation est signalée, quoi qu'elle touche, même quand le groupe n'a pas de tank."
 L["TAUNTS_AOE_ENABLE"] = "Signaler les provocations de zone"
 L["TAUNTS_AOE_MINE"] = "Mes provocations de zone"
 L["TAUNTS_AOE_OTHERS"] = "Provocations de zone des autres"
@@ -343,7 +364,7 @@ L["FEARS_ENABLE"] = "Activer la surveillance des peurs"
 
 L["FEARS_ALERT_HEADER"] = "Peurs réussies"
 L["FEARS_ALERT_DESC"] =
-	"Une peur qui a porté et a éparpillé le pull hors de portée du tank. Seule la peur qui porte compte : une simple incantation, une résistance ou une immunité ne déplacent rien, aucune n'est donc signalée."
+	"Une peur qui éparpille le pull hors de portée du tank. Une peur de zone est signalée à chaque incantation, quoi qu'elle touche. Une peur sur une seule cible n'est signalée que si elle porte, car une résistance ou une immunité ne déplacent rien."
 L["FEARS_ALERT_ENABLE"] = "Signaler les peurs réussies"
 L["FEARS_ALERT_MINE"] = "Mes peurs réussies"
 L["FEARS_ALERT_OTHERS"] = "Peurs réussies des autres"
@@ -383,10 +404,13 @@ L["INCAPACITATED_THRESHOLD_ONE"] = "%d seconde"
 L["INCAPACITATED_THRESHOLD"] = "%d secondes"
 L["INCAPACITATED_SHORT"] = "Ma neutralisation courte"
 L["INCAPACITATED_SHORT_DESC"] =
-	"Où va la ligne quand vous êtes mis hors jeu moins longtemps que la durée ci-dessus. Par défaut, elle s'affiche dans votre propre fenêtre : un étourdissement dont vous êtes sorti avant que quiconque ait pu vous couvrir explique le temps de recharge global que vous venez de perdre, et ne concerne personne d'autre."
+	"Mis hors de combat moins longtemps que la durée ci-dessus. Par défaut, cela s'affiche seulement dans votre propre fenêtre : un étourdissement dont vous êtes sorti avant que quiconque ait pu vous couvrir explique le temps de recharge global que vous venez de perdre, et ne concerne personne d'autre."
 L["INCAPACITATED_LONG"] = "Ma neutralisation longue"
 L["INCAPACITATED_LONG_DESC"] =
-	"Où va la ligne quand vous êtes mis hors jeu au moins aussi longtemps que la durée ci-dessus. Par défaut, elle est annoncée : c'est celle sur laquelle quelqu'un d'autre a le temps d'agir, et vous êtes la seule personne à ne pas pouvoir le dire. Un effet sans aucune durée, comme un Contrôle mental, compte comme une neutralisation longue."
+	"Mis hors de combat au moins aussi longtemps que la durée ci-dessus. Par défaut, cela est annoncé en groupe et affiché en raid : c'est le cas où quelqu'un d'autre a le temps d'agir, et vous êtes la seule personne à ne pas pouvoir le dire. Un effet sans aucune durée, comme un Contrôle mental, compte comme une neutralisation longue."
+
+L["INCAPACITATED_EFFECTS_HEADER"] = "Effets inclus"
+L["INCAPACITATED_EFFECTS_DESC"] = "Décochez un effet pour ne plus le signaler."
 
 L["INCAPACITATED_STUN"] = "Inclure les étourdissements"
 L["INCAPACITATED_STUN_DESC"] = "Perte totale de contrôle, sur place. Le sommeil compte comme un étourdissement."
@@ -434,46 +458,108 @@ L["TANK_DEATHS_ALERT_DESC"] =
 	"En raid, ne compte que les joueurs désignés tank principal, vous compris, et un rôle de la recherche de groupe n'y compte pour rien. En groupe, compte quiconque a sélectionné le rôle Tank dans la recherche de groupe. Un tank qui n'a ni l'un ni l'autre meurt sans être signalé."
 L["TANK_DEATHS_ALERT_ENABLE"] = "Signaler les morts de tank"
 L["TANK_DEATHS_ALERT_MINE"] = "Ma mort"
-L["TANK_DEATHS_ALERT_MINE_DESC"] =
-	"Signale votre propre mort lorsque vous tankez. Le menu déroulant à côté indique où va la ligne."
+L["TANK_DEATHS_ALERT_MINE_DESC"] = "Votre propre mort lorsque vous tankez."
 L["TANK_DEATHS_ALERT_OTHERS"] = "Morts de tank des autres"
-L["TANK_DEATHS_ALERT_OTHERS_DESC"] =
-	"Signale la mort de tout autre membre de votre groupe qui tanke. Le menu déroulant à côté indique où va la ligne."
+L["TANK_DEATHS_ALERT_OTHERS_DESC"] = "La mort de tout autre membre de votre groupe qui tanke."
 
 L["TANK_DEATHS_CLASS_HEADER"] = "Morts par classe"
 L["TANK_DEATHS_CLASS_DESC"] = "Toutes les autres morts, par classe, pour celles que vous voulez suivre."
 L["TANK_DEATHS_CLASS_ROW_DESC"] = "Signale la mort d'un %s de votre groupe."
 
 --------------------------------------------------------------------------------
--- Bad Priests
+-- Peer Pressure
 --------------------------------------------------------------------------------
 
-L["BAD_PRIESTS_SUMMARY"] = "Des soigneurs qui font plus de mal que de bien au tank."
--- Shown only on a client whose data has no Power Word: Shield row, which among the shipped ones is Season of Discovery's.
-L["BAD_PRIESTS_DISCOVERY_STATUS"] =
-	"La Saison de la Découverte ne signale jamais de mauvais bouclier : la rune Force d'âme rend leur rage aux tanks, et aucun add-on ne peut voir les runes d'un autre joueur."
-L["BAD_PRIESTS_ENABLE"] = "Activer la surveillance des vilains prêtres"
+--[[
+    The alert is the whose shape with no target, like Fears: the line names a
+    classmate and a cooldown.
 
-L["BAD_PRIESTS_HEADER"] = "Mauvais boucliers"
-L["BAD_PRIESTS_DESC"] =
-	"Signale un Mot de pouvoir : Bouclier posé sur un druide ou un guerrier en train de tanker. La rage vient des dégâts subis, et les dégâts absorbés par un bouclier n'en génèrent aucune : un bouclier bien intentionné prive donc le tank de la rage qui lui sert à tenir la menace."
-L["BAD_PRIESTS_ALERT_ENABLE"] = "Signaler les mauvais boucliers"
-L["BAD_PRIESTS_HEALTH_DESC"] =
-	"Jusqu'où la vie du tank doit descendre avant qu'un bouclier cesse d'être une erreur. Un bouclier sur quelqu'un sur le point de mourir est le bon réflexe, l'avertissement se tait donc en dessous du niveau choisi ici. Choisissez \"Toujours\" pour être averti de chaque bouclier."
-L["BAD_PRIESTS_HEALTH_ALWAYS"] = "Toujours"
-L["BAD_PRIESTS_HEALTH_EXCEPT"] = "Sauf sous %d %% de vie"
--- The one row: the report is about somebody else's cast, so it is not "My" anything.
-L["BAD_PRIESTS_REPORT"] = "Avertissements de mauvais bouclier"
-L["BAD_PRIESTS_REPORT_DESC"] =
-	"Où va l'avertissement quand quelqu'un pose un bouclier sur un tank à rage. Il n'y a pas ici une ligne pour vous et une pour les autres : le sort est celui du soigneur et le problème, celui du tank."
-L["BAD_PRIESTS_SELF_ONLY"] = "Quand vous tankez en druide ou guerrier"
-L["BAD_PRIESTS_SELF_ONLY_DESC"] =
-	"N'avertit que des boucliers posés sur vous, et seulement quand vous êtes un druide ou un guerrier en train de tanker. Désactivez cette option pour être averti d'un bouclier posé sur n'importe quel membre de votre groupe qui tanke avec l'une de ces classes."
-L["BAD_PRIESTS_WHISPER"] = "Chuchoter au lanceur"
-L["BAD_PRIESTS_WHISPER_DESC"] =
-	"Envoie à celui qui a posé le bouclier un mot expliquant pourquoi il est nuisible. Un seul message est envoyé, même si plusieurs personnes de votre groupe utilisent Control Freak."
-L["BAD_PRIESTS_COOLDOWN_DESC"] =
-	"Durée pendant laquelle un même lanceur n'est plus signalé après avoir déclenché un avertissement de bouclier. Cela couvre l'affichage, le son, l'annonce et le chuchotement, car un soigneur qui pose ses boucliers à chaque recharge ne doit pas remplir votre fenêtre."
+    TRANSLATORS: the two rows' tooltips each say what they count, because
+    neither is "everybody's casts": only the player's own class ever reports,
+    and the My row has no pet to include.
+]]
+L["PEER_PRESSURE_SUMMARY"] =
+	"Recevez une alerte quand d'autres joueurs de votre classe utilisent leurs capacités à temps de recharge, pour pouvoir céder à la pression sociale."
+L["PEER_PRESSURE_ENABLE"] = "Activer la pression sociale"
+
+L["PEER_PRESSURE_ALERT_HEADER"] = "Temps de recharge"
+L["PEER_PRESSURE_ALERT_DESC"] =
+	"Une capacité à temps de recharge utilisée par un joueur de votre classe dans votre groupe : le signal pour utiliser la vôtre. Seule votre propre classe est signalée, et Capacités suivies choisit lesquelles comptent."
+L["PEER_PRESSURE_ALERT_ENABLE"] = "Signaler les temps de recharge"
+L["PEER_PRESSURE_ALERT_MINE"] = "Mes temps de recharge"
+L["PEER_PRESSURE_ALERT_MINE_DESC"] = "Vos propres capacités à temps de recharge suivies."
+L["PEER_PRESSURE_ALERT_OTHERS"] = "Temps de recharge des autres"
+L["PEER_PRESSURE_ALERT_OTHERS_DESC"] =
+	"Une capacité à temps de recharge suivie utilisée par tout autre joueur de votre classe dans votre groupe."
+
+L["PEER_PRESSURE_ABILITIES_DESC"] =
+	"Décochez une capacité à temps de recharge pour ne plus la suivre. Seules celles de votre propre classe sont signalées."
+
+--------------------------------------------------------------------------------
+-- Bad Mages
+--------------------------------------------------------------------------------
+
+L["BAD_MAGES_SUMMARY"] = "Des mages qui font quelque chose qui fige un pull hors de portée du tank."
+L["BAD_MAGES_ENABLE"] = "Activer la surveillance des vilains mages"
+
+L["BAD_MAGES_ALERT_HEADER"] = "Novas"
+L["BAD_MAGES_ALERT_DESC"] = "Signale une Nova de givre, qui gèle un pull sur place, hors de portée du tank."
+L["BAD_MAGES_ALERT_ENABLE"] = "Signaler les novas"
+L["BAD_MAGES_ALERT_MINE"] = "Mes novas"
+L["BAD_MAGES_ALERT_OTHERS"] = "Novas des autres"
+L["BAD_MAGES_WHISPER_ENABLE"] = "Chuchoter au mage"
+L["BAD_MAGES_WHISPER_ENABLE_DESC"] =
+	"Envoie au mage un mot lui demandant de garder Nova de givre pour les urgences. Un seul message est envoyé, même si plusieurs personnes de votre groupe utilisent Control Freak."
+L["BAD_MAGES_COOLDOWN_DESC"] =
+	"Durée pendant laquelle un même mage n'est plus signalé après avoir déclenché une alerte de nova. Cela couvre l'affichage, le son, l'annonce et le chuchotement, pour qu'un mage qui lance une nova à chaque pull ne remplisse pas votre fenêtre."
+
+--------------------------------------------------------------------------------
+-- Bad Parry Monkeys
+--------------------------------------------------------------------------------
+
+L["BAD_PARRY_MONKEYS_SUMMARY"] =
+	"Des joueurs qui ne tankent pas, se tiennent devant un boss et se font parer. Chaque parade accélère le prochain coup du boss sur le tank."
+L["BAD_PARRY_MONKEYS_ENABLE"] = "Activer la surveillance des singes à parades"
+
+L["BAD_PARRY_MONKEYS_ALERT_HEADER"] = "Parades"
+L["BAD_PARRY_MONKEYS_ALERT_DESC"] =
+	"Quelqu'un qui se fait parer par un ennemi qu'il ne tanke pas se tient devant lui. Chaque parade accélère le prochain coup de cet ennemi sur celui qui le tient."
+L["BAD_PARRY_MONKEYS_ALERT_ENABLE"] = "Signaler les parades sur"
+L["BAD_PARRY_MONKEYS_ALERT_MINE"] = "Mes parades"
+L["BAD_PARRY_MONKEYS_ALERT_MINE_DESC"] = "Un ennemi qui pare vos attaques."
+L["BAD_PARRY_MONKEYS_ALERT_OTHERS"] = "Parades des autres"
+L["BAD_PARRY_MONKEYS_ALERT_OTHERS_DESC"] = "Un ennemi qui pare les attaques de tout autre membre de votre groupe."
+L["BAD_PARRY_MONKEYS_IGNORE_TANKS"] = "Ignorer les tanks"
+L["BAD_PARRY_MONKEYS_IGNORE_TANKS_DESC"] =
+	"Reste silencieux quand le joueur dont l'attaque a été parée est un tank : désigné tank principal en raid, ou avec le rôle Tank sélectionné dans la recherche de groupe en groupe. Un second tank se tient devant le boss pour un échange de provocation, et ce n'est pas une erreur qui mérite un chuchotement. Vos propres parades sont toujours signalées."
+L["BAD_PARRY_MONKEYS_IGNORE_PETS"] = "Ignorer les familiers"
+L["BAD_PARRY_MONKEYS_IGNORE_PETS_DESC"] =
+	"Reste silencieux quand celui qui se fait parer est un familier, le vôtre compris. Un familier se tient là où son maître l'a envoyé, et une ligne qui nomme le familier ne donne rien à faire à personne dans le groupe. Aucun chuchotement n'est envoyé pour un familier, quoi qu'il en soit."
+L["BAD_PARRY_MONKEYS_WHISPER"] = "Chuchoter au fautif"
+L["BAD_PARRY_MONKEYS_WHISPER_DESC"] =
+	"Envoie au fautif un mot lui demandant de se placer derrière l'ennemi. Un seul message est envoyé, même si plusieurs personnes de votre groupe utilisent Control Freak."
+L["BAD_PARRY_MONKEYS_COOLDOWN_DESC"] =
+	"Durée pendant laquelle un même fautif n'est plus signalé après avoir déclenché un avertissement de parade. Cela couvre l'affichage, le son, l'annonce et le chuchotement, car quelqu'un qui n'a pas encore bougé n'a pas besoin qu'on le lui répète à chaque coup."
+
+--[[
+    Parry Monkey, the section under Parries: the player owning up to their own
+    parries, with a running count, every so often. TRANSLATORS: the message is
+    the player's own words, so its default is a line a player would say about
+    themselves.
+]]
+L["BAD_PARRY_MONKEYS_MONKEY_HEADER"] = "Singe à parades"
+L["BAD_PARRY_MONKEYS_MONKEY_DESC"] =
+	"Avouez-le quand un boss de raid que vous ne tankez pas vous pare, avec le compte de toutes les parades depuis que vous avez rejoint le groupe de raid. Chaque parade compte, et le temps de recharge ci-dessous décide à quelle fréquence vous le dites."
+L["BAD_PARRY_MONKEYS_MONKEY_ENABLE"] = "Signaler le singe à parades"
+L["BAD_PARRY_MONKEYS_MONKEY_MINE"] = "Mes aveux"
+L["BAD_PARRY_MONKEYS_MONKEY_MINE_DESC"] = "Vos propres parades, avec vos propres mots."
+L["BAD_PARRY_MONKEYS_MONKEY_MESSAGE"] = "Message"
+L["BAD_PARRY_MONKEYS_MONKEY_MESSAGE_DESC"] =
+	"Ce que disent vos aveux. Le compte vient après, et repart de zéro chaque fois que vous rejoignez un groupe de raid."
+L["BAD_PARRY_MONKEYS_MONKEY_MESSAGE_DEFAULT"] = "Je suis un vilain singe à parades !"
+L["BAD_PARRY_MONKEYS_MONKEY_COOLDOWN"] = "Temps de recharge"
+L["BAD_PARRY_MONKEYS_MONKEY_COOLDOWN_DESC"] =
+	"Durée pendant laquelle vous restez silencieux après des aveux. Les parades entre-temps comptent quand même, les aveux suivants portent donc le total complet."
 
 --------------------------------------------------------------------------------
 -- Bad Pets
@@ -498,60 +584,60 @@ L["BAD_PETS_COOLDOWN_DESC"] =
 L["BAD_PETS_ABILITIES_DESC"] = "Décochez une capacité de familier pour ne plus la suivre."
 
 --------------------------------------------------------------------------------
--- Peer Pressure
+-- Bad Priests
 --------------------------------------------------------------------------------
 
---[[
-    The alert is the whose shape with no target, like Fears: the line names a
-    classmate and a cooldown.
+L["BAD_PRIESTS_SUMMARY"] = "Des soigneurs qui font plus de mal que de bien au tank."
+-- Shown only on a client whose data has no Power Word: Shield row, which among the shipped ones is Season of Discovery's.
+L["BAD_PRIESTS_DISCOVERY_STATUS"] =
+	"La Saison de la Découverte ne signale jamais de mauvais bouclier : la rune Force d'âme rend leur rage aux tanks, et aucun add-on ne peut voir les runes d'un autre joueur."
+L["BAD_PRIESTS_ENABLE"] = "Activer la surveillance des vilains prêtres"
 
-    TRANSLATORS: the two rows' tooltips each say what they count, because
-    neither is "everybody's casts": only the player's own class ever reports,
-    and the My row has no pet to include.
-]]
-L["PEER_PRESSURE_SUMMARY"] =
-	"Recevez une alerte quand d'autres joueurs de votre classe utilisent leurs capacités à temps de recharge, pour pouvoir céder à la pression sociale."
-L["PEER_PRESSURE_ENABLE"] = "Activer la pression sociale"
-
-L["PEER_PRESSURE_ALERT_HEADER"] = "Temps de recharge"
-L["PEER_PRESSURE_ALERT_DESC"] =
-	"Une capacité à temps de recharge utilisée par un joueur de votre classe dans votre groupe : le signal pour utiliser la vôtre. Seule votre propre classe est signalée, et Capacités suivies choisit lesquelles comptent."
-L["PEER_PRESSURE_ALERT_ENABLE"] = "Signaler les temps de recharge"
-L["PEER_PRESSURE_ALERT_MINE"] = "Mes temps de recharge"
-L["PEER_PRESSURE_ALERT_MINE_DESC"] =
-	"Signale aussi vos propres capacités à temps de recharge suivies. Le menu déroulant à côté indique où va la ligne."
-L["PEER_PRESSURE_ALERT_OTHERS"] = "Temps de recharge des autres"
-L["PEER_PRESSURE_ALERT_OTHERS_DESC"] =
-	"Signale une capacité à temps de recharge suivie utilisée par tout autre joueur de votre classe dans votre groupe. Le menu déroulant à côté indique où va la ligne."
-
-L["PEER_PRESSURE_ABILITIES_DESC"] =
-	"Décochez une capacité à temps de recharge pour ne plus la suivre. Seules celles de votre propre classe sont signalées."
+L["BAD_PRIESTS_HEADER"] = "Mauvais boucliers"
+L["BAD_PRIESTS_DESC"] =
+	"Signale un Mot de pouvoir : Bouclier posé sur un druide ou un guerrier en train de tanker. La rage vient des dégâts subis, et les dégâts absorbés par un bouclier n'en génèrent aucune : un bouclier bien intentionné prive donc le tank de la rage qui lui sert à tenir la menace. Un bouclier avant le pull, sur un tank qui n'est pas encore en combat, est ignoré."
+L["BAD_PRIESTS_ALERT_ENABLE"] = "Signaler les mauvais boucliers"
+L["BAD_PRIESTS_HEALTH_DESC"] =
+	"Jusqu'où la vie du tank doit descendre avant qu'un bouclier cesse d'être une erreur. Un bouclier sur quelqu'un sur le point de mourir est le bon réflexe, l'avertissement se tait donc en dessous du niveau choisi ici. Choisissez \"Toujours\" pour être averti de chaque bouclier."
+L["BAD_PRIESTS_HEALTH_ALWAYS"] = "Toujours"
+L["BAD_PRIESTS_HEALTH_EXCEPT"] = "Sauf sous %d %% de vie"
+-- The one row: the report is about somebody else's cast, so it is not "My" anything.
+L["BAD_PRIESTS_REPORT"] = "Avertissements de mauvais bouclier"
+L["BAD_PRIESTS_REPORT_DESC"] =
+	"Quelqu'un qui pose un bouclier sur un tank à rage. Il n'y a pas ici une ligne pour vous et une pour les autres : le sort est celui du soigneur et le problème, celui du tank."
+L["BAD_PRIESTS_SELF_ONLY"] = "Quand vous tankez en druide ou guerrier"
+L["BAD_PRIESTS_SELF_ONLY_DESC"] =
+	"N'avertit que des boucliers posés sur vous, et seulement quand vous êtes un druide ou un guerrier en train de tanker. Désactivez cette option pour être averti d'un bouclier posé sur n'importe quel membre de votre groupe qui tanke avec l'une de ces classes."
+L["BAD_PRIESTS_WHISPER"] = "Chuchoter au lanceur"
+L["BAD_PRIESTS_WHISPER_DESC"] =
+	"Envoie à celui qui a posé le bouclier un mot expliquant pourquoi il est nuisible. Un seul message est envoyé, même si plusieurs personnes de votre groupe utilisent Control Freak."
+L["BAD_PRIESTS_COOLDOWN_DESC"] =
+	"Durée pendant laquelle un même lanceur n'est plus signalé après avoir déclenché un avertissement de bouclier. Cela couvre l'affichage, le son, l'annonce et le chuchotement, car un soigneur qui pose ses boucliers à chaque recharge ne doit pas remplir votre fenêtre."
 
 --------------------------------------------------------------------------------
 -- Tanking Tools
 --------------------------------------------------------------------------------
 
 --[[
-    The tab's summary says it ships off and where its four tools live, since
+    The tab's summary says it ships off and where its two tools live, since
     each tool is a page of its own and the tab page holds only the switch.
 
     The mini-map tooltip carries its own shorter one, because the button's
-    Right-Click toggles this tab and the tooltip has to say what it is turning
-    on. TRANSLATORS: it lists the four section headers below in your own words
-    for them; keep it to two lines in the tooltip.
+    Shift + Left-Click toggles this tab and the tooltip has to say what it is
+    turning on. TRANSLATORS: it lists the two section headers below in your
+    own words for them; keep it to two lines in the tooltip.
 ]]
 L["TANKING_TOOLS_SUMMARY"] =
-	"Cette fonction est encore en bêta, elle est donc désactivée par défaut. Ouvertures ratées, Affaiblissements d'armure, Parades et Novas de givre ont chacun leur propre page sous Outils de tank."
+	"Cette fonction est encore en bêta, elle est donc désactivée par défaut. Ouvertures ratées et Affaiblissements d'armure ont chacun leur propre page sous Outils de tank."
 L["TANKING_TOOLS_ENABLE"] = "Activer les outils de tank"
-L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "Ouvertures ratées, affaiblissements d'armure, parades et novas de givre."
+L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "Ouvertures ratées et affaiblissements d'armure."
 
 L["TANKING_TOOLS_COLD_OPENER_HEADER"] = "Ouvertures ratées"
 L["TANKING_TOOLS_COLD_OPENER_DESC"] =
 	"Signale vos propres attaques d'ouverture qui n'ont pas porté : un raté, une esquive, une parade, un blocage, une résistance ou une immunité dans les premières secondes d'un pull. De la menace qui n'a jamais existé, au moment où elle compte le plus."
 L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "Signaler les ouvertures ratées sur"
 L["TANKING_TOOLS_COLD_OPENER_MINE"] = "Mes ouvertures ratées"
-L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] =
-	"Signale vos propres capacités d'ouverture qui n'ont pas porté. Le menu déroulant à côté indique où va la ligne."
+L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] = "Vos propres capacités d'ouverture qui n'ont pas porté."
 -- The caption before the window dropdown: "Within [10 Seconds of the Pull]".
 L["TANKING_TOOLS_COLD_OPENER_WITHIN"] = "Dans les"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "%d secondes du pull"
@@ -565,41 +651,13 @@ L["TANKING_TOOLS_ARMOR_ENABLE"] = "Signaler les affaiblissements d'armure sur"
 -- The one row: the report is the group's, so it is not "My" anything.
 L["TANKING_TOOLS_ARMOR_REPORT"] = "Rapports d'affaiblissement d'armure"
 L["TANKING_TOOLS_ARMOR_REPORT_DESC"] =
-	"Où va le rapport une fois que le groupe a réduit l'armure d'une cible. Il n'y a pas ici une ligne pour vous et une pour les autres : c'est le travail du groupe, qui vous est rapporté."
+	"Le groupe qui réduit l'armure d'une cible. Il n'y a pas ici une ligne pour vous et une pour les autres : c'est le travail du groupe, qui vous est rapporté."
 L["TANKING_TOOLS_ARMOR_FAERIE_FIRE"] = "Inclure Lucioles"
 L["TANKING_TOOLS_ARMOR_FAERIE_FIRE_DESC"] =
 	"Attend Lucioles avant de faire le rapport, quelle que soit la forme sous laquelle le druide le lance. Ignoré s'il n'y a aucun druide dans le groupe."
 L["TANKING_TOOLS_ARMOR_RECKLESSNESS"] = "Inclure Malédiction de témérité"
 L["TANKING_TOOLS_ARMOR_RECKLESSNESS_DESC"] =
 	"Attend Malédiction de témérité avant de faire le rapport. Ignoré s'il n'y a aucun démoniste dans le groupe."
-
-L["TANKING_TOOLS_PARRY_HEADER"] = "Parades"
-L["TANKING_TOOLS_PARRY_DESC"] =
-	"Quelqu'un qui se fait parer par un ennemi qu'il ne tanke pas se tient devant lui. Chaque parade accélère le prochain coup de cet ennemi sur celui qui le tient."
-L["TANKING_TOOLS_PARRY_ENABLE"] = "Signaler les parades sur"
-L["TANKING_TOOLS_PARRY_MINE"] = "Mes parades"
-L["TANKING_TOOLS_PARRY_MINE_DESC"] =
-	"Signale un ennemi qui pare vos attaques. Le menu déroulant à côté indique où va la ligne."
-L["TANKING_TOOLS_PARRY_OTHERS"] = "Parades des autres"
-L["TANKING_TOOLS_PARRY_OTHERS_DESC"] =
-	"Signale un ennemi qui pare les attaques de tout autre membre de votre groupe. Le menu déroulant à côté indique où va la ligne."
-L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "Ignorer les tanks"
-L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"] =
-	"Reste silencieux quand le joueur qui se fait parer est un tank : désigné tank principal en raid, ou avec le rôle Tank sélectionné dans la recherche de groupe en groupe. Un second tank se tient devant le boss pour un échange de provocation, et ce n'est pas une erreur qui mérite un chuchotement. Vos propres parades sont toujours signalées."
-L["TANKING_TOOLS_PARRY_IGNORE_PETS"] = "Ignorer les familiers"
-L["TANKING_TOOLS_PARRY_IGNORE_PETS_DESC"] =
-	"Reste silencieux quand l'attaque parée vient d'un familier, le vôtre compris. Un familier se tient là où son maître l'a envoyé, et une ligne qui nomme le familier ne donne rien à faire à personne dans le groupe. Aucun chuchotement n'est envoyé pour un familier, quoi qu'il en soit."
-L["TANKING_TOOLS_PARRY_WHISPER"] = "Chuchoter au fautif"
-L["TANKING_TOOLS_PARRY_WHISPER_DESC"] =
-	"Envoie au fautif un mot lui demandant de se placer derrière l'ennemi. Un seul message est envoyé, même si plusieurs personnes de votre groupe utilisent Control Freak."
-L["TANKING_TOOLS_PARRY_COOLDOWN_DESC"] =
-	"Durée pendant laquelle un même fautif n'est plus signalé après avoir déclenché un avertissement de parade. Cela couvre l'affichage, le son, l'annonce et le chuchotement, car quelqu'un qui n'a pas encore bougé n'a pas besoin qu'on le lui répète à chaque coup."
-
-L["TANKING_TOOLS_NOVA_HEADER"] = "Novas de givre"
-L["TANKING_TOOLS_NOVA_DESC"] = "Signale une Nova de givre, qui gèle un pull sur place, hors de portée du tank."
-L["TANKING_TOOLS_NOVA_ENABLE"] = "Signaler les novas de givre"
-L["TANKING_TOOLS_NOVA_MINE"] = "Mes novas de givre"
-L["TANKING_TOOLS_NOVA_OTHERS"] = "Novas de givre des autres"
 
 --------------------------------------------------------------------------------
 -- Message Formats
@@ -666,10 +724,10 @@ L["INCAPACITATED_PLAIN_INDEFINITE"] = "%s neutralisé ! %s subit %s de %s."
 
     TRANSLATORS: this is our own word for the person in that seat, not the
     client's group finder role label, which names a role rather than a person.
-    It opens a sentence as its subject. "Afflicted by" in the formats above is deliberately the
-    phrasing Blizzard's combat log uses for a debuff landing
-    (AURAADDEDOTHERHARMFUL), so a player reads the same words here as in the log
-    they already watch -- use your client's wording for both if it has one.
+    It opens a sentence as its subject. "Afflicted by" in the formats above is
+    deliberately the phrasing Blizzard's combat log uses for a debuff landing
+    (AURAADDEDOTHERHARMFUL), so a player reads the same words here as in the
+    log they already watch -- use your client's wording for both if it has one.
 ]]
 L["INCAPACITATED_ROLE_TANK"] = "Tank"
 L["INCAPACITATED_ROLE_HEALER"] = "Soigneur"
@@ -727,7 +785,7 @@ L["TANK_DEATHS_CLASS_LINE"] = "%s à terre ! %s vient de mourir."
 ]]
 L["SHIELD_WARNING"] = "Mauvais bouclier ! %s a lancé %s sur %s."
 L["SHIELD_WHISPER"] =
-	"Mauvais bouclier ! Merci d'éviter de lancer %s sur %s. Cette capacité empêche les tanks de gagner de la rage."
+	"Vilain prêtre ! Merci d'éviter de lancer %s sur %s. Cette capacité empêche les tanks de gagner de la rage."
 
 L["BAD_PET"] = "Vilain familier ! Le familier de %s, %s, a utilisé %s sur %s."
 L["BAD_PET_AOE"] = "Vilain familier ! Le familier de %s, %s, a utilisé %s."
@@ -739,9 +797,9 @@ L["BAD_PET_UNKNOWN_OWNER_AOE"] = "Vilain familier ! %s a utilisé %s."
     English.
 ]]
 L["BAD_PET_WHISPER"] =
-	"Ton familier %s a utilisé %s sur %s. Fais un clic droit sur la capacité pour couper le lancement automatique."
+	"Vilain familier ! Ton familier %s a utilisé %s sur %s. Fais un clic droit sur la capacité pour couper le lancement automatique."
 L["BAD_PET_WHISPER_AOE"] =
-	"Ton familier %s a utilisé %s. Fais un clic droit sur la capacité pour couper le lancement automatique."
+	"Vilain familier ! Ton familier %s a utilisé %s. Fais un clic droit sur la capacité pour couper le lancement automatique."
 
 L["COLD_OPENER_MISS"] = "Attention ! %s a lancé %s et a raté %s."
 L["COLD_OPENER_DODGE"] = "Attention ! %s a lancé %s et %s a esquivé."
@@ -754,10 +812,19 @@ L["ARMOR_REPORT"] = "Armure réduite ! %s : vulnérable en %s s."
 
 L["PARRY_WARNING"] = "Hâte de parade ! %s se tient devant %s."
 L["PARRY_WHISPER"] =
-	"Hâte de parade ! Place-toi derrière %s, s'il te plaît : chaque parade accélère son prochain coup."
+	"Vilain singe à parades ! Place-toi derrière %s, s'il te plaît ; chaque parade fait frapper le boss plus vite et le tank subit plus de dégâts."
+-- Parry Monkey's line. TRANSLATORS: %s is the player's own message, %d the count since joining the raid group.
+L["PARRY_CONFESSION"] = "%s (x%d)"
 
 L["NOVA"] = "Nova ! %s a utilisé %s sur %s."
 L["NOVA_AOE"] = "Nova de zone ! %s a utilisé %s."
+--[[
+    Every whisper opens on "Naughty" and the culprit it is addressed to, the
+    Naughty List's own word, where the line the group sees opens on the news.
+    TRANSLATORS: %s is the spell.
+]]
+L["NOVA_WHISPER"] =
+	"Vilain mage ! Ta %s a figé le pull hors de portée du tank. Garde-la pour les urgences, s'il te plaît."
 
 --[[
     Opens on a bang naming the news, like every other alert line.

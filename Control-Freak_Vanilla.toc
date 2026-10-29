@@ -74,6 +74,7 @@ Features/Utilities.lua
 Features/Ability-Index.lua
 Features/Alert-Gates.lua
 Features/Enemy-Tier.lua
+Features/Enemy-Target.lua
 Features/Announcements.lua
 Features/Whisper-Election.lua
 Features/Combat-Log.lua
@@ -84,10 +85,10 @@ Features/Incapacitated.lua
 Features/Tank-Deaths.lua
 Features/Tanking-Tools-Cold-Opener.lua
 Features/Tanking-Tools-Armor.lua
-Features/Tanking-Tools-Parry.lua
-Features/Tanking-Tools-Nova.lua
-Features/Bad-Priests.lua
+Features/Bad-Mages.lua
+Features/Bad-Parry-Monkeys.lua
 Features/Bad-Pets.lua
+Features/Bad-Priests.lua
 Features/Peer-Pressure.lua
 Features/Minimap-Button.lua
 
@@ -112,9 +113,11 @@ Options/Options-Interrupts.lua
 Options/Options-Fears.lua
 Options/Options-Incapacitated.lua
 Options/Options-Tank-Deaths.lua
-Options/Options-Bad-Priests.lua
-Options/Options-Bad-Pets.lua
 Options/Options-Peer-Pressure.lua
+Options/Options-Bad-Mages.lua
+Options/Options-Bad-Parry-Monkeys.lua
+Options/Options-Bad-Pets.lua
+Options/Options-Bad-Priests.lua
 Options/Options-Tanking-Tools.lua
 Options/Options-Profiles.lua
 Options/Options-Feedback-Support.lua

@@ -42,7 +42,7 @@ ns.SAMPLE_SPELL_IDS = {
 How We Got the Data
 
 Last Validated
-	2026-10-20, TBC Anniversary 2.5.6.70006
+	2026-10-28, TBC Anniversary 2.5.6.70577
 
 Notes
 	- The spells the options panel's Example lines name, one per line that needs a spell, so the client supplies each name in the player's own language.
@@ -56,7 +56,7 @@ Wowhead
 	None.
 
 wago.tools
-	https://wago.tools/db2/SpellName?build=2.5.6.69795
+	https://wago.tools/db2/SpellName?build=2.5.6.70577
 
 QuestieDB
 	None.

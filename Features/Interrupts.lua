@@ -16,7 +16,7 @@ local lastTimestamp, lastSourceGUID, lastSpellId
 local INTERRUPTED_CAST_WINDOW = 1
 local interruptedCast = {}
 
-function ns:UNIT_SPELLCAST_INTERRUPTED(unit, _, spellId)
+function ns:OnUnitSpellcastInterrupted(unit, _, spellId)
 	if type(spellId) ~= "number" or spellId == 0 then
 		return
 	end

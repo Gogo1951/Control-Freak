@@ -60,7 +60,7 @@ function ns.BuildPeerPressureOptions()
 	    names a classmate and a cooldown rather than a mob. Both rows say what
 	    they count in their own tooltips, since neither is "everybody's casts":
 	    only your own class ever reports, and the My row has no pet to include.
-	    The My row ships off; Data/Default-Settings.lua says why.
+	    Both rows ship on and printing; Data/Default-Settings.lua says why.
 	]]
 	local cooldown = SampleCooldown()
 	ns.AddWhoseAlertSection(args, "alert", Section, 20, hidden, {

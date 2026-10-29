@@ -19,7 +19,7 @@ for _, seconds in ipairs(ns.COLD_OPENER_WINDOWS) do
 end
 
 --[[
-    Four separate tools, each on a sub-panel of its own under Tanking Tools. The
+    Two separate tools, each on a sub-panel of its own under Tanking Tools. The
     parent keeps only what they share: the feature's switch and its scope rows.
     The root panel draws one switch per tool from this same list, bound to the
     same setting as the tool's own (Options/Options-General.lua), and
@@ -28,8 +28,6 @@ end
 ns.TANKING_TOOLS = {
 	{ key = "coldOpener", headerKey = "TANKING_TOOLS_COLD_OPENER_HEADER", registry = "TankingToolsColdOpener" },
 	{ key = "armor", headerKey = "TANKING_TOOLS_ARMOR_HEADER", registry = "TankingToolsArmor" },
-	{ key = "parry", headerKey = "TANKING_TOOLS_PARRY_HEADER", registry = "TankingToolsParry" },
-	{ key = "nova", headerKey = "TANKING_TOOLS_NOVA_HEADER", registry = "TankingToolsNova" },
 }
 
 function ns.BuildTankingToolsOptions()
@@ -156,112 +154,5 @@ function ns.BuildTankingToolsArmorOptions()
 				})
 			end
 		end,
-	})
-end
-
-function ns.BuildTankingToolsParryOptions()
-	--[[
-	    One mob for both of Parries' examples: the warning the group sees and the
-	    whisper its culprit gets describe the same swing.
-	]]
-	local PARRY_BOSS = ns.SampleBoss()
-
-	return ToolPanel("parry", {
-		headerKey = "TANKING_TOOLS_PARRY_HEADER",
-		enableKey = "TANKING_TOOLS_PARRY_ENABLE",
-		descKey = "TANKING_TOOLS_PARRY_DESC",
-		mineKey = "TANKING_TOOLS_PARRY_MINE",
-		mineDescKey = "TANKING_TOOLS_PARRY_MINE_DESC",
-		othersKey = "TANKING_TOOLS_PARRY_OTHERS",
-		othersDescKey = "TANKING_TOOLS_PARRY_OTHERS_DESC",
-		sample = {
-			key = "PARRY_WARNING",
-			row = "others",
-			args = { ns.SampleOther("ROGUE"), ns.SampleTarget(PARRY_BOSS) },
-		},
-		--[[
-		    Under the indent because both narrow who counts: an off-tank in front
-		    of the boss for a taunt swap is not a mistake to whisper about, and a
-		    pet in front of it is where its owner sent it, so the line would name
-		    somebody nobody can act on.
-		]]
-		extraRow = function(rowArgs, order, rowsHidden)
-			local extras = {
-				{ key = "ignoreTanks", label = "TANKING_TOOLS_PARRY_IGNORE_TANKS" },
-				{ key = "ignorePets", label = "TANKING_TOOLS_PARRY_IGNORE_PETS" },
-			}
-			for index, extra in ipairs(extras) do
-				rowArgs["parry" .. extra.key] = ns.OptionsSubRow(order + index, rowsHidden, {
-					[extra.key] = {
-						type = "toggle",
-						name = ns.OptionsSubLabel(L[extra.label]),
-						desc = L[extra.label .. "_DESC"],
-						width = ns.OPTIONS_SUB_LABEL_WIDTH,
-						order = 1,
-						get = function()
-							return Section("parry")()[extra.key]
-						end,
-						set = function(_, value)
-							Section("parry")()[extra.key] = value
-						end,
-					},
-				})
-			end
-		end,
-		--[[
-		    The whisper goes to the culprit rather than into the player's own window
-		    or the group's chat, so it is not one of the alert's outputs: it sits
-		    below the block's example with an example of its own.
-		]]
-		afterSample = function(rowArgs, order, rowsHidden)
-			ns.AddWhisperRow(rowArgs, "parry", order, rowsHidden, {
-				labelKey = "TANKING_TOOLS_PARRY_WHISPER",
-				descKey = "TANKING_TOOLS_PARRY_WHISPER_DESC",
-				cooldownDescKey = "TANKING_TOOLS_PARRY_COOLDOWN_DESC",
-				cooldowns = ns.PARRY_COOLDOWNS,
-				sample = { key = "PARRY_WHISPER", args = { PARRY_BOSS } },
-				getWhisper = function()
-					return Section("parry")().whisper
-				end,
-				setWhisper = function(_, value)
-					Section("parry")().whisper = value
-				end,
-				getCooldown = function()
-					return ns.ResolveChoice(
-						Section("parry")().whisperCooldown,
-						ns.PARRY_COOLDOWNS,
-						ns.PARRY_COOLDOWN_DEFAULT
-					)
-				end,
-				setCooldown = function(_, value)
-					Section("parry")().whisperCooldown = value
-				end,
-			})
-		end,
-	})
-end
-
---[[
-    Frost Nova is a ring, not a target: nothing for a ladder or a mark to apply
-    to, so this draws like AOE Taunts, and its example is the AOE line the one
-    nova in the category actually produces.
-
-    No ability list, here or on any tool: each warning IS one thing, and its own
-    switch already says whether it fires. A list holding the single Frost Nova
-    row would be the Nova switch printed a second time.
-]]
-function ns.BuildTankingToolsNovaOptions()
-	return ToolPanel("nova", {
-		headerKey = "TANKING_TOOLS_NOVA_HEADER",
-		enableKey = "TANKING_TOOLS_NOVA_ENABLE",
-		descKey = "TANKING_TOOLS_NOVA_DESC",
-		mineKey = "TANKING_TOOLS_NOVA_MINE",
-		othersKey = "TANKING_TOOLS_NOVA_OTHERS",
-		noTarget = true,
-		sample = {
-			key = "NOVA_AOE",
-			row = "others",
-			args = { ns.SampleOther("MAGE"), ns.SpellPart(ns.SAMPLE_SPELL_IDS.FROST_NOVA) },
-		},
 	})
 end

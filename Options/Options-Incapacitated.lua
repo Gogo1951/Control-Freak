@@ -21,11 +21,10 @@ end
     One alert, its own tab, sitting between Fears and Tank Deaths. It is a
     feature rather than a Tanking Tools section because its scope question is
     about the PLAYER's own seat, where the Tanking Tools gate asks "is anybody
-    tanking" for four warnings that are all about a mob, and a section cannot
+    tanking" for two warnings that are both about a mob, and a section cannot
     answer a scope question of its own -- only a feature can.
 
-    It bends the alert block three ways, and the middle one is the interesting
-    one:
+    It bends the alert block two ways, and the second is the interesting one:
 
       No target, because C_LossOfControl names no caster and no mob. Nothing
       takes the freed slot beside the switch, so the switch spans the row on its
@@ -39,8 +38,9 @@ end
       are named after it. ns:Alert is handed the row by name for the same
       reason -- affiliation would pick the same one every time.
 
-      Nine effect boxes, the longest extraRow in the add-on, drawn from
-      ns.INCAPACITATED_ROWS so the panel and the defaults read one list.
+    Its nine effect boxes sit under a header of their own below the block,
+    drawn from ns.INCAPACITATED_ROWS so the panel and the defaults read one
+    list.
 
     No whisper row: the effect is on the player, so the person who would receive
     the note is the person sending it.
@@ -110,42 +110,50 @@ function ns.BuildIncapacitatedOptions()
 				end,
 			},
 		},
-		--[[
-		    Under the indent because they narrow what counts, like every other
-		    extra in the add-on -- there are simply nine of them.
-
-		    Orders step by TENTHS rather than whole numbers: extras start at the
-		    caller's +11 and the sound row sits at +14, so nine whole steps would
-		    run straight through the sound and the sample.
-		]]
-		extraRow = function(rowArgs, order, rowsHidden)
-			for index, row in ipairs(ns.INCAPACITATED_ROWS) do
-				local key, localeSuffix = row[1], row[2]
-				rowArgs["effect" .. key] = ns.OptionsSubRow(order + index / 10, rowsHidden, {
-					[key] = {
-						type = "toggle",
-						name = ns.OptionsSubLabel(L["INCAPACITATED_" .. localeSuffix]),
-						desc = L["INCAPACITATED_" .. localeSuffix .. "_DESC"],
-						width = ns.OPTIONS_SUB_LABEL_WIDTH,
-						order = 1,
-						get = function()
-							return Section().effects[key]
-						end,
-						set = function(_, value)
-							Section().effects[key] = value
-						end,
-					},
-				})
-			end
-		end,
 	})
+
+	--[[
+	    The nine effect boxes, under a header of their own rather than inside the
+	    block's indent: nine rows there buried the sound and the Example under a
+	    wall of Include boxes. They still narrow the alert above, so they go when
+	    it does -- a list of effects for an alert that is off reads as a second
+	    switch that does something.
+
+	    Two to a line, in the cost order ns.INCAPACITATED_ROWS is written in, so
+	    the list reads left to right from the worst.
+	]]
+	local function EffectsHidden()
+		return hidden() or not Section().enabled
+	end
+
+	ns.AddGatedHeader(args, "effects", "INCAPACITATED_EFFECTS_HEADER", 40, EffectsHidden, true)
+	args.effectsDesc = ns.OptionsDesc(L["INCAPACITATED_EFFECTS_DESC"], 43)
+	args.effectsDesc.hidden = EffectsHidden
+	args.effectsDescSpace = ns.OptionsSpacer(44, EffectsHidden)
+
+	local toggles = {}
+	for index, row in ipairs(ns.INCAPACITATED_ROWS) do
+		local key, localeSuffix = row[1], row[2]
+		toggles[index] = {
+			type = "toggle",
+			name = L["INCAPACITATED_" .. localeSuffix],
+			desc = L["INCAPACITATED_" .. localeSuffix .. "_DESC"],
+			get = function()
+				return Section().effects[key]
+			end,
+			set = function(_, value)
+				Section().effects[key] = value
+			end,
+		}
+	end
+	ns.OptionsTogglePairs(args, "effect", 45, toggles, EffectsHidden)
 
 	--[[
 	    No ability list. Every other tab that has one covers a category built from
 	    spell ids, and ns.BuildAbilityToggles draws a row per ability with a
 	    tooltip per rank. A loss of control has no spell behind it that this
 	    add-on tracks: the client hands over an effect TYPE, and the nine boxes
-	    inside the block above are what thins that out.
+	    above are what thins that out.
 	]]
 
 	return {

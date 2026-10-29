@@ -1,7 +1,8 @@
 local _, ns = ...
 
 --[[
-    Parry Warnings, one of the Tanking Tools.
+    Bad Parry Monkeys, the Naughty List tab for somebody who is not tanking and
+    keeps getting parried.
 
     A mob can only parry an attack coming at its front, and every parry it lands
     speeds up its next swing at whoever is tanking it. So a parry is not the
@@ -39,11 +40,99 @@ ns.stateResets[#ns.stateResets + 1] = function()
 	wipe(lastWarning)
 end
 
-function ns:HandleParry(feature, sourceGUID, sourceName, sourceFlags, destGUID, destName, raidIconIndex, missType)
-	local settings = feature.parry
-	if not settings or not settings.enabled then
+--------------------------------------------------------------------------------
+-- Parry Monkey
+--------------------------------------------------------------------------------
+
+--[[
+    The tab's second section: the player owning up to their own parries, in
+    their own words, with a running count. It reads the same parries as the
+    Parries section above it but is its own switch, rows and filters, so the
+    warning everybody gets and the confession never stand in for each other.
+
+    Every parry counts, but the line goes out at most once per the section's
+    cooldown: the count is the news, and a confession on every swing is noise.
+    The count goes back to zero whenever the player joins a raid group, so the
+    number is tonight's. A roster update before the first loading screen only
+    records the raid state, so a /reload inside a raid keeps the count.
+]]
+local lastConfession
+local wasInRaid
+
+ns.stateResets[#ns.stateResets + 1] = function()
+	lastConfession = nil
+	wasInRaid = IsInRaid()
+end
+
+function ns:OnGroupRosterUpdate()
+	local inRaid = IsInRaid()
+	if inRaid and wasInRaid == false and ns.db then
+		ns.db.profile.badParryMonkeys.monkey.count = 0
+	end
+	wasInRaid = inRaid
+end
+
+--[[
+    The player's words, pipes stripped since they never carry a link, so a
+    typed "|" cannot break the escape the client sends. Left blank, the shipped
+    words stand in rather than the section going quiet behind an empty box.
+]]
+function ns.GetParryConfession(settings)
+	local message = type(settings.message) == "string" and settings.message:gsub("|", "") or ""
+	if message:match("^%s*$") then
+		return ns.L["BAD_PARRY_MONKEYS_MONKEY_MESSAGE_DEFAULT"]
+	end
+	return message
+end
+
+--[[
+    Raid bosses only, fixed rather than a ladder, and a raid mark changes
+    nothing: the count is how often a boss parried the player tonight. A mob
+    nothing on screen can classify does not count, since the tally must not
+    grow on trash it could not tell apart.
+]]
+local function Confess(settings, sourceFlags, destGUID, raidIconIndex)
+	if not settings.enabled then
 		return
 	end
+	if ns.GetEnemyTier(destGUID) ~= ns.TARGET_TIER.BOSS then
+		return
+	end
+	if not ns:PassesAlertGates(settings, sourceFlags, nil, nil) then
+		return
+	end
+	settings.count = settings.count + 1
+
+	local now = GetTime()
+	local cooldown = ns.ResolveChoice(settings.cooldown, ns.PARRY_MONKEY_COOLDOWNS, ns.PARRY_MONKEY_COOLDOWN_DEFAULT)
+	if lastConfession and now - lastConfession < cooldown then
+		return
+	end
+	lastConfession = now
+	ns:Alert(
+		settings,
+		"PARRY_CONFESSION",
+		{ ns.GetParryConfession(settings), settings.count },
+		sourceFlags,
+		destGUID,
+		raidIconIndex
+	)
+end
+
+--------------------------------------------------------------------------------
+-- Parries
+--------------------------------------------------------------------------------
+
+function ns:HandleBadParryMonkey(
+	feature,
+	sourceGUID,
+	sourceName,
+	sourceFlags,
+	destGUID,
+	destName,
+	raidIconIndex,
+	missType
+)
 	if missType ~= "PARRY" then
 		return
 	end
@@ -58,6 +147,16 @@ function ns:HandleParry(feature, sourceGUID, sourceName, sourceFlags, destGUID, 
 	    parry nobody has history for is the first second of a pull.
 	]]
 	if not ns.EnemyIsOnSomeoneElse(destGUID, sourceGUID) then
+		return
+	end
+
+	-- The player's own parry, not their pet's.
+	if sourceGUID == ns.playerGUID then
+		Confess(feature.monkey, sourceFlags, destGUID, raidIconIndex)
+	end
+
+	local settings = feature.alert
+	if not settings.enabled then
 		return
 	end
 
@@ -115,7 +214,7 @@ function ns:HandleParry(feature, sourceGUID, sourceName, sourceFlags, destGUID, 
 	    tell would bounce, or land on a stranger who happens to share it. The
 	    warning above still names the pet, for a player who unticked Ignore Pets.
 
-	    The whisper rides the same election as Bad Pets', so a raid with four
+	    The whisper rides the same election as the other Bad tabs', so a raid with four
 	    Control Freak users sends the culprit one note rather than four.
 	]]
 	if settings.whisper and sourceName and not ns.IsMineSource(sourceFlags) and not ns.IsPetSource(sourceFlags) then

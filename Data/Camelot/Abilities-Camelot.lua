@@ -13,7 +13,7 @@ ns.ABILITIES = {
 	{
 		class = "DRUID",
 		category = "TAUNT",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 5209 },
 	}, -- Challenging Roar
@@ -73,7 +73,7 @@ ns.ABILITIES = {
 	{
 		class = "PRIEST",
 		category = "FEAR",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 8122, 8124, 10888, 10890 },
 	}, -- Psychic Scream
@@ -142,7 +142,7 @@ ns.ABILITIES = {
 	{
 		class = "WARLOCK",
 		category = "FEAR",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 5484, 17928 },
 	}, -- Howl of Terror
@@ -165,14 +165,14 @@ ns.ABILITIES = {
 	{
 		class = "WARRIOR",
 		category = "TAUNT",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 1161 },
 	}, -- Challenging Shout
 	{
 		class = "WARRIOR",
 		category = "FEAR",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 5246 },
 	}, -- Intimidating Shout
@@ -243,7 +243,7 @@ Notes
 	- Every ability Control Freak watches on WoW Forever, one row per checkbox in the options panel, grouped by class, with the pets' taunts and the engineering items last.
 	- class is the bucket the options panel files the row under; ITEM is its own bucket.
 	- category is TAUNT, FEAR, NOVA, SHIELD or PET_TAUNT, and ns.CATEGORY_FEATURE in Features/Ability-Index.lua maps each to the tab that owns its alert.
-	- detection is how a success is recognised. AURA means the ability lands an aura on its target, so success is that aura applying and a resist produces exactly one failure line. It is usually a debuff; Power Word: Shield's is a buff on a friendly target. CAST means it lands nothing to observe, so the cast itself is the success. Pet taunts are CAST: Growl, Torment and Suffering apply no debuff, and watching for an aura would leave the whole feature silent.
+	- detection is how a success is recognised. AURA means the ability lands an aura on its target, so success is that aura applying and a resist produces exactly one failure line. It is usually a debuff; Power Word: Shield's is a buff on a friendly target. CAST means the cast itself is the success: the ability lands nothing to observe, or it is an AOE taunt or AOE fear, which reports every press whatever it hits (a maintainer decision). Pet taunts are CAST: Growl, Torment and Suffering apply no debuff, and watching for an aura would leave the whole feature silent.
 	- isAoe means the ability hits more than one target. It picks the alert section that reports it and suppresses failure lines, since an AoE taunt fires one miss per immune mob, which is noise rather than information.
 	- kindChoice, taunts only, marks a taunt that takes a few mobs rather than one or a whole pack, so the Taunts tab lets the player report it as Single Target or AOE, with isAoe as the default. Every other taunt's dropdown is locked on its isAoe. It needs AURA detection: a cast names one target at most, where an aura lands on each mob the taunt took. No row on this client sets it.
 	- renamed marks an ability whose ranks answer to more than one name on this client, so Validate Data reports a differing name as RENAMED rather than as the typo signal NAME MISMATCH. Set it only for a verified rename, never to quiet a surprise. A rename stays one row, and the panel shows whichever name the client gives the highest rank the character has. No row on this client sets it.

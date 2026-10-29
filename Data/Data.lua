@@ -65,16 +65,18 @@ ns.OPTIONS_REGISTRY = {
 	FearsTracked = ADDON_NAME .. "_FearsTracked",
 	Incapacitated = ADDON_NAME .. "_Incapacitated",
 	TankDeaths = ADDON_NAME .. "_TankDeaths",
-	BadPriests = ADDON_NAME .. "_BadPriests",
+	Monitoring = ADDON_NAME .. "_Monitoring",
+	NaughtyList = ADDON_NAME .. "_NaughtyList",
+	BadMages = ADDON_NAME .. "_BadMages",
+	BadParryMonkeys = ADDON_NAME .. "_BadParryMonkeys",
 	BadPets = ADDON_NAME .. "_BadPets",
 	BadPetsTracked = ADDON_NAME .. "_BadPetsTracked",
+	BadPriests = ADDON_NAME .. "_BadPriests",
 	PeerPressure = ADDON_NAME .. "_PeerPressure",
 	PeerPressureTracked = ADDON_NAME .. "_PeerPressureTracked",
 	TankingTools = ADDON_NAME .. "_TankingTools",
 	TankingToolsColdOpener = ADDON_NAME .. "_TankingToolsColdOpener",
 	TankingToolsArmor = ADDON_NAME .. "_TankingToolsArmor",
-	TankingToolsParry = ADDON_NAME .. "_TankingToolsParry",
-	TankingToolsNova = ADDON_NAME .. "_TankingToolsNova",
 	Profiles = ADDON_NAME .. "_Profiles",
 	FeedbackSupport = ADDON_NAME .. "_FeedbackSupport",
 	Diagnostics = ADDON_NAME .. "_Diagnostics",
@@ -135,8 +137,10 @@ ns.FEATURE_SCOPE_OPTIONS = {
 	]]
 	tankDeaths = { "roleScope", "instanceOnly" },
 	tankingTools = { "roleScope", "groupHasTank", "instanceOnly" },
-	badPriests = { "roleScope", "groupHasTank", "instanceOnly" },
+	badMages = { "roleScope", "groupHasTank", "instanceOnly" },
+	badParryMonkeys = { "roleScope", "groupHasTank", "instanceOnly" },
 	badPets = { "roleScope", "groupHasTank", "instanceOnly" },
+	badPriests = { "roleScope", "groupHasTank", "instanceOnly" },
 	--[[
 	    No groupHasTank: a cooldown is about the player's own class, not a mob a
 	    tank should be holding, and Thanks for the Buff, where this tab came from,
@@ -149,13 +153,16 @@ ns.FEATURE_SCOPE_OPTIONS = {
     The feature tabs in tab order. Every loop over the features reads this, so a
     new tab cannot be gated in one place and missed in another.
 
-    Peer Pressure sits after the two Bad tabs because it is the one tab whose
-    news is not about the fight going wrong: it tells the player a classmate
-    has pressed a cooldown, so they can press theirs.
+    Grouped as the General panel's Features block draws them
+    (ns.FEATURE_GROUPS): the six Monitoring tabs, then the four Naughty List
+    tabs. Peer Pressure closes Monitoring, the one tab there whose news is not
+    about the fight going wrong: it tells the player a classmate has pressed a
+    cooldown, so they can press theirs. The four Bad tabs sit together,
+    alphabetically.
 
-    Tanking Tools sits last, below it, because it is the one tab that ships
-    switched off -- its tools are still in beta -- and a tab nobody has opted
-    into does not belong in the middle of the ones that work.
+    Tanking Tools sits last, below it, because its tools are still in beta and
+    it ships switched off, and a tab nobody has opted into does not belong in
+    the middle of the ones that work.
 ]]
 ns.FEATURE_KEYS = {
 	"taunts",
@@ -163,11 +170,53 @@ ns.FEATURE_KEYS = {
 	"fears",
 	"incapacitated",
 	"tankDeaths",
-	"badPriests",
-	"badPets",
 	"peerPressure",
+	"badMages",
+	"badParryMonkeys",
+	"badPets",
+	"badPriests",
 	"tankingTools",
 }
+
+--[[
+    The two groups the General panel's Features block draws a switch over:
+    Monitoring, the six tabs that report what happened, and Naughty List, the
+    four Bad tabs about somebody in the group doing something wrong. A group's
+    switch silences every feature under it without touching their own switches,
+    so switching it back on brings back exactly what was on before. Stored in
+    ns.db.profile.featureGroups by key, and read through ns.IsFeatureGroupOn.
+
+    Each group is also a page in the settings tree, with its features' tabs
+    nested under it: registry names the page's ns.OPTIONS_REGISTRY entry, and
+    summaryKey the line it opens on.
+
+    Tanking Tools belongs to no group: its own switch already plays this part
+    for its tools.
+]]
+ns.FEATURE_GROUPS = {
+	{
+		key = "monitoring",
+		labelKey = "OPTIONS_MONITORING_LABEL",
+		summaryKey = "OPTIONS_MONITORING_SUMMARY",
+		registry = "Monitoring",
+		features = { "taunts", "interrupts", "fears", "incapacitated", "tankDeaths", "peerPressure" },
+	},
+	{
+		key = "naughtyList",
+		labelKey = "OPTIONS_NAUGHTY_LIST_LABEL",
+		summaryKey = "OPTIONS_NAUGHTY_LIST_SUMMARY",
+		registry = "NaughtyList",
+		features = { "badMages", "badParryMonkeys", "badPets", "badPriests" },
+	},
+}
+
+-- Which group each feature belongs to, by feature key; a feature in none is absent.
+ns.FEATURE_GROUP_OF = {}
+for _, group in ipairs(ns.FEATURE_GROUPS) do
+	for _, featureKey in ipairs(group.features) do
+		ns.FEATURE_GROUP_OF[featureKey] = group
+	end
+end
 
 --[[
     A label-plus-control row. The label half is wide because it carries the longest
@@ -249,6 +298,9 @@ ns.CHAT_MESSAGE_MAX_LENGTH = 255
 ns.BAD_PET_COOLDOWNS = { 30, 60, 300 }
 ns.BAD_PET_COOLDOWN_DEFAULT = 60
 
+-- Seconds between Bad Mages alerts for the same mage, whisper included, on the Bad Pets ladder for the same reasons.
+ns.NOVA_COOLDOWN_DEFAULT = 60
+
 -- Seconds the whisper election waits for other Control Freak users to bid.
 ns.WHISPER_ELECTION_DELAY = 1
 
@@ -286,8 +338,8 @@ ns.COLD_OPENER_MISS_FORMATS = {
 }
 
 --[[
-    Seconds a culprit stays quiet after a parry warning. Much shorter than the Bad
-    Pet ladder, because the two are not the same question: a pet with auto-cast on
+    Seconds a culprit stays quiet after a parry warning. Shorter than the Bad Pet
+    ladder, because the two are not the same question: a pet with auto-cast on
     will keep taunting all night whatever you say, while somebody standing in front
     of a boss can fix it in one step and wants telling now.
 
@@ -295,38 +347,43 @@ ns.COLD_OPENER_MISS_FORMATS = {
     reads as "No Cooldown" rather than "0 Second Cooldown", and the arithmetic
     falls out on its own: nothing is ever less than zero seconds old.
 
-    Nine, the top of the ladder, is what ships. The setting is stored as the
-    whisper's cooldown, but it covers the print, the sound and the announce as
-    well, so it is also how often one culprit can set the section off at all.
+    The three rungs are the maintainer's, and thirty ships. The setting is
+    stored as the whisper's cooldown, but it covers the print, the sound and the
+    announce as well, so it is also how often one culprit can set the section
+    off at all.
 ]]
-ns.PARRY_COOLDOWNS = { 0, 3, 6, 9 }
-ns.PARRY_COOLDOWN_DEFAULT = 9
+ns.PARRY_COOLDOWNS = { 0, 15, 30 }
+ns.PARRY_COOLDOWN_DEFAULT = 30
+
+-- Seconds between Parry Monkey's confessions, the maintainer's two rungs. Every parry still counts in between.
+ns.PARRY_MONKEY_COOLDOWNS = { 15, 30 }
+ns.PARRY_MONKEY_COOLDOWN_DEFAULT = 30
 
 --[[
     A shield on a tank who is about to die is the right call, so the Bad Shields
     warning goes quiet below a health line the player picks. Zero is "Always",
     meaning warn at any health; every other value reads as the exception it is,
-    "Except Under 30% Health" complaining only while the tank is above 30%.
+    "Except Under 50% Health" complaining only while the tank is above half.
 
-    Thirty is what ships. Between 30% and half the tank is not in danger yet,
-    and the rage they are being denied is part of what keeps them out of it;
-    below 30% the shield is a save, and telling somebody off for saving the tank
-    is the one case this warning is simply wrong.
+    Fifty is what ships, a maintainer decision: below half the shield is a
+    save, and telling somebody off for saving the tank is the one case this
+    warning is simply wrong.
 
     Percentages rather than fractions: the label prints the number, and
     ns.ResolveChoice compares a stored value against this list.
 ]]
 ns.SHIELD_HEALTH_THRESHOLDS = { 0, 50, 40, 30, 10 }
-ns.SHIELD_HEALTH_THRESHOLD_DEFAULT = 30
+ns.SHIELD_HEALTH_THRESHOLD_DEFAULT = 50
 
 --[[
     Seconds between Bad Shield warnings about the same caster, whisper included.
     The ladder is Bad Pets' -- a shield kept rolling is the same shape of problem
-    as a pet left on auto-cast -- but the shipped value is its floor rather than
-    its middle: a healer shielding on cooldown repeats the mistake every few
-    seconds, and a minute of silence lets most of a pull go by unsaid.
+    as a pet left on auto-cast -- and the shipped value is a minute, copied from
+    the maintainer's own profile. The whisper ships on, and a
+    healer shielding on cooldown repeats the mistake every few seconds, so
+    anything shorter tells the same priest twice in one pull.
 ]]
-ns.SHIELD_COOLDOWN_DEFAULT = 30
+ns.SHIELD_COOLDOWN_DEFAULT = 60
 
 -- The classes that take rage from damage taken, and so lose it to an absorb.
 ns.RAGE_TANK_CLASSES = { DRUID = true, WARRIOR = true }
@@ -372,7 +429,8 @@ ns.INCAPACITATED_EFFECTS = {
 
     Ordered by what it costs a tank, not alphabetically: the top of the list is
     the mob walking away while you watch, and the two at the bottom are the ones
-    that leave a tank their taunt button. All nine ship on.
+    that leave a tank their taunt button. All nine ship on. The panel draws
+    them under a header of their own, below the alert block they narrow.
 ]]
 -- { settings key, locale suffix, ships on }
 ns.INCAPACITATED_ROWS = {
@@ -398,12 +456,12 @@ ns.INCAPACITATED_ROWS = {
     "nothing is ever short", which is not a threshold, it is switching the Short
     row off -- and that row has a box of its own for exactly that.
 
-    Four is what ships. Below it a tank is usually back before anybody could
-    have taunted in their place, so the line is for them; at four or more
+    Five is what ships. Below it a tank is usually back before anybody could
+    have taunted in their place, so the line is for them; at five or more
     somebody else has time to act on it, which is what earns the group's chat.
 ]]
 ns.INCAPACITATED_LONG_THRESHOLDS = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
-ns.INCAPACITATED_LONG_DEFAULT = 4
+ns.INCAPACITATED_LONG_DEFAULT = 5
 
 --[[
     The four debuff types somebody in the group can remove, mapped from the word
@@ -490,17 +548,20 @@ ns.DEATH_CLASS_COOLDOWN = 3
 
 --[[
     Every alert section asks the same question the same way: WHOSE cast is the
-    row, and WHERE the line goes is the dropdown beside it. A section carries a `mine` row and an
-    `others` row, each { enabled, output }, so "announce my own resists and say
-    nothing about anybody else's" is one row rather than two switches and two
-    scopes that have to be read together.
+    row, and each row says whether its line prints and where it is announced.
+    A section carries a `mine` row and an `others` row, each { print, announce },
+    so "announce my own resists and say nothing about anybody else's" is one
+    row rather than two switches and two scopes that have to be read together.
 
-    PRINT is the player's own window, ANNOUNCE is party or raid chat, and a line
-    goes to exactly one of them. Both at once would put the same sentence on
-    screen twice, so the pair is not on offer.
+    The announce is a ladder of where the group hears it: NEVER, PARTY (a group
+    of five or fewer, and quiet in a raid), or GROUP (party or raid chat,
+    whichever the player is in). print is the fallback: the line prints to the
+    player's own window only when the announce did not go out, because an
+    announced line already shows in their own chat and two copies of one
+    sentence is noise. A row with print off that announces nowhere is off.
 ]]
-ns.ALERT_OUTPUTS = { "PRINT", "ANNOUNCE" }
-ns.ALERT_OUTPUT_DEFAULT = "PRINT"
+ns.ANNOUNCE_SCOPES = { "NEVER", "PARTY", "GROUP" }
+ns.ANNOUNCE_SCOPE_DEFAULT = "NEVER"
 
 --[[
     Which enemies a section counts, as a threshold rather than a set of
@@ -653,29 +714,31 @@ ns.LINKS = {
 
     Whichever it is, the extension has to match the file on disk.
 
-    Renaming one is a breaking change for anybody who picked it by hand: a profile
-    stores the name, and a name this list no longer registers leaves that alert
-    silent behind a blank picker.
+    A row holds only its suffix: the picker name is the add-on's title, a colon
+    and that suffix, built into ns.SOUND_NAMES below the list. Renaming a suffix
+    is a breaking change for anybody who picked it by hand: a profile stores the
+    full name, and a name this list no longer registers leaves that alert silent
+    behind a blank picker.
 ]]
--- { picker name, file name under Includes/Sounds/ }
+-- { picker name suffix, file name under Includes/Sounds/ }
 ns.SOUNDS = {
-	{ "Control Freak: Taunt", "cf-taunt.ogg" },
-	{ "Control Freak: AOE Taunt", "cf-aoe-taunt.ogg" },
-	{ "Control Freak: Interrupt", "cf-interrupt.ogg" },
-	{ "Control Freak: Fear", "cf-fears.ogg" },
-	{ "Control Freak: Nova", "cf-nova.ogg" },
-	{ "Control Freak: Parry", "cf-parry.ogg" },
+	{ "Taunt", "cf-taunt.ogg" },
+	{ "AOE Taunt", "cf-aoe-taunt.ogg" },
+	{ "Interrupt", "cf-interrupt.ogg" },
+	{ "Fear", "cf-fears.ogg" },
+	{ "Nova", "cf-nova.ogg" },
+	{ "Parry", "cf-parry.ogg" },
 	--[[
 	    Spares that became defaults, keeping the names they arrived under: a
 	    name here is a promise, still what the picker shows after the sound has
-	    a job. Failure 4 is Failed Taunts', Magic 2 is Bad Shields', and Game
-	    Over is Tank Deaths'. Thunder is Peer Pressure's, under the name it had
-	    in Thanks for the Buff, where that tab came from.
+	    a job. Failure 4 is Failed Taunts', Failure 2 is Tank Deaths', and
+	    Magic 2 is Bad Shields'. Thunder is Peer Pressure's, under the name it
+	    had in Thanks for the Buff, where that tab came from.
 	]]
-	{ "Control Freak: Failure 4", "cf-failure-4.ogg" },
-	{ "Control Freak: Magic 2", "cf-magic-2.ogg" },
-	{ "Control Freak: Game Over", "cf-game-over.ogg" },
-	{ "Control Freak: Thunder", "cf-thunder.ogg" },
+	{ "Failure 4", "cf-failure-4.ogg" },
+	{ "Failure 2", "cf-failure-2.ogg" },
+	{ "Magic 2", "cf-magic-2.ogg" },
+	{ "Thunder", "cf-thunder.ogg" },
 	--[[
 	    Nothing from here down plays out of the box. All of it is in the picker,
 	    and it is the bank an alert draws from when it gets a sound of its own --
@@ -686,18 +749,23 @@ ns.SOUNDS = {
 	    that picked one by hand stores it, and a rename would leave that alert
 	    silent behind a blank picker.
 
-	    Failure, Failure 2 and Failure 3 are alternates for Failed Taunts, which
-	    plays Failure 4 above. Negative Beeps is what Incapacitated's picker
-	    points at, though that alert's sound ships off, so it plays nothing out
-	    of the box either.
+	    Failure and Failure 3 are alternates for Failed Taunts, which plays
+	    Failure 4 above. Negative Beeps is what Incapacitated's picker points
+	    at, though that alert ships silent, so it plays nothing out of the box.
 	]]
-	{ "Control Freak: Taunt Resist", "cf-taunt-resist.ogg" },
-	{ "Control Freak: Tank Death", "cf-tank-death.ogg" },
-	{ "Control Freak: Magic", "cf-magic.ogg" },
-	{ "Control Freak: Failure", "cf-failure.ogg" },
-	{ "Control Freak: Failure 2", "cf-failure-2.ogg" },
-	{ "Control Freak: Failure 3", "cf-failure-3.ogg" },
-	{ "Control Freak: Defeat", "cf-defeat.ogg" },
-	{ "Control Freak: Negative Beeps", "cf-negative-beeps.ogg" },
-	{ "Control Freak: Sad Trumpet", "cf-sad-trumpet.ogg" },
+	{ "Taunt Resist", "cf-taunt-resist.ogg" },
+	{ "Tank Death", "cf-tank-death.ogg" },
+	{ "Magic", "cf-magic.ogg" },
+	{ "Failure", "cf-failure.ogg" },
+	{ "Failure 3", "cf-failure-3.ogg" },
+	{ "Negative Beeps", "cf-negative-beeps.ogg" },
+	{ "Defeat", "cf-defeat.ogg" },
+	{ "Game Over", "cf-game-over.ogg" },
+	{ "Sad Trumpet", "cf-sad-trumpet.ogg" },
 }
+
+-- Suffix -> full picker name, the name LibSharedMedia registers and a profile stores.
+ns.SOUND_NAMES = {}
+for _, row in ipairs(ns.SOUNDS) do
+	ns.SOUND_NAMES[row[1]] = L["ADDON_TITLE"] .. ": " .. row[1]
+end

@@ -6,29 +6,9 @@ local bit_band = bit.band
 local ABILITY_MAP = ns.ABILITY_MAP
 
 --------------------------------------------------------------------------------
--- Who Each Enemy Is Already On
+-- Combat Outcomes
 --------------------------------------------------------------------------------
 
---[[
-    A taunt on a mob that was already hitting you is a threat refresh, not news,
-    so the success alert needs to know who the mob was on a moment ago.
-
-    It cannot be asked. By the time the taunt's aura lands the mob has already
-    changed target, so reading it from a nameplate or unit token answers with the
-    taunter every time. The combat log is the only source that is strictly
-    earlier, and melee swings are the honest signal: a mob melees whoever it is
-    actually on, while a spell can land anywhere.
-
-    Unknown means report, FOR TAUNTS. That consumer only ever suppresses on a
-    positive match, so a mob nobody has seen swing still announces.
-
-    The parry warning reads the same cache the other way round and wants the
-    opposite: it asks ns.EnemyIsOnSomeoneElse and stays quiet on an unknown mob,
-    because a parry with no holder on record is the opening exchange of a pull
-    rather than somebody standing wrong. Read a consumer's own file before
-    assuming which way an unknown answers.
-]]
-local ENEMY_TARGET_LIMIT = 500
 local SWING_SUBEVENTS = {
 	SWING_DAMAGE = true,
 	SWING_MISSED = true,
@@ -45,15 +25,16 @@ local ARMOR_SUBEVENTS = {
 }
 
 --[[
-    Cold Opener and Parry both key off an avoided attack, so one dispatch reads
-    the event and hands each the shape it wants.
+    Cold Openers (a Tanking Tool) and Bad Parry Monkeys (a Naughty List tab)
+    both key off an avoided attack, so one dispatch reads the event and hands
+    each the shape it wants, behind its own feature's gate.
 
     They disagree about auto-attacks, and deliberately. A cold opener is about
     abilities -- an auto-attack is dodged constantly against a boss and reporting
     those would bury the specials -- while a parry from a melee DPS standing in
     front comes mostly FROM auto-attacks, which are the ones worth catching.
 ]]
-function ns:DispatchTankingToolMiss(
+local function DispatchMiss(
 	sourceGUID,
 	sourceName,
 	sourceFlags,
@@ -66,11 +47,15 @@ function ns:DispatchTankingToolMiss(
 	isSwing
 )
 	--[[
-	    The section switches first: the gate below reads the group's tank state,
+	    The section switches first: the gates below read the group's tank state,
 	    which is the expensive question, and every miss in the zone reaches here.
 	]]
-	local tankingTools = ns.db.profile.tankingTools
-	if not tankingTools.coldOpener.enabled and not tankingTools.parry.enabled then
+	local profile = ns.db.profile
+	local tankingTools = profile.tankingTools
+	local parryMonkeys = profile.badParryMonkeys
+	local coldOpener = not isSwing and tankingTools.coldOpener.enabled
+	local parry = missType == "PARRY" and (parryMonkeys.alert.enabled or parryMonkeys.monkey.enabled)
+	if not coldOpener and not parry then
 		return
 	end
 
@@ -78,11 +63,7 @@ function ns:DispatchTankingToolMiss(
 		return
 	end
 
-	if not ns:IsFeatureGateOpen(tankingTools) then
-		return
-	end
-
-	if not isSwing then
+	if coldOpener and ns:IsFeatureGateOpen(tankingTools) then
 		ns:HandleColdOpener(
 			tankingTools,
 			sourceGUID,
@@ -97,53 +78,18 @@ function ns:DispatchTankingToolMiss(
 		)
 	end
 
-	ns:HandleParry(tankingTools, sourceGUID, sourceName, sourceFlags, destGUID, destName, raidIconIndex, missType)
-end
-
--- Filled by the swing dispatch below, and by ns:HandleTaunt through ns.RememberEnemyTarget.
-local enemyTarget = {}
-local enemyTargetCount = 0
-
-ns.stateResets[#ns.stateResets + 1] = function()
-	wipe(enemyTarget)
-	enemyTargetCount = 0
-end
-
-function ns.RememberEnemyTarget(enemyGUID, playerGUID)
-	if not enemyGUID or not playerGUID then
-		return
+	if parry and ns:IsFeatureGateOpen(parryMonkeys) then
+		ns:HandleBadParryMonkey(
+			parryMonkeys,
+			sourceGUID,
+			sourceName,
+			sourceFlags,
+			destGUID,
+			destName,
+			raidIconIndex,
+			missType
+		)
 	end
-	if not ns.IsPlayerGUID(playerGUID) or ns.IsPlayerGUID(enemyGUID) then
-		return
-	end
-	if enemyTarget[enemyGUID] == nil then
-		--[[
-		    Emptied whole when it fills rather than pruned: what is lost is only a
-		    line that would have been suppressed, and a raid night is a lot of corpses.
-		]]
-		if enemyTargetCount >= ENEMY_TARGET_LIMIT then
-			wipe(enemyTarget)
-			enemyTargetCount = 0
-		end
-		enemyTargetCount = enemyTargetCount + 1
-	end
-	enemyTarget[enemyGUID] = playerGUID
-end
-
-function ns.EnemyWasAlreadyOn(enemyGUID, playerGUID)
-	return enemyGUID ~= nil and enemyTarget[enemyGUID] == playerGUID
-end
-
---[[
-    The strict opposite of the above: a mob nobody has been seen swinging at
-    answers false, so "not on somebody else" covers "not settled on anyone yet".
-]]
-function ns.EnemyIsOnSomeoneElse(enemyGUID, playerGUID)
-	if not enemyGUID then
-		return false
-	end
-	local holder = enemyTarget[enemyGUID]
-	return holder ~= nil and holder ~= playerGUID
 end
 
 --------------------------------------------------------------------------------
@@ -161,7 +107,7 @@ local RAID_ICON_INDEX = {
 	[COMBATLOG_OBJECT_RAIDTARGET8] = 8,
 }
 
-function ns.GetRaidIconIndex(destRaidFlags)
+local function GetRaidIconIndex(destRaidFlags)
 	if not destRaidFlags then
 		return nil
 	end
@@ -188,7 +134,7 @@ end
 ]]
 local lastTimestamp, lastSourceGUID, lastSpellId, lastOutcome, lastDestGUID
 
-function ns:COMBAT_LOG_EVENT_UNFILTERED()
+function ns:OnCombatLogEventUnfiltered()
 	local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, _, destGUID, destName, destFlags, destRaidFlags, spellId, spellName, _, extra, extraName =
 		CombatLogGetCurrentEventInfo()
 
@@ -201,6 +147,38 @@ function ns:COMBAT_LOG_EVENT_UNFILTERED()
 	    interrupts, and the name is then the only thing that can name the spell
 	    that was stopped.
 	]]
+	--[[
+	    Incapacitated names the mob that took the player out of the fight, and
+	    C_LossOfControl carries no caster at all. This is the only place that name
+	    is reliable -- the debuff's own sourceUnit is a token, so it resolves only
+	    while the mob happens to be somebody's target or on a name plate -- so the
+	    cast is stamped on the way past and read back a moment later when
+	    LOSS_OF_CONTROL_ADDED fires. Features/Interrupts.lua keeps the spell id
+	    Era omits the same way.
+
+	    A DEBUFF landing on the player, or an interrupt aimed at them: a spell
+	    lockout such as Shield Bash reaches the log as SPELL_INTERRUPT and never
+	    as an aura, so without it the line names no caster. Ahead of the
+	    interrupt branch below, which drops a mob's interrupt on its source gate.
+	    Behind that feature's own switches and one guid comparison: auras land
+	    on the player several times a second in a raid, almost none of them take
+	    control away, and a heal over time overwriting the slot would cost the
+	    fear beside it its caster.
+
+	    Incapacitated is its own feature rather than a Tanking Tool, so this is
+	    the one place in this file reaching outside the tab whose event it is
+	    handling.
+	]]
+	if
+		destGUID == ns.playerGUID
+		and (subevent == "SPELL_INTERRUPT" or (subevent == "SPELL_AURA_APPLIED" and extra == "DEBUFF"))
+	then
+		local incapacitatedProfile = ns.db.profile.incapacitated
+		if incapacitatedProfile.enabled and incapacitatedProfile.alert.enabled then
+			ns.RememberIncapacitatingAura(spellId, sourceName)
+		end
+	end
+
 	if subevent == "SPELL_INTERRUPT" then
 		--[[
 		    Mobs interrupt too. This branch returns before the ability path's own
@@ -226,7 +204,7 @@ function ns:COMBAT_LOG_EVENT_UNFILTERED()
 			sourceFlags,
 			destGUID,
 			destName,
-			ns.GetRaidIconIndex(destRaidFlags),
+			GetRaidIconIndex(destRaidFlags),
 			spellId,
 			spellName,
 			extra,
@@ -245,35 +223,6 @@ function ns:COMBAT_LOG_EVENT_UNFILTERED()
 	if tankingToolsProfile.enabled and tankingToolsProfile.coldOpener.enabled then
 		ns.RememberEnemyFirstSeen(sourceGUID)
 		ns.RememberEnemyFirstSeen(destGUID)
-	end
-
-	--[[
-	    Incapacitated names the mob that took the player out of the fight, and
-	    C_LossOfControl carries no caster at all. This is the only place that name
-	    is reliable -- the debuff's own sourceUnit is a token, so it resolves only
-	    while the mob happens to be somebody's target or on a name plate -- so the
-	    aura is stamped on the way past and read back a moment later when
-	    LOSS_OF_CONTROL_ADDED fires. Features/Interrupts.lua keeps the spell id
-	    Era omits the same way.
-
-	    DEBUFF only, and behind that feature's own switches and one guid
-	    comparison: auras land on the player several times a second in a raid,
-	    almost none of them take control away, and a heal over time overwriting
-	    the slot would cost the fear beside it its caster.
-
-	    Incapacitated is its own feature rather than a Tanking Tool, so this is
-	    the one place in this file reaching outside the tab whose event it is
-	    handling.
-	]]
-	local incapacitatedProfile = ns.db.profile.incapacitated
-	if
-		subevent == "SPELL_AURA_APPLIED"
-		and extra == "DEBUFF"
-		and destGUID == ns.playerGUID
-		and incapacitatedProfile.enabled
-		and incapacitatedProfile.alert.enabled
-	then
-		ns.RememberIncapacitatingAura(spellId, sourceName)
 	end
 
 	--[[
@@ -303,13 +252,13 @@ function ns:COMBAT_LOG_EVENT_UNFILTERED()
 	]]
 	if subevent == "SWING_MISSED" or subevent == "SPELL_MISSED" then
 		local isSwing = subevent == "SWING_MISSED"
-		ns:DispatchTankingToolMiss(
+		DispatchMiss(
 			sourceGUID,
 			sourceName,
 			sourceFlags,
 			destGUID,
 			destName,
-			ns.GetRaidIconIndex(destRaidFlags),
+			GetRaidIconIndex(destRaidFlags),
 			isSwing and 0 or spellId,
 			not isSwing and spellName or nil,
 			isSwing and spellId or extra,
@@ -333,7 +282,7 @@ function ns:COMBAT_LOG_EVENT_UNFILTERED()
 				sourceFlags,
 				destGUID,
 				destName,
-				ns.GetRaidIconIndex(destRaidFlags),
+				GetRaidIconIndex(destRaidFlags),
 				spellId
 			)
 		end
@@ -360,7 +309,7 @@ function ns:COMBAT_LOG_EVENT_UNFILTERED()
 	end
 
 	local feature = ns.db.profile[ns.CATEGORY_FEATURE[category]]
-	if not ns:IsFeatureGateOpen(feature) then
+	if not ns:IsFeatureGateOpen(feature, category == "TAUNT" and ns.IsAoeTaunt(ability)) then
 		return
 	end
 
@@ -408,7 +357,7 @@ function ns:COMBAT_LOG_EVENT_UNFILTERED()
 	lastTimestamp, lastSourceGUID, lastSpellId, lastOutcome, lastDestGUID =
 		timestamp, sourceGUID, spellId, outcome, dedupeDestGUID
 
-	local raidIconIndex = ns.GetRaidIconIndex(destRaidFlags)
+	local raidIconIndex = GetRaidIconIndex(destRaidFlags)
 
 	if ns.diagnostics and ns.diagnostics.logging and ns.LogEventNow then
 		ns:LogEventNow("COMBAT_LOG_EVENT_UNFILTERED", subevent, sourceName, destName, spellId, outcome)

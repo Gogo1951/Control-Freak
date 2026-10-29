@@ -20,7 +20,7 @@ local unpack = unpack
     all of them.
 ]]
 for _, row in ipairs(ns.SOUNDS) do
-	local name, file = row[1], row[2]
+	local name, file = ns.SOUND_NAMES[row[1]], row[2]
 	LibSharedMedia:Register("sound", name, "Interface\\AddOns\\" .. ADDON_NAME .. "\\Includes\\Sounds\\" .. file)
 end
 
@@ -114,7 +114,7 @@ function ns.GetRaidIconTexture(index)
 	return index and RAID_ICON_TEXTURES[index] or ""
 end
 
-function ns.GetRaidIconToken(index)
+local function GetRaidIconToken(index)
 	return index and RAID_ICON_TOKENS[index] or ""
 end
 
@@ -133,7 +133,7 @@ end
     drops the whole message with no error, so the alert simply never arrives.
     Never strip pipes here, wholesale or by escape.
 ]]
-function ns.StripChatFormatting(text)
+local function StripChatFormatting(text)
 	if not text then
 		return nil
 	end
@@ -157,13 +157,33 @@ function ns:GetGroupChatChannel()
 	return nil
 end
 
+--[[
+    The PARTY announce: party chat in a group of five or fewer. A raid answers
+    nil rather than its /party subgroup, which would put the line in front of
+    four people and nobody else; the row then falls back to its print. An
+    instance group no bigger than a party says the same thing through its own
+    channel.
+]]
+local function GetPartyChatChannel()
+	if IsInRaid() then
+		return nil
+	end
+	if IsInGroup(LE_PARTY_CATEGORY_HOME) then
+		return "PARTY"
+	end
+	if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and not IsInRaid(LE_PARTY_CATEGORY_INSTANCE) then
+		return "INSTANCE_CHAT"
+	end
+	return nil
+end
+
 function ns:BuildAnnounceMessage(formatKey, ...)
 	local template = L[formatKey]
 	if not template then
 		return nil
 	end
-	local body = ns.StripChatFormatting(string_format(template, ...))
-	return TrimClosingPeriod(body) .. " // " .. L["ADDON_TITLE"]
+	local body = StripChatFormatting(string_format(template, ...))
+	return TrimClosingPeriod(body) .. " // " .. L["ADDON_SHORT_NAME"]
 end
 
 --[[
@@ -241,7 +261,7 @@ function ns:Announce(channel, target, formatKey, ...)
 	end
 	if #message > ns.CHAT_MESSAGE_MAX_LENGTH then
 		-- Drop the brand before cutting the body: the body is the information.
-		message = ns.StripChatFormatting(string_format(L[formatKey], ...))
+		message = StripChatFormatting(string_format(L[formatKey], ...))
 		if #message > ns.CHAT_MESSAGE_MAX_LENGTH then
 			local length = SafeCutLength(message, ns.CHAT_MESSAGE_MAX_LENGTH)
 			if length <= 0 then
@@ -292,7 +312,7 @@ local function RenderPart(part, rich)
 
 	if part.kind == "target" then
 		local name = part.name or L["UNKNOWN_TARGET"]
-		local icon = rich and ns.GetRaidIconTexture(part.raidIconIndex) or ns.GetRaidIconToken(part.raidIconIndex)
+		local icon = rich and ns.GetRaidIconTexture(part.raidIconIndex) or GetRaidIconToken(part.raidIconIndex)
 		if icon == "" then
 			return name
 		end
@@ -306,26 +326,44 @@ end
 ns.RenderAlertPart = RenderPart
 
 --[[
-    Where this event's line goes. A section keeps one row for the player's own
-    casts and one for everybody else's (ns.ALERT_OUTPUTS); the event picks its
-    row by the combat log's affiliation bit, and the row's output says print or
-    announce -- one line, one place, never both. A row that is switched off
-    answers neither.
+    Group chat only. The client silently drops an add-on's SAY or YELL outside
+    a dungeon or raid, so those are not on offer. A battleground or arena is
+    skipped too: its chat is a crowd of strangers rather than the group these
+    alerts are for.
 ]]
-local function ResolveOutputs(settings, sourceFlags, rowKey)
-	--[[
-	    rowKey names the row outright, for a section whose pair does not split on
-	    whose cast it was. Incapacitated is the only one: the game reports the
-	    player's own losses of control and nobody else's, so affiliation would
-	    pick the same row every time, and what its two rows actually separate is
-	    a short effect from a long one.
-	]]
-	local row = rowKey and settings[rowKey] or (ns.IsMineSource(sourceFlags) and settings.mine or settings.others)
-	if not row or not row.enabled then
-		return false, false
+local function AnnounceChannel(announce)
+	if announce == "NEVER" then
+		return nil
 	end
-	local output = ns.ResolveChoice(row.output, ns.ALERT_OUTPUTS, ns.ALERT_OUTPUT_DEFAULT)
-	return output == "PRINT", output == "ANNOUNCE"
+	local _, instanceType = IsInInstance()
+	if instanceType == "pvp" or instanceType == "arena" then
+		return nil
+	end
+	if announce == "PARTY" then
+		return GetPartyChatChannel()
+	end
+	return ns:GetGroupChatChannel()
+end
+
+--[[
+    Where this event's line goes: whether it prints, and the chat channel it is
+    announced to, nil for either that it skips. A section keeps one row for the
+    player's own casts and one for everybody else's (ns.ANNOUNCE_SCOPES); the
+    event picks its row by the combat log's affiliation bit. The print is the
+    row's fallback, so a line is never shown twice: it prints only when the
+    announce found no channel to go to.
+
+    rowKey names the row outright, for a section whose pair does not split on
+    whose cast it was: Incapacitated's short and long, and Tank Deaths, which
+    reads a death rather than a cast.
+]]
+function ns.ResolveAlertDestination(settings, sourceFlags, rowKey)
+	local row = rowKey and settings[rowKey] or (ns.IsMineSource(sourceFlags) and settings.mine or settings.others)
+	if not row then
+		return false, nil
+	end
+	local channel = AnnounceChannel(ns.ResolveChoice(row.announce, ns.ANNOUNCE_SCOPES, ns.ANNOUNCE_SCOPE_DEFAULT))
+	return channel == nil and row.print == true, channel
 end
 
 --[[
@@ -414,23 +452,8 @@ function ns:Alert(settings, formatKey, parts, sourceFlags, destGUID, raidIconInd
 	    The gates above have already run the target filter, and ns.GetEnemyTier
 	    keeps its answer per mob, so which of the two runs first costs nothing.
 	]]
-	local doPrint, doAnnounce = ResolveOutputs(settings, sourceFlags, rowKey)
-
-	--[[
-	    Group chat only. The client silently drops an add-on's SAY or YELL
-	    outside a dungeon or raid, so those are not on offer. A battleground or
-	    arena is skipped too: its chat is a crowd of strangers rather than the
-	    group these alerts are for. With no group chat to go to, an announced
-	    line goes nowhere at all.
-	]]
-	local channel
-	if doAnnounce then
-		local _, instanceType = IsInInstance()
-		if instanceType ~= "pvp" and instanceType ~= "arena" then
-			channel = ns:GetGroupChatChannel()
-		end
-		doAnnounce = channel ~= nil
-	end
+	local doPrint, channel = ns.ResolveAlertDestination(settings, sourceFlags, rowKey)
+	local doAnnounce = channel ~= nil
 
 	--[[
 	    Past this point the line is going somewhere the player reads, their own
@@ -468,8 +491,8 @@ end
 --[[
     The print-only half of the above, for a line that has no business in group
     chat at all. Tank Deaths' class log is the one caller: a watch list somebody
-    keeps for themselves, so its rows draw no destination dropdown, and there is
-    nothing here for ResolveOutputs to resolve.
+    keeps for themselves, so its rows draw no print box or announce dropdown,
+    and there is nothing here for ns.ResolveAlertDestination to resolve.
 
     No alert gates either. Those answer "was this cast ours, is the mob worth
     mentioning, is it marked" -- and a death has no caster and no mob. The

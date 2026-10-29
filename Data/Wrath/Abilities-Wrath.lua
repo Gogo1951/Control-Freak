@@ -16,7 +16,9 @@ local _, ns = ...
                           applying and a resist produces exactly one failure
                           line. Usually a debuff; Power Word: Shield is the one
                           entry where it is a buff on a friendly target.
-                    CAST  lands nothing to observe, so the cast itself is success.
+                    CAST  the cast itself is success: the ability lands nothing
+                          to observe, or it is an AOE taunt or AOE fear, which
+                          reports every press whatever it hits.
                           Pet taunts are CAST: on these clients Growl, Torment and
                           Suffering apply no debuff, and watching for an aura
                           leaves the whole feature silent.
@@ -56,7 +58,7 @@ ns.ABILITIES = {
 	{
 		class = "DRUID",
 		category = "TAUNT",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 5209 },
 	}, -- Challenging Roar
@@ -132,7 +134,7 @@ ns.ABILITIES = {
 	{
 		class = "PRIEST",
 		category = "FEAR",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 8122, 8124, 10888, 10890 },
 	}, -- Psychic Scream
@@ -164,7 +166,7 @@ ns.ABILITIES = {
 	{
 		class = "WARLOCK",
 		category = "FEAR",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 5484, 17928 },
 	}, -- Howl of Terror
@@ -187,14 +189,14 @@ ns.ABILITIES = {
 	{
 		class = "WARRIOR",
 		category = "TAUNT",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 1161 },
 	}, -- Challenging Shout
 	{
 		class = "WARRIOR",
 		category = "FEAR",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 5246 },
 	}, -- Intimidating Shout

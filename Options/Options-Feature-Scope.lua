@@ -97,10 +97,11 @@ function ns.AddFeatureScope(args, getFeature, summaryKey, enableKey, order, scop
 	end
 
 	--[[
-	    Above everything, for All Alerts only: this feature's own switch being off
-	    already collapses the page to the switch that says so.
+	    Above everything, for All Alerts and the General panel's group switch
+	    over this feature: this feature's own switch being off already collapses
+	    the page to the switch that says so.
 	]]
-	ns.AddQuietStatus(args, order - 0.6)
+	ns.AddQuietStatus(args, order - 0.6, nil, nil, scopeKey)
 
 	args.scopeSummary = ns.OptionsDesc(L[summaryKey], order)
 	args.scopeSpace0 = ns.OptionsSpacer(order + 1)
