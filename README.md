@@ -4,6 +4,9 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 
 **TL;DR:** Tells you what happened, who caused it, and what needs fixing while the fight is still happening. Less combat-log archaeology after the wipe, more information when it matters, so you can make better decisions and have cleaner runs.
 
+<img width="800" src="https://github.com/user-attachments/assets/80215a1a-26a7-4f6a-888a-9bb70e3cfd26" />
+
+
 ### Example Messages
 
 > **Taunt Lands, 🔊 & Self:** Taunt! Prima used [Taunt] on Lucifron // Control Freak
