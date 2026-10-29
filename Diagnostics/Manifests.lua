@@ -239,9 +239,9 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		end,
 	},
 	{
-		"LE_PARTY_CATEGORY_INSTANCE (group chat channel)",
+		"LE_PARTY_CATEGORY_HOME and LE_PARTY_CATEGORY_INSTANCE (group chat channel)",
 		function()
-			return type(LE_PARTY_CATEGORY_INSTANCE) == "number"
+			return type(LE_PARTY_CATEGORY_HOME) == "number" and type(LE_PARTY_CATEGORY_INSTANCE) == "number"
 		end,
 	},
 	{
@@ -377,6 +377,11 @@ ns.DiagnosticsStrings.EVENT_LOG_EXAMPLES = "Best for 'it never fires' reports. T
     goes nowhere. A whisper election that never hears the other clients' bids,
     because the prefix did not register, sends one whisper per Control Freak
     user rather than one in all.
+
+    Each Announce choice is then resolved through ns.ResolveAlertDestination,
+    the call every alert makes, on a row with its print box ticked: In a Party
+    finds no channel in a raid, and a row that finds none falls back to its
+    print, so "announced nowhere" and "printed instead" read apart.
 ]]
 local function AppendAnnounceContext(lines)
 	local _, instanceType = IsInInstance()
@@ -387,6 +392,12 @@ local function AppendAnnounceContext(lines)
 		tostring(instanceType),
 		(instanceType == "pvp" or instanceType == "arena") and ", announcing is skipped here" or ""
 	)
+	local choices = {}
+	for _, scope in ipairs(ns.ANNOUNCE_SCOPES) do
+		local doPrint, channel = ns.ResolveAlertDestination({ row = { print = true, announce = scope } }, nil, "row")
+		choices[#choices + 1] = string.format("%s -> %s", scope, channel or (doPrint and "print" or "nothing"))
+	end
+	lines[#lines + 1] = "Announce choices resolve now to: " .. table.concat(choices, ", ")
 	lines[#lines + 1] = string.format(
 		"Add-on message prefix %s registered = %s",
 		ns.ADDON_MESSAGE_PREFIX,
@@ -397,7 +408,7 @@ end
 --[[
     Every alert section on every tab, found by the rows it carries rather than
     listed by name, so a new section shows up here without an edit: its switch,
-    each row's switch and resolved destination, its target filters, its sound,
+    each row's print box and resolved announce, its target filters, its sound,
     and then every other setting it stores -- a health floor, a whisper, a
     cooldown, the Incapacitated effect boxes -- since any of them can keep a
     line quiet. A sound whose stored name LibSharedMedia no longer knows plays
@@ -475,10 +486,10 @@ local function SectionLine(featureKey, sectionKey, section)
 		local row = section[rowKey]
 		if type(row) == "table" then
 			rows[#rows + 1] = string.format(
-				"%s=%s/%s",
+				"%s=print:%s/announce:%s",
 				rowKey,
-				tostring(row.enabled),
-				ns.ResolveChoice(row.output, ns.ALERT_OUTPUTS, ns.ALERT_OUTPUT_DEFAULT)
+				tostring(row.print),
+				ns.ResolveChoice(row.announce, ns.ANNOUNCE_SCOPES, ns.ANNOUNCE_SCOPE_DEFAULT)
 			)
 		end
 	end
@@ -736,6 +747,11 @@ function ns:BuildAlertContextReport()
 	-- Every setting below is this profile's, so a character on the wrong one reads as settings that never took.
 	lines[#lines + 1] = string.format("profile = %s", tostring(ns.db:GetCurrentProfile()))
 	lines[#lines + 1] = string.format("enabled (all alerts) = %s", tostring(profile.enabled))
+	-- The group switches sit between All Alerts and each feature's own, and IsFeatureGateOpen below reads them.
+	for _, group in ipairs(ns.FEATURE_GROUPS) do
+		lines[#lines + 1] =
+			string.format("featureGroups.%s = %s", group.key, tostring(ns.IsFeatureGroupOn(group.features[1])))
+	end
 	lines[#lines + 1] = string.format("showWelcome (login line) = %s", tostring(profile.showWelcome))
 	lines[#lines + 1] = ""
 	for _, key in ipairs(ns.FEATURE_KEYS) do
@@ -1033,6 +1049,8 @@ local ALERT_FORMATS = {
 	{ "BAD_PET_WHISPER_AOE", "name", "spell" },
 	{ "SHIELD_WHISPER", "spell", "name" },
 	{ "PARRY_WHISPER", "boss" },
+	{ "NOVA_WHISPER", "spell" },
+	{ "PARRY_CONFESSION", "confession", "count" },
 }
 
 --[[
@@ -1084,6 +1102,8 @@ local function WidestParts()
 		),
 		dispel = Longest(dispels),
 		elapsed = "99.9",
+		confession = ns.GetParryConfession(ns.db.profile.badParryMonkeys.monkey),
+		count = 9999,
 	}
 end
 

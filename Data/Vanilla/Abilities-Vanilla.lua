@@ -17,7 +17,7 @@ ns.ABILITIES = {
 	{
 		class = "DRUID",
 		category = "TAUNT",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 5209 },
 	}, -- Challenging Roar
@@ -77,7 +77,7 @@ ns.ABILITIES = {
 	{
 		class = "PRIEST",
 		category = "FEAR",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 8122, 8124, 10888, 10890 },
 	}, -- Psychic Scream
@@ -146,7 +146,7 @@ ns.ABILITIES = {
 	{
 		class = "WARLOCK",
 		category = "FEAR",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 5484, 17928 },
 	}, -- Howl of Terror
@@ -169,14 +169,14 @@ ns.ABILITIES = {
 	{
 		class = "WARRIOR",
 		category = "TAUNT",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 1161 },
 	}, -- Challenging Shout
 	{
 		class = "WARRIOR",
 		category = "FEAR",
-		detection = "AURA",
+		detection = "CAST",
 		isAoe = true,
 		triggers = { 5246 },
 	}, -- Intimidating Shout
@@ -241,13 +241,13 @@ ns.ABILITIES = {
 How We Got the Data
 
 Last Validated
-	2026-10-20, Classic Era 1.15.9.70003
+	2026-10-28, Classic Era 1.15.9.70576
 
 Notes
 	- Every ability Control Freak watches on Classic Era, one row per checkbox in the options panel, grouped by class, with the pets' taunts and the engineering items last.
 	- class is the bucket the options panel files the row under; ITEM is its own bucket.
 	- category is TAUNT, FEAR, NOVA, SHIELD or PET_TAUNT, and ns.CATEGORY_FEATURE in Features/Ability-Index.lua maps each to the tab that owns its alert.
-	- detection is how a success is recognised. AURA means the ability lands an aura on its target, so success is that aura applying and a resist produces exactly one failure line. It is usually a debuff; Power Word: Shield's is a buff on a friendly target. CAST means it lands nothing to observe, so the cast itself is the success. Pet taunts are CAST: Growl, Torment and Suffering apply no debuff, and watching for an aura would leave the whole feature silent.
+	- detection is how a success is recognised. AURA means the ability lands an aura on its target, so success is that aura applying and a resist produces exactly one failure line. It is usually a debuff; Power Word: Shield's is a buff on a friendly target. CAST means the cast itself is the success: the ability lands nothing to observe, or it is an AOE taunt or AOE fear, which reports every press whatever it hits (a maintainer decision). Pet taunts are CAST: Growl, Torment and Suffering apply no debuff, and watching for an aura would leave the whole feature silent.
 	- isAoe means the ability hits more than one target. It picks the alert section that reports it and suppresses failure lines, since an AoE taunt fires one miss per immune mob, which is noise rather than information.
 	- kindChoice, taunts only, marks a taunt that takes a few mobs rather than one or a whole pack, so the Taunts tab lets the player report it as Single Target or AOE, with isAoe as the default. Every other taunt's dropdown is locked on its isAoe. It needs AURA detection: a cast names one target at most, where an aura lands on each mob the taunt took. No row on this client sets it.
 	- renamed marks an ability whose ranks answer to more than one name on this client, so Validate Data reports a differing name as RENAMED rather than as the typo signal NAME MISMATCH. Set it only for a verified rename, never to quiet a surprise. A rename stays one row, and the panel shows whichever name the client gives the highest rank the character has. No row on this client sets it.
@@ -257,7 +257,7 @@ Notes
 	- Quest tools whose Use only puts threat on a quest's own mob are left out too: the Taming Rods, Morbent's Bane, Torch of Flame, the Alterac Valley collar and muzzle, and Glowing Crystal Prison. No equipped item procs a fear or taunt on an enemy.
 	- Items have no category of their own. An ITEM row takes the category of what its Use does, so the target dummies are AOE taunts and Flash Bomb an AOE fear.
 	- Tame Beast carries threat only to start a tame, so it is left out.
-	- The pet family test is a spell on a pet's skill line whose only effect is threat on enemies: Growl, Torment and Suffering. Cower and Soothing Kiss carry only threat too, but lower it, so they are left out.
+	- The pet family test is a spell on a pet's skill line whose only effect is threat on enemies: Growl, Torment and Suffering. Scorpid Poison carries threat beside its poison and is left out, and Cower and Soothing Kiss carry only threat but lower it.
 	- The three paladin bubbles are parked, listed in the comment under the PALADIN rows with what bringing them back would take.
 	- Season of Discovery's own copies (its rune taunts, its second Growl, Taunt and pet Growl ids, and the felguard's Anguish) live only in Data/Discovery/. The Classic Era client knows them, but they never belong in this folder.
 
@@ -268,16 +268,16 @@ Wowhead
 	None.
 
 wago.tools
-	https://wago.tools/db2/SpellName?build=1.15.9.70003
-	https://wago.tools/db2/Spell?build=1.15.9.70003
-	https://wago.tools/db2/SpellEffect?build=1.15.9.70003
+	https://wago.tools/db2/SpellName?build=1.15.9.70576
+	https://wago.tools/db2/Spell?build=1.15.9.70576
+	https://wago.tools/db2/SpellEffect?build=1.15.9.70576
 	https://wago.tools/db2/SpellLevels?build=1.15.9.70003
 	https://wago.tools/db2/SpellClassOptions?build=1.15.9.70003
-	https://wago.tools/db2/SkillLineAbility?build=1.15.9.70003
-	https://wago.tools/db2/SkillLine?build=1.15.9.70003
+	https://wago.tools/db2/SkillLineAbility?build=1.15.9.70576
+	https://wago.tools/db2/SkillLine?build=1.15.9.70576
 	https://wago.tools/db2/SpellCooldowns?build=1.15.9.70003
-	https://wago.tools/db2/ItemEffect?build=1.15.9.70003
-	https://wago.tools/db2/ItemSparse?build=1.15.9.70003
+	https://wago.tools/db2/ItemEffect?build=1.15.9.70576
+	https://wago.tools/db2/ItemSparse?build=1.15.9.70576
 
 QuestieDB
 	None.

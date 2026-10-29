@@ -23,11 +23,26 @@ local _, ns = ...
     kind is a bare word and id is a guid, neither of which can contain one. kind
     keeps two features from colliding on the same subject: a pet and the player it
     belongs to are different whispers about different things.
+
+    A bid heard before this client queues its own is kept for one election
+    delay and wins the same way, since the clients do not see the event at
+    exactly the same moment.
 ]]
 local pending = {}
 
+local heard = {}
+local heardCount = 0
+local HEARD_LIMIT = 200
+
 ns.stateResets[#ns.stateResets + 1] = function()
 	wipe(pending)
+	wipe(heard)
+	heardCount = 0
+end
+
+-- The stand-down rule: the higher bid wins, and equal bids break on the sender's guid.
+local function Beats(priority, senderGUID, otherPriority, otherGUID)
+	return priority > otherPriority or (priority == otherPriority and senderGUID > otherGUID)
 end
 
 --[[
@@ -59,6 +74,19 @@ function ns:QueueGroupWhisper(kind, id, target, formatKey, args)
 	local key = kind .. ":" .. id
 	local priority = math.random(1, 10000)
 
+	local earlier = heard[key]
+	if earlier then
+		heard[key] = nil
+		heardCount = heardCount - 1
+		if
+			GetTime() - earlier.at <= ns.WHISPER_ELECTION_DELAY
+			and Beats(earlier.priority, earlier.senderGUID, priority, ns.playerGUID or "")
+		then
+			ns.LogWhisperStep("stand down, heard earlier (theirs, ours)", earlier.priority, priority)
+			return
+		end
+	end
+
 	pending[key] = { priority = priority, target = target, formatKey = formatKey, args = args }
 
 	local channel = ns:GetGroupChatChannel()
@@ -84,7 +112,7 @@ function ns:QueueGroupWhisper(kind, id, target, formatKey, args)
 	end)
 end
 
-function ns:CHAT_MSG_ADDON(prefix, message, channel, sender)
+function ns:OnChatMsgAddon(prefix, message, channel, sender)
 	if prefix ~= ns.ADDON_MESSAGE_PREFIX then
 		return
 	end
@@ -107,8 +135,20 @@ function ns:CHAT_MSG_ADDON(prefix, message, channel, sender)
 		return
 	end
 
-	local bid = pending[kind .. ":" .. id]
+	local key = kind .. ":" .. id
+	local bid = pending[key]
 	if not bid then
+		local kept = heard[key]
+		if not kept or Beats(priority, senderGUID, kept.priority, kept.senderGUID) then
+			if not kept then
+				if heardCount >= HEARD_LIMIT then
+					wipe(heard)
+					heardCount = 0
+				end
+				heardCount = heardCount + 1
+			end
+			heard[key] = { priority = priority, senderGUID = senderGUID, at = GetTime() }
+		end
 		return
 	end
 
@@ -116,8 +156,8 @@ function ns:CHAT_MSG_ADDON(prefix, message, channel, sender)
 	    Equal bids break on the sender's guid, so both clients stand down the same
 	    way and exactly one whisper goes out.
 	]]
-	if priority > bid.priority or (priority == bid.priority and senderGUID > (ns.playerGUID or "")) then
-		pending[kind .. ":" .. id] = nil
+	if Beats(priority, senderGUID, bid.priority, ns.playerGUID or "") then
+		pending[key] = nil
 		ns.LogWhisperStep("stand down (theirs, ours)", priority, bid.priority)
 	end
 end

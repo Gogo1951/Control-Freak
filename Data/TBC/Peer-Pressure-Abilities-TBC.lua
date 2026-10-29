@@ -317,7 +317,7 @@ ns.PEER_PRESSURE_ABILITIES = {
 How We Got the Data
 
 Last Validated
-	2026-10-19, TBC Anniversary 2.5.6.70006
+	2026-10-28, TBC Anniversary 2.5.6.70577
 
 Notes
 	- The class cooldowns the Peer Pressure tab reports when another player of your class in your group uses one, or when you do while the My Cooldowns row is on. Hand-picked, not queried. They moved here from Thanks for the Buff in October 2026.
@@ -341,11 +341,11 @@ Wowhead
 wago.tools
 	https://wago.tools/db2/SpellName?build=2.5.6.69795
 	https://wago.tools/db2/SkillLineAbility?build=2.5.6.69795
-	https://wago.tools/db2/SpellName?build=2.5.6.70006
-	https://wago.tools/db2/SkillLineAbility?build=2.5.6.70006
+	https://wago.tools/db2/SpellName?build=2.5.6.70577
+	https://wago.tools/db2/SkillLineAbility?build=2.5.6.70577
 	https://wago.tools/db2/SpellLevels?build=2.5.6.70006
-	https://wago.tools/db2/SkillLine?build=2.5.6.70006
-	https://wago.tools/db2/SpellEffect?build=2.5.6.70006
+	https://wago.tools/db2/SkillLine?build=2.5.6.70577
+	https://wago.tools/db2/SpellEffect?build=2.5.6.70577
 	https://wago.tools/db2/Talent?build=2.5.6.70006
 
 QuestieDB

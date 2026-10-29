@@ -28,68 +28,80 @@ function ns.RegisterOptionsPanels()
 	]]
 	local function AddSubPanel(appName, options, name, parentID)
 		AceConfig:RegisterOptionsTable(appName, options)
-		AceConfigDialog:AddToBlizOptions(appName, name, parentID)
+		return select(2, AceConfigDialog:AddToBlizOptions(appName, name, parentID))
 	end
 
-	AceConfig:RegisterOptionsTable(registry.Taunts, ns.BuildTauntsOptions())
-	local _, tauntsID = AceConfigDialog:AddToBlizOptions(registry.Taunts, L["TAB_TAUNTS"], L["ADDON_TITLE"])
+	--[[
+	    The tree follows the General panel's Features block: a page per group
+	    (ns.FEATURE_GROUPS) with its features' tabs nested under it, then
+	    Tanking Tools with its tools. Both group pages register first, so they
+	    sit at the top of the list in that order; the tabs then nest under the
+	    IDs they handed back, in tab order. A Tracked Abilities page sits one
+	    level further down, under its tab.
+	]]
+	local groupIDs = {}
+	for _, group in ipairs(ns.FEATURE_GROUPS) do
+		groupIDs[group.key] =
+			AddSubPanel(registry[group.registry], ns.BuildFeatureGroupOptions(group), L[group.labelKey], mainCategoryID)
+	end
+	local monitoringID, naughtyListID = groupIDs.monitoring, groupIDs.naughtyList
+
+	local tauntsID = AddSubPanel(registry.Taunts, ns.BuildTauntsOptions(), L["TAB_TAUNTS"], monitoringID)
 	AddSubPanel(registry.TauntsTracked, ns.BuildTauntsTrackedOptions(), L["TRACKED_HEADER"], tauntsID)
 
-	AceConfig:RegisterOptionsTable(registry.Interrupts, ns.BuildInterruptsOptions())
-	AceConfigDialog:AddToBlizOptions(registry.Interrupts, L["TAB_INTERRUPTS"], L["ADDON_TITLE"])
+	AddSubPanel(registry.Interrupts, ns.BuildInterruptsOptions(), L["TAB_INTERRUPTS"], monitoringID)
 
-	AceConfig:RegisterOptionsTable(registry.Fears, ns.BuildFearsOptions())
-	local _, fearsID = AceConfigDialog:AddToBlizOptions(registry.Fears, L["TAB_FEARS"], L["ADDON_TITLE"])
+	local fearsID = AddSubPanel(registry.Fears, ns.BuildFearsOptions(), L["TAB_FEARS"], monitoringID)
 	AddSubPanel(registry.FearsTracked, ns.BuildFearsTrackedOptions(), L["TRACKED_HEADER"], fearsID)
 
 	--[[
 	    Directly under Fears, because the two are the same news read from opposite
 	    ends: a fear scattering the pull, and the tank it landed on saying so.
 	]]
-	AceConfig:RegisterOptionsTable(registry.Incapacitated, ns.BuildIncapacitatedOptions())
-	AceConfigDialog:AddToBlizOptions(registry.Incapacitated, L["TAB_INCAPACITATED"], L["ADDON_TITLE"])
+	AddSubPanel(registry.Incapacitated, ns.BuildIncapacitatedOptions(), L["TAB_INCAPACITATED"], monitoringID)
 
 	--[[
 	    Next after Incapacitated, because the two are one step apart: losing
 	    control of your character, then losing it for good.
 	]]
-	AceConfig:RegisterOptionsTable(registry.TankDeaths, ns.BuildTankDeathsOptions())
-	AceConfigDialog:AddToBlizOptions(registry.TankDeaths, L["TAB_TANK_DEATHS"], L["ADDON_TITLE"])
+	AddSubPanel(registry.TankDeaths, ns.BuildTankDeathsOptions(), L["TAB_TANK_DEATHS"], monitoringID)
 
 	--[[
-	    The two Bad tabs sit together: they are the ones about somebody in the
-	    group doing something wrong, where everything above them reports what
+	    Last of the Monitoring tabs, as the General panel's Features block lists
+	    it: the one whose news is not the fight going wrong, but a classmate
+	    pressing a cooldown so the player can press theirs.
+	]]
+	local peerPressureID =
+		AddSubPanel(registry.PeerPressure, ns.BuildPeerPressureOptions(), L["TAB_PEER_PRESSURE"], monitoringID)
+	AddSubPanel(registry.PeerPressureTracked, ns.BuildPeerPressureTrackedOptions(), L["TRACKED_HEADER"], peerPressureID)
+
+	--[[
+	    The four Bad tabs sit together, alphabetically, as the General panel's
+	    Naughty List draws them: they are the ones about somebody in the group
+	    doing something wrong, where everything above them reports what
 	    happened.
 	]]
+	AddSubPanel(registry.BadMages, ns.BuildBadMagesOptions(), L["TAB_BAD_MAGES"], naughtyListID)
+
+	AddSubPanel(registry.BadParryMonkeys, ns.BuildBadParryMonkeysOptions(), L["TAB_BAD_PARRY_MONKEYS"], naughtyListID)
+
+	local badPetsID = AddSubPanel(registry.BadPets, ns.BuildBadPetsOptions(), L["TAB_BAD_PETS"], naughtyListID)
+	AddSubPanel(registry.BadPetsTracked, ns.BuildBadPetsTrackedOptions(), L["TRACKED_HEADER"], badPetsID)
+
 	--[[
 	    Registered on every flavor, Season of Discovery included, where a status
 	    line says a priest rune gives the rage back, rather than the tab hiding itself.
 	]]
-	AceConfig:RegisterOptionsTable(registry.BadPriests, ns.BuildBadPriestsOptions())
-	AceConfigDialog:AddToBlizOptions(registry.BadPriests, L["TAB_BAD_PRIESTS"], L["ADDON_TITLE"])
-
-	AceConfig:RegisterOptionsTable(registry.BadPets, ns.BuildBadPetsOptions())
-	local _, badPetsID = AceConfigDialog:AddToBlizOptions(registry.BadPets, L["TAB_BAD_PETS"], L["ADDON_TITLE"])
-	AddSubPanel(registry.BadPetsTracked, ns.BuildBadPetsTrackedOptions(), L["TRACKED_HEADER"], badPetsID)
+	AddSubPanel(registry.BadPriests, ns.BuildBadPriestsOptions(), L["TAB_BAD_PRIESTS"], naughtyListID)
 
 	--[[
-	    After the Bad pair, because its news is not the fight going wrong: a
-	    classmate pressed a cooldown, so the player can press theirs.
+	    Last of the feature tabs, below Naughty List, because its tools are still
+	    in beta and it ships switched off. A tab nobody has opted into yet does
+	    not belong in the middle of the ones that work. ns.FEATURE_KEYS carries
+	    the same order; keep the two in step.
 	]]
-	AceConfig:RegisterOptionsTable(registry.PeerPressure, ns.BuildPeerPressureOptions())
-	local _, peerPressureID =
-		AceConfigDialog:AddToBlizOptions(registry.PeerPressure, L["TAB_PEER_PRESSURE"], L["ADDON_TITLE"])
-	AddSubPanel(registry.PeerPressureTracked, ns.BuildPeerPressureTrackedOptions(), L["TRACKED_HEADER"], peerPressureID)
-
-	--[[
-	    Last of the feature tabs, below Peer Pressure, because it is the only one
-	    that ships switched off -- its tools are still in beta. A tab nobody has
-	    opted into yet does not belong in the middle of the ones that work.
-	    ns.FEATURE_KEYS carries the same order; keep the two in step.
-	]]
-	AceConfig:RegisterOptionsTable(registry.TankingTools, ns.BuildTankingToolsOptions())
-	local _, tankingToolsID =
-		AceConfigDialog:AddToBlizOptions(registry.TankingTools, L["TAB_TANKING_TOOLS"], L["ADDON_TITLE"])
+	local tankingToolsID =
+		AddSubPanel(registry.TankingTools, ns.BuildTankingToolsOptions(), L["TAB_TANKING_TOOLS"], mainCategoryID)
 
 	-- One sub-panel per tool, in ns.TANKING_TOOLS order; each builder is named after its registry key.
 	for _, tool in ipairs(ns.TANKING_TOOLS) do

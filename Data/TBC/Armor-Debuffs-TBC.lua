@@ -42,7 +42,7 @@ ns.ARMOR_DEBUFFS = {
 How We Got the Data
 
 Last Validated
-	2026-10-20, TBC Anniversary 2.5.6.70006
+	2026-10-28, TBC Anniversary 2.5.6.70577
 
 Notes
 	- The debuffs the Armor Debuffs tool (Features/Tanking-Tools-Armor.lua) waits on before it reports a target's armor as down, and what each one needs before it counts.
@@ -61,11 +61,11 @@ Wowhead
 	None.
 
 wago.tools
-	https://wago.tools/db2/SpellName?build=2.5.6.70006
-	https://wago.tools/db2/SpellEffect?build=2.5.6.70006
-	https://wago.tools/db2/SkillLineAbility?build=2.5.6.70006
-	https://wago.tools/db2/ItemEffect?build=2.5.6.70006
-	https://wago.tools/db2/ItemSparse?build=2.5.6.70006
+	https://wago.tools/db2/SpellName?build=2.5.6.70577
+	https://wago.tools/db2/SpellEffect?build=2.5.6.70577
+	https://wago.tools/db2/SkillLineAbility?build=2.5.6.70577
+	https://wago.tools/db2/ItemEffect?build=2.5.6.70577
+	https://wago.tools/db2/ItemSparse?build=2.5.6.70577
 	https://wago.tools/db2/Spell?build=2.5.6.69795
 	https://wago.tools/db2/SpellClassOptions?build=2.5.6.69795
 

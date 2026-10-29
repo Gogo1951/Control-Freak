@@ -8,6 +8,7 @@ end
 --------------------------------------------------------------------------------
 
 L["ADDON_TITLE"] = "Control Freak"
+L["ADDON_SHORT_NAME"] = "Control Freak"
 L["OPTIONS_DESCRIPTION"] =
 	"战斗播报插件，覆盖嘲讽、打断、恐惧、坦克死亡、捣蛋宠物、招架、护甲削弱以及其他关键战斗事件。通过可自定义的提示，掌握谁嘲讽了、什么失败了、谁打断了施法，以及发生了什么。"
 
@@ -30,27 +31,25 @@ L["ENABLE_MINIMAP_BUTTON_DESC"] = "在你的小地图上显示 Control Freak 按
 
 L["OPTIONS_MASTER_SWITCH_HEADER"] = "总开关"
 L["OPTIONS_FEATURES_HEADER"] = "功能"
--- The Features block's switch captions. Each tab's own switch keeps its "Enable" caption.
-L["FEATURES_TAUNTS"] = "嘲讽监视"
-L["FEATURES_INTERRUPTS"] = "打断监视"
-L["FEATURES_FEARS"] = "恐惧监视"
-L["FEATURES_INCAPACITATED"] = "失控监视"
-L["FEATURES_TANK_DEATHS"] = "坦克死亡监视"
-L["FEATURES_BAD_PRIESTS"] = "捣蛋牧师监视"
-L["FEATURES_BAD_PETS"] = "捣蛋宠物监视"
-L["FEATURES_PEER_PRESSURE"] = "同伴压力"
-L["FEATURES_TANKING_TOOLS"] = "坦克工具"
+-- The Features block's group switches and their tooltip, whose %s is the group's own name, then each group's page summary. Its other switches read each tab's own name (TAB_*).
+L["OPTIONS_MONITORING_LABEL"] = "监视"
+L["OPTIONS_NAUGHTY_LIST_LABEL"] = "捣蛋名单"
+L["OPTIONS_GROUP_ENABLE_DESC"] =
+	'一次性关闭或重新开启"%s"下的所有功能。每项功能都保留各自的开关，重新开启后会恢复到原来的状态。'
+L["OPTIONS_MONITORING_SUMMARY"] =
+	'战斗中发生了什么：嘲讽、打断、恐惧、你的角色失去控制、坦克死亡，以及同职业队友的冷却技能。关闭"监视"会让这六项同时静音，而每一项都保留各自的开关。'
+L["OPTIONS_NAUGHTY_LIST_SUMMARY"] =
+	'队伍里有人在给坦克添麻烦：法师的新星、不是坦克却被首领招架的人、开着嘲讽的宠物、套在怒气坦克身上的牧师护盾。关闭"捣蛋名单"会让这四项同时静音，而每一项都保留各自的开关。'
 
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/freak"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "打开本插件的选项界面。"
 
 --[[
-    The add-on's own switch. KILL_SWITCH titles the mini-map tooltip's block for
-    it, naming its REACH rather than the act of throwing it. KILL_SWITCH_ENABLE
-    captions it under the General panel's Master Switch header, and
-    KILL_SWITCH_ENABLE_DESC is both that switch's tooltip and the mini-map
-    block's description, so the two cannot describe it differently.
+    The add-on's own switch. KILL_SWITCH names it in the status line a silenced
+    page opens on, naming its REACH rather than the act of throwing it.
+    KILL_SWITCH_ENABLE captions it under the General panel's Master Switch
+    header, and KILL_SWITCH_ENABLE_DESC is that switch's tooltip.
 ]]
 L["KILL_SWITCH"] = "所有提示"
 L["KILL_SWITCH_ENABLE"] = "启用 Control Freak"
@@ -95,9 +94,20 @@ L["STATE_ON"] = "已启用"
 L["STATE_OFF"] = "已禁用"
 L["LEFT_CLICK"] = "左键点击"
 L["RIGHT_CLICK"] = "右键点击"
+L["MINIMAP_SHIFT_LEFT_CLICK"] = "Shift + 左键点击"
 L["SHIFT_MIDDLE_CLICK"] = "Shift + 中键点击"
 L["ACTION_TOGGLE"] = "切换"
 L["MINIMAP_OPTIONS"] = "Control Freak 选项"
+--[[
+    Each block's summary names everything its switch reaches, to show a player
+    what there is to turn on. TRANSLATORS: keep each to two lines in the
+    tooltip. TANKING_TOOLS_MINIMAP_SUMMARY, the third, sits with its tab below.
+]]
+L["MONITORING_MINIMAP_SUMMARY"] = "嘲讽、打断、恐惧、失控、坦克死亡和同伴压力。"
+L["NAUGHTY_LIST_MINIMAP_SUMMARY"] =
+	"冰霜新星、招架猴、开着嘲讽的宠物，以及套在怒气坦克身上的护盾。"
+-- Replaces the three blocks while All Alerts is off, since none of their clicks would do anything.
+L["MINIMAP_ALL_ALERTS_OFF"] = '"所有提示"已关闭，因此什么都不会触发。'
 
 --------------------------------------------------------------------------------
 -- Feature Tabs
@@ -109,9 +119,11 @@ L["TAB_INTERRUPTS"] = "打断"
 L["TAB_FEARS"] = "恐惧"
 L["TAB_INCAPACITATED"] = "失控"
 L["TAB_TANK_DEATHS"] = "坦克死亡"
-L["TAB_BAD_PRIESTS"] = "捣蛋牧师"
-L["TAB_BAD_PETS"] = "捣蛋宠物"
 L["TAB_PEER_PRESSURE"] = "同伴压力"
+L["TAB_BAD_MAGES"] = "捣蛋法师"
+L["TAB_BAD_PARRY_MONKEYS"] = "捣蛋招架猴"
+L["TAB_BAD_PETS"] = "捣蛋宠物"
+L["TAB_BAD_PRIESTS"] = "捣蛋牧师"
 L["TAB_TANKING_TOOLS"] = "坦克工具"
 
 --------------------------------------------------------------------------------
@@ -145,7 +157,8 @@ L["SCOPE_INSTANCE_ONLY_DESC"] = "只在地下城和团队副本中触发。"
 
 --[[
     The line at the top of a page that a switch somewhere else has silenced:
-    All Alerts on any feature page, or the feature a sub-page belongs to.
+    All Alerts on any feature page, the group a feature tab sits under, or the
+    feature a sub-page belongs to. A group uses STATUS_FEATURE_OFF too.
 
     TRANSLATORS: in both, the first %s is the name of the switch that is off
     (drawn gold) and the second is STATUS_OFF (drawn red). The rest are plain
@@ -183,33 +196,39 @@ L["ALERT_SOUND_PREVIEW_DESC"] = "立即播放这个声音，无论声音是否�
 L["SOUND_NONE"] = "无"
 
 --[[
-    The block every tab draws: whose cast is the row, where its line goes is
-    the dropdown beside it, and the target filter is a ladder rather than a
+    The block every tab draws: whose cast is the row, beside it a Print box and
+    an Announce dropdown, and the target filter is a ladder rather than a
     switch. Each section names its own two rows -- see
     TAUNTS_SUCCESS_MINE below -- because "My" and "Others'" agree with the noun
     in some languages and a shared "%s" template could not.
 
     TRANSLATORS: ALERT_AGAINST_DESC quotes one rung and one row by name; that
     wording must match your TARGET_RUNG_ELITE_0 and ALERT_MARKED_ALWAYS, or the
-    tooltip explains a choice the player cannot find. The four rungs are a
-    threshold, widest first: each one counts itself and the ones after it,
-    which is why every rung that includes bosses says so. Keep that in your
-    translations -- a rung reading only "Elites" beside a separate "Bosses"
-    reads as two disjoint sets.
+    tooltip explains a choice the player cannot find. ALERT_PRINT_DESC and
+    ALERT_ANNOUNCE_DESC quote the Announce choices the same way. Keep
+    ALERT_PRINT_HEADER short: it heads a narrow column of boxes. The four
+    rungs are a threshold, widest first: each one counts itself and the ones
+    after it, which is why every rung that includes bosses says so. Keep that
+    in your translations -- a rung reading only "Elites" beside a separate
+    "Bosses" reads as two disjoint sets.
 
     ALERT_MARKED_ALWAYS is the one control that WIDENS a section rather than
     narrowing it: a marked target counts whatever the rung says. Keep "Always"
-    in it, and keep it distinct from ALERT_OUTPUT_ANNOUNCE -- this row decides
+    in it, and keep it distinct from the Announce choices -- this row decides
     WHETHER the alert fires, never where its line goes.
 ]]
-L["ALERT_MINE_DESC"] =
-	"报告你自己的施法，包括你宠物的。旁边的下拉框决定这条消息发往哪里。"
-L["ALERT_OTHERS_DESC"] =
-	"报告你队伍里其他所有人的施法。旁边的下拉框决定这条消息发往哪里。"
-L["ALERT_OUTPUT_PRINT"] = "显示（仅自己可见）"
-L["ALERT_OUTPUT_ANNOUNCE"] = "通报"
-L["ALERT_OUTPUT_DESC"] =
-	"这条消息发往哪里：只发一处，绝不两处都发。显示（仅自己可见）只出现在你自己的窗口里，不会给任何人添麻烦。通报则改为发到小队或团队频道，而向整个团队播报别人的一举一动，正是插件惹人嫌的原因，所以选它之前值得三思。你不在队伍中时，以及在战场和竞技场里，通报不会发出任何消息。"
+L["ALERT_MINE_DESC"] = "你自己的施法，包括你宠物的。"
+L["ALERT_OTHERS_DESC"] = "你队伍里其他所有人的施法。"
+-- The two column headers over a section's rows, then the Announce dropdown's three choices.
+L["ALERT_PRINT_HEADER"] = "显示（仅自己）"
+L["ALERT_ANNOUNCE_HEADER"] = "通报"
+L["ALERT_ANNOUNCE_NEVER"] = "从不"
+L["ALERT_ANNOUNCE_PARTY"] = "在小队中"
+L["ALERT_ANNOUNCE_GROUP"] = "在小队或团队中"
+L["ALERT_PRINT_DESC"] =
+	'勾选后，只要这条消息没有被通报，就会显示在你自己的窗口里：你单人时，"通报"设为"从不"时，"在小队中"遇上团队时，或者在战场和竞技场里。已通报的消息本来就会出现在你的聊天框里，所以绝不会显示两次。'
+L["ALERT_ANNOUNCE_DESC"] =
+	'还有谁能看到这条消息。"在小队中"会在五人及以下的小队里发到小队频道，在团队中则保持安静。"在小队或团队中"会根据你所在的队伍，发到小队或团队频道。向整个团队播报别人的一举一动，正是插件惹人嫌的原因，所以选这一项之前值得三思。你不在队伍中时，以及在战场和竞技场里，都不会通报任何消息。'
 L["ALERT_AGAINST_DESC"] =
 	'哪些敌人计入：每个选项都包含排在它后面的选项。首领指骷髅等级（??）的敌人。地下城首领的等级不显示为骷髅，所以算作精英："同级及以上精英与首领"这一项会保留它，同时滤掉它周围等级较低的小怪。勾选"始终提示已标记的目标"时，团队标记优先于以上所有规则。'
 L["TARGET_RUNG_ALL"] = "全部"
@@ -305,7 +324,8 @@ L["TAUNTS_FAILED_MINE"] = "我的失败嘲讽"
 L["TAUNTS_FAILED_OTHERS"] = "他人的失败嘲讽"
 
 L["TAUNTS_AOE_HEADER"] = "群体嘲讽"
-L["TAUNTS_AOE_DESC"] = "一次抓住周围所有目标的嘲讽，而不是只针对一个目标。"
+L["TAUNTS_AOE_DESC"] =
+	"一次抓住周围所有目标的嘲讽，而不是只针对一个目标。每次施放都会报告，无论命中什么，即使队伍里没有坦克也一样。"
 L["TAUNTS_AOE_ENABLE"] = "启用群体嘲讽提示"
 L["TAUNTS_AOE_MINE"] = "我的群体嘲讽"
 L["TAUNTS_AOE_OTHERS"] = "他人的群体嘲讽"
@@ -341,7 +361,7 @@ L["FEARS_ENABLE"] = "启用恐惧监视"
 
 L["FEARS_ALERT_HEADER"] = "成功的恐惧"
 L["FEARS_ALERT_DESC"] =
-	"生效并把怪物撒到坦克够不着的地方的恐惧。只有生效才算：单纯的施法、被抵抗和免疫都没有挪动任何东西，所以三者都不会上报。"
+	"把怪物撒到坦克够不着的地方的恐惧。群体恐惧每次施放都会报告，无论命中什么。单体恐惧只在生效时报告，因为被抵抗或免疫时，没有任何怪物被挪动。"
 L["FEARS_ALERT_ENABLE"] = "启用成功恐惧提示"
 L["FEARS_ALERT_MINE"] = "我的成功恐惧"
 L["FEARS_ALERT_OTHERS"] = "他人的成功恐惧"
@@ -381,10 +401,13 @@ L["INCAPACITATED_THRESHOLD_ONE"] = "%d 秒"
 L["INCAPACITATED_THRESHOLD"] = "%d 秒"
 L["INCAPACITATED_SHORT"] = "我的短时失控"
 L["INCAPACITATED_SHORT_DESC"] =
-	"失控时间短于上面设定的时长时，这条消息发往哪里。默认只显示在你自己的窗口：一个在别人来得及替你顶上之前就已结束的昏迷，只是解释了你刚刚丢掉的那个公共冷却，与别人无关。"
+	"失控时间短于上面设定的时长。默认只显示在你自己的窗口：一个在别人来得及替你顶上之前就已结束的昏迷，只是解释了你刚刚丢掉的那个公共冷却，与别人无关。"
 L["INCAPACITATED_LONG"] = "我的长时失控"
 L["INCAPACITATED_LONG_DESC"] =
-	"失控时间达到或超过上面设定的时长时，这条消息发往哪里。默认会通报：这种情况别人有时间做出反应，而你恰恰是那个没法开口的人。完全没有持续时间的效果，比如精神控制，算作长时失控。"
+	"失控时间达到或超过上面设定的时长。默认在小队中通报，在团队中只显示给自己：这种情况别人有时间做出反应，而你恰恰是那个没法开口的人。完全没有持续时间的效果，比如精神控制，算作长时失控。"
+
+L["INCAPACITATED_EFFECTS_HEADER"] = "包含的效果"
+L["INCAPACITATED_EFFECTS_DESC"] = "取消勾选某个效果即可不再报告它。"
 
 L["INCAPACITATED_STUN"] = "包含昏迷效果"
 L["INCAPACITATED_STUN_DESC"] = "完全失去控制，原地不动。沉睡也算作昏迷。"
@@ -431,46 +454,107 @@ L["TANK_DEATHS_ALERT_DESC"] =
 	"在团队中，只计入被指派为主坦克的玩家，也包括你自己，队伍查找器的职责在团队中不起任何作用。在小队中，计入在队伍查找器中选择了坦克职责的人。两者都没有的坦克死亡时不会提示。"
 L["TANK_DEATHS_ALERT_ENABLE"] = "启用坦克死亡提示"
 L["TANK_DEATHS_ALERT_MINE"] = "我的死亡"
-L["TANK_DEATHS_ALERT_MINE_DESC"] =
-	"报告你在当坦克时自己的死亡。旁边的下拉框决定这条消息发往哪里。"
+L["TANK_DEATHS_ALERT_MINE_DESC"] = "你在当坦克时自己的死亡。"
 L["TANK_DEATHS_ALERT_OTHERS"] = "他人的坦克死亡"
-L["TANK_DEATHS_ALERT_OTHERS_DESC"] =
-	"报告你队伍里其他正在当坦克的人的死亡。旁边的下拉框决定这条消息发往哪里。"
+L["TANK_DEATHS_ALERT_OTHERS_DESC"] = "你队伍里其他正在当坦克的人的死亡。"
 
 L["TANK_DEATHS_CLASS_HEADER"] = "按职业的死亡"
 L["TANK_DEATHS_CLASS_DESC"] = "其余所有死亡，按职业列出，挑你想盯的。"
 L["TANK_DEATHS_CLASS_ROW_DESC"] = "队伍中的%s死亡时提示。"
 
 --------------------------------------------------------------------------------
--- Bad Priests
+-- Peer Pressure
 --------------------------------------------------------------------------------
 
-L["BAD_PRIESTS_SUMMARY"] = "治疗做了对坦克弊大于利的事。"
--- Shown only on a client whose data has no Power Word: Shield row, which among the shipped ones is Season of Discovery's.
-L["BAD_PRIESTS_DISCOVERY_STATUS"] =
-	"探索赛季永远不会提示有害护盾：灵魂之力符文会把怒气还给坦克，而且插件看不到其他玩家的符文。"
-L["BAD_PRIESTS_ENABLE"] = "启用捣蛋牧师监视"
+--[[
+    The alert is the whose shape with no target, like Fears: the line names a
+    classmate and a cooldown.
 
-L["BAD_PRIESTS_HEADER"] = "有害护盾"
-L["BAD_PRIESTS_DESC"] =
-	"提示落在正在当坦克的德鲁伊或战士身上的真言术：盾。怒气来自所受的伤害，而被护盾吸收的伤害不产生怒气，所以一个好心的护盾会让坦克缺少用来保持仇恨的怒气。"
-L["BAD_PRIESTS_ALERT_ENABLE"] = "启用有害护盾提示"
-L["BAD_PRIESTS_HEALTH_DESC"] =
-	'坦克的生命值要降到多低，护盾才不再算失误。给快死的人上盾是正确的做法，所以生命值低于你在这里选择的水平时，警告保持安静。选择"始终"，每个护盾都会提示。'
-L["BAD_PRIESTS_HEALTH_ALWAYS"] = "始终"
-L["BAD_PRIESTS_HEALTH_EXCEPT"] = "生命值低于 %d%% 时除外"
--- The one row: the report is about somebody else's cast, so it is not "My" anything.
-L["BAD_PRIESTS_REPORT"] = "有害护盾警告"
-L["BAD_PRIESTS_REPORT_DESC"] =
-	'有人给怒气坦克上盾时，警告发往哪里。这里没有"我的"和"他人的"两行之分：施法的是治疗，吃亏的是坦克。'
-L["BAD_PRIESTS_SELF_ONLY"] = "担任德鲁伊或战士坦克时"
-L["BAD_PRIESTS_SELF_ONLY_DESC"] =
-	"只提示落在你身上的护盾，而且只在你是正在当坦克的德鲁伊或战士时提示。关闭此项，队伍里任何以这两个职业当坦克的人被上盾时都会提示。"
-L["BAD_PRIESTS_WHISPER"] = "密语施法者"
-L["BAD_PRIESTS_WHISPER_DESC"] =
-	"给施放护盾的人发一条密语，解释为什么这样有害。即使你队伍里有好几个人在用 Control Freak，也只会发出一条。"
-L["BAD_PRIESTS_COOLDOWN_DESC"] =
-	"同一个施法者触发护盾警告后，要过多久才会再次提示。它同时作用于显示、声音、通报和密语，因为不能让一个盾一好就套的治疗刷满你的窗口。"
+    TRANSLATORS: the two rows' tooltips each say what they count, because
+    neither is "everybody's casts": only the player's own class ever reports,
+    and the My row has no pet to include.
+]]
+L["PEER_PRESSURE_SUMMARY"] =
+	"当你的同职业玩家使用冷却技能时收到通知，好让你也屈服于同伴压力。"
+L["PEER_PRESSURE_ENABLE"] = "启用同伴压力"
+
+L["PEER_PRESSURE_ALERT_HEADER"] = "冷却技能"
+L["PEER_PRESSURE_ALERT_DESC"] =
+	'你队伍里同职业玩家使用了冷却技能，就是提示你也该用上自己的。只报告你自己的职业，哪些冷却技能计入由"追踪的技能"决定。'
+L["PEER_PRESSURE_ALERT_ENABLE"] = "启用冷却技能提示"
+L["PEER_PRESSURE_ALERT_MINE"] = "我的冷却技能"
+L["PEER_PRESSURE_ALERT_MINE_DESC"] = "你自己被追踪的冷却技能。"
+L["PEER_PRESSURE_ALERT_OTHERS"] = "他人的冷却技能"
+L["PEER_PRESSURE_ALERT_OTHERS_DESC"] = "你队伍里其他同职业玩家使用的被追踪冷却技能。"
+
+L["PEER_PRESSURE_ABILITIES_DESC"] =
+	"取消勾选某个冷却技能即可不再追踪它。只会报告你自己职业的冷却技能。"
+
+--------------------------------------------------------------------------------
+-- Bad Mages
+--------------------------------------------------------------------------------
+
+L["BAD_MAGES_SUMMARY"] = "做了某件事、把怪物困在坦克够不着的地方的法师。"
+L["BAD_MAGES_ENABLE"] = "启用捣蛋法师监视"
+
+L["BAD_MAGES_ALERT_HEADER"] = "新星"
+L["BAD_MAGES_ALERT_DESC"] = "提示冰霜新星，它会把怪物冻在原地，让坦克够不着。"
+L["BAD_MAGES_ALERT_ENABLE"] = "启用新星提示"
+L["BAD_MAGES_ALERT_MINE"] = "我的新星"
+L["BAD_MAGES_ALERT_OTHERS"] = "他人的新星"
+L["BAD_MAGES_WHISPER_ENABLE"] = "密语法师"
+L["BAD_MAGES_WHISPER_ENABLE_DESC"] =
+	"给法师发一条密语，请他把冰霜新星留到紧急时刻再用。即使你队伍里有好几个人在用 Control Freak，也只会发出一条。"
+L["BAD_MAGES_COOLDOWN_DESC"] =
+	"同一个法师触发新星提示后，要过多久才会再次提示。它同时作用于显示、声音、通报和密语，这样每次拉怪都放新星的法师就不会刷满你的窗口。"
+
+--------------------------------------------------------------------------------
+-- Bad Parry Monkeys
+--------------------------------------------------------------------------------
+
+L["BAD_PARRY_MONKEYS_SUMMARY"] =
+	"不在当坦克、却站在首领正面被招架的玩家。每一次招架都会让首领对坦克的下一击来得更快。"
+L["BAD_PARRY_MONKEYS_ENABLE"] = "启用捣蛋招架猴监视"
+
+L["BAD_PARRY_MONKEYS_ALERT_HEADER"] = "招架"
+L["BAD_PARRY_MONKEYS_ALERT_DESC"] =
+	"有人被一只不归他坦的怪物招架，说明他正站在怪物正面。每一次招架都会让那只怪物更快地对拉住它的人挥出下一击。"
+L["BAD_PARRY_MONKEYS_ALERT_ENABLE"] = "启用招架提示，针对"
+L["BAD_PARRY_MONKEYS_ALERT_MINE"] = "我被招架"
+L["BAD_PARRY_MONKEYS_ALERT_MINE_DESC"] = "怪物招架了你的攻击。"
+L["BAD_PARRY_MONKEYS_ALERT_OTHERS"] = "他人被招架"
+L["BAD_PARRY_MONKEYS_ALERT_OTHERS_DESC"] = "怪物招架了你队伍里其他人的攻击。"
+L["BAD_PARRY_MONKEYS_IGNORE_TANKS"] = "忽略坦克"
+L["BAD_PARRY_MONKEYS_IGNORE_TANKS_DESC"] =
+	"攻击被招架的玩家是坦克时保持安静：在团队中被指派为主坦克，或在小队中于队伍查找器里选择了坦克职责。副坦克站在首领面前是为了换坦时接嘲讽，这不是需要密语提醒的错误。你自己被招架时仍会提示。"
+L["BAD_PARRY_MONKEYS_IGNORE_PETS"] = "忽略宠物"
+L["BAD_PARRY_MONKEYS_IGNORE_PETS_DESC"] =
+	"被招架的是宠物时保持安静，你自己的宠物也算。宠物站在主人派它去的地方，一条写着宠物名字的提示，队伍里没人能据此做什么。无论如何都不会密语宠物。"
+L["BAD_PARRY_MONKEYS_WHISPER"] = "密语肇事者"
+L["BAD_PARRY_MONKEYS_WHISPER_DESC"] =
+	"给肇事者发一条密语，请他移动到怪物背后。即使你队伍里有好几个人在用 Control Freak，也只会发出一条。"
+L["BAD_PARRY_MONKEYS_COOLDOWN_DESC"] =
+	"同一个肇事者触发招架警告后，要过多久才会再次提示。它同时作用于显示、声音、通报和密语，因为还没挪位置的人，不需要每挥一下就被提醒一次。"
+
+--[[
+    Parry Monkey, the section under Parries: the player owning up to their own
+    parries, with a running count, every so often. TRANSLATORS: the message is
+    the player's own words, so its default is a line a player would say about
+    themselves.
+]]
+L["BAD_PARRY_MONKEYS_MONKEY_HEADER"] = "招架猴"
+L["BAD_PARRY_MONKEYS_MONKEY_DESC"] =
+	"当一个你没在坦的团队首领招架了你时，主动认错，并附上你加入团队以来被招架的总次数。每次招架都会计数，下方的冷却决定你多久说一次。"
+L["BAD_PARRY_MONKEYS_MONKEY_ENABLE"] = "启用招架猴提示"
+L["BAD_PARRY_MONKEYS_MONKEY_MINE"] = "我的认错"
+L["BAD_PARRY_MONKEYS_MONKEY_MINE_DESC"] = "你自己被招架，用你自己的话说出来。"
+L["BAD_PARRY_MONKEYS_MONKEY_MESSAGE"] = "消息"
+L["BAD_PARRY_MONKEYS_MONKEY_MESSAGE_DESC"] =
+	"你的认错说些什么。次数跟在后面，每次你加入团队时都会从零开始重新计数。"
+L["BAD_PARRY_MONKEYS_MONKEY_MESSAGE_DEFAULT"] = "我是一只捣蛋的招架猴！"
+L["BAD_PARRY_MONKEYS_MONKEY_COOLDOWN"] = "冷却"
+L["BAD_PARRY_MONKEYS_MONKEY_COOLDOWN_DESC"] =
+	"认错之后保持安静的时长。期间的招架照样计数，所以下一次认错会带上全部次数。"
 
 --------------------------------------------------------------------------------
 -- Bad Pets
@@ -494,60 +578,60 @@ L["BAD_PETS_COOLDOWN_DESC"] =
 L["BAD_PETS_ABILITIES_DESC"] = "取消勾选某个宠物技能即可不再追踪它。"
 
 --------------------------------------------------------------------------------
--- Peer Pressure
+-- Bad Priests
 --------------------------------------------------------------------------------
 
---[[
-    The alert is the whose shape with no target, like Fears: the line names a
-    classmate and a cooldown.
+L["BAD_PRIESTS_SUMMARY"] = "治疗做了对坦克弊大于利的事。"
+-- Shown only on a client whose data has no Power Word: Shield row, which among the shipped ones is Season of Discovery's.
+L["BAD_PRIESTS_DISCOVERY_STATUS"] =
+	"探索赛季永远不会提示有害护盾：灵魂之力符文会把怒气还给坦克，而且插件看不到其他玩家的符文。"
+L["BAD_PRIESTS_ENABLE"] = "启用捣蛋牧师监视"
 
-    TRANSLATORS: the two rows' tooltips each say what they count, because
-    neither is "everybody's casts": only the player's own class ever reports,
-    and the My row has no pet to include.
-]]
-L["PEER_PRESSURE_SUMMARY"] =
-	"当你的同职业玩家使用冷却技能时收到通知，好让你也屈服于同伴压力。"
-L["PEER_PRESSURE_ENABLE"] = "启用同伴压力"
-
-L["PEER_PRESSURE_ALERT_HEADER"] = "冷却技能"
-L["PEER_PRESSURE_ALERT_DESC"] =
-	'你队伍里同职业玩家使用了冷却技能，就是提示你也该用上自己的。只报告你自己的职业，哪些冷却技能计入由"追踪的技能"决定。'
-L["PEER_PRESSURE_ALERT_ENABLE"] = "启用冷却技能提示"
-L["PEER_PRESSURE_ALERT_MINE"] = "我的冷却技能"
-L["PEER_PRESSURE_ALERT_MINE_DESC"] =
-	"也报告你自己被追踪的冷却技能。旁边的下拉框决定这条消息发往哪里。"
-L["PEER_PRESSURE_ALERT_OTHERS"] = "他人的冷却技能"
-L["PEER_PRESSURE_ALERT_OTHERS_DESC"] =
-	"报告你队伍里其他同职业玩家使用的被追踪冷却技能。旁边的下拉框决定这条消息发往哪里。"
-
-L["PEER_PRESSURE_ABILITIES_DESC"] =
-	"取消勾选某个冷却技能即可不再追踪它。只会报告你自己职业的冷却技能。"
+L["BAD_PRIESTS_HEADER"] = "有害护盾"
+L["BAD_PRIESTS_DESC"] =
+	"提示落在正在当坦克的德鲁伊或战士身上的真言术：盾。怒气来自所受的伤害，而被护盾吸收的伤害不产生怒气，所以一个好心的护盾会让坦克缺少用来保持仇恨的怒气。开怪前套在还没进入战斗的坦克身上的护盾不算。"
+L["BAD_PRIESTS_ALERT_ENABLE"] = "启用有害护盾提示"
+L["BAD_PRIESTS_HEALTH_DESC"] =
+	'坦克的生命值要降到多低，护盾才不再算失误。给快死的人上盾是正确的做法，所以生命值低于你在这里选择的水平时，警告保持安静。选择"始终"，每个护盾都会提示。'
+L["BAD_PRIESTS_HEALTH_ALWAYS"] = "始终"
+L["BAD_PRIESTS_HEALTH_EXCEPT"] = "生命值低于 %d%% 时除外"
+-- The one row: the report is about somebody else's cast, so it is not "My" anything.
+L["BAD_PRIESTS_REPORT"] = "有害护盾警告"
+L["BAD_PRIESTS_REPORT_DESC"] =
+	'有人给怒气坦克上盾。这里没有"我的"和"他人的"两行之分：施法的是治疗，吃亏的是坦克。'
+L["BAD_PRIESTS_SELF_ONLY"] = "担任德鲁伊或战士坦克时"
+L["BAD_PRIESTS_SELF_ONLY_DESC"] =
+	"只提示落在你身上的护盾，而且只在你是正在当坦克的德鲁伊或战士时提示。关闭此项，队伍里任何以这两个职业当坦克的人被上盾时都会提示。"
+L["BAD_PRIESTS_WHISPER"] = "密语施法者"
+L["BAD_PRIESTS_WHISPER_DESC"] =
+	"给施放护盾的人发一条密语，解释为什么这样有害。即使你队伍里有好几个人在用 Control Freak，也只会发出一条。"
+L["BAD_PRIESTS_COOLDOWN_DESC"] =
+	"同一个施法者触发护盾警告后，要过多久才会再次提示。它同时作用于显示、声音、通报和密语，因为不能让一个盾一好就套的治疗刷满你的窗口。"
 
 --------------------------------------------------------------------------------
 -- Tanking Tools
 --------------------------------------------------------------------------------
 
 --[[
-    The tab's summary says it ships off and where its four tools live, since
+    The tab's summary says it ships off and where its two tools live, since
     each tool is a page of its own and the tab page holds only the switch.
 
     The mini-map tooltip carries its own shorter one, because the button's
-    Right-Click toggles this tab and the tooltip has to say what it is turning
-    on. TRANSLATORS: it lists the four section headers below in your own words
-    for them; keep it to two lines in the tooltip.
+    Shift + Left-Click toggles this tab and the tooltip has to say what it is
+    turning on. TRANSLATORS: it lists the two section headers below in your
+    own words for them; keep it to two lines in the tooltip.
 ]]
 L["TANKING_TOOLS_SUMMARY"] =
-	"仍处于测试阶段，因此默认关闭。开场落空、护甲削弱、招架和新星在坦克工具下各有自己的页面。"
+	"仍处于测试阶段，因此默认关闭。开场落空和护甲削弱在坦克工具下各有自己的页面。"
 L["TANKING_TOOLS_ENABLE"] = "启用坦克工具"
-L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "开场落空、护甲削弱、招架和新星。"
+L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "开场落空和护甲削弱。"
 
 L["TANKING_TOOLS_COLD_OPENER_HEADER"] = "开场落空"
 L["TANKING_TOOLS_COLD_OPENER_DESC"] =
 	"提示你自己没能打上的开场攻击：开怪最初几秒内的未命中、躲闪、招架、格挡、抵抗或免疫。那是本该产生却没有产生的仇恨，而且正发生在最要紧的时刻。"
 L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "启用开场落空提示，针对"
 L["TANKING_TOOLS_COLD_OPENER_MINE"] = "我的开场落空"
-L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] =
-	"报告你自己没能打上的开场技能。旁边的下拉框决定这条消息发往哪里。"
+L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] = "你自己没能打上的开场技能。"
 -- The caption before the window dropdown: "Within [10 Seconds of the Pull]".
 L["TANKING_TOOLS_COLD_OPENER_WITHIN"] = "限定在"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "开怪后 %d 秒内"
@@ -561,40 +645,12 @@ L["TANKING_TOOLS_ARMOR_ENABLE"] = "启用护甲削弱提示，针对"
 -- The one row: the report is the group's, so it is not "My" anything.
 L["TANKING_TOOLS_ARMOR_REPORT"] = "护甲削弱报告"
 L["TANKING_TOOLS_ARMOR_REPORT_DESC"] =
-	'队伍削掉目标护甲后，报告发往哪里。这里没有"我的"和"他人的"两行之分：这是全队的成果，只是报告给你。'
+	'队伍削减目标的护甲。这里没有"我的"和"他人的"两行之分：这是全队的成果，只是报告给你。'
 L["TANKING_TOOLS_ARMOR_FAERIE_FIRE"] = "包含精灵之火"
 L["TANKING_TOOLS_ARMOR_FAERIE_FIRE_DESC"] =
 	"上报前等待精灵之火，无论德鲁伊以哪种形态施放。队伍中没有德鲁伊时忽略此项。"
 L["TANKING_TOOLS_ARMOR_RECKLESSNESS"] = "包含鲁莽诅咒"
 L["TANKING_TOOLS_ARMOR_RECKLESSNESS_DESC"] = "上报前等待鲁莽诅咒。队伍中没有术士时忽略此项。"
-
-L["TANKING_TOOLS_PARRY_HEADER"] = "招架"
-L["TANKING_TOOLS_PARRY_DESC"] =
-	"有人被一只不归他坦的怪物招架，说明他正站在怪物正面。每一次招架都会让那只怪物更快地对拉住它的人挥出下一击。"
-L["TANKING_TOOLS_PARRY_ENABLE"] = "启用招架提示，针对"
-L["TANKING_TOOLS_PARRY_MINE"] = "我被招架"
-L["TANKING_TOOLS_PARRY_MINE_DESC"] =
-	"报告你的攻击被怪物招架。旁边的下拉框决定这条消息发往哪里。"
-L["TANKING_TOOLS_PARRY_OTHERS"] = "他人被招架"
-L["TANKING_TOOLS_PARRY_OTHERS_DESC"] =
-	"报告你队伍里其他人的攻击被怪物招架。旁边的下拉框决定这条消息发往哪里。"
-L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "忽略坦克"
-L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"] =
-	"被招架的玩家是坦克时保持安静：在团队中被指派为主坦克，或在小队中于队伍查找器里选择了坦克职责。副坦克站在首领面前是为了换坦时接嘲讽，这不是需要密语提醒的错误。你自己被招架时仍会提示。"
-L["TANKING_TOOLS_PARRY_IGNORE_PETS"] = "忽略宠物"
-L["TANKING_TOOLS_PARRY_IGNORE_PETS_DESC"] =
-	"被招架的是宠物时保持安静，你自己的宠物也算。宠物站在主人派它去的地方，一条写着宠物名字的提示，队伍里没人能据此做什么。无论如何都不会密语宠物。"
-L["TANKING_TOOLS_PARRY_WHISPER"] = "密语肇事者"
-L["TANKING_TOOLS_PARRY_WHISPER_DESC"] =
-	"给肇事者发一条密语，请他移动到怪物背后。即使你队伍里有好几个人在用 Control Freak，也只会发出一条。"
-L["TANKING_TOOLS_PARRY_COOLDOWN_DESC"] =
-	"同一个肇事者触发招架警告后，要过多久才会再次提示。它同时作用于显示、声音、通报和密语，因为还没挪位置的人，不需要每挥一下就被提醒一次。"
-
-L["TANKING_TOOLS_NOVA_HEADER"] = "新星"
-L["TANKING_TOOLS_NOVA_DESC"] = "提示冰霜新星，它会把怪物冻在原地，让坦克够不着。"
-L["TANKING_TOOLS_NOVA_ENABLE"] = "启用新星提示"
-L["TANKING_TOOLS_NOVA_MINE"] = "我的新星"
-L["TANKING_TOOLS_NOVA_OTHERS"] = "他人的新星"
 
 --------------------------------------------------------------------------------
 -- Message Formats
@@ -661,10 +717,10 @@ L["INCAPACITATED_PLAIN_INDEFINITE"] = "%s失控！%s 中了 %s，来自 %s。"
 
     TRANSLATORS: this is our own word for the person in that seat, not the
     client's group finder role label, which names a role rather than a person.
-    It opens a sentence as its subject. "Afflicted by" in the formats above is deliberately the
-    phrasing Blizzard's combat log uses for a debuff landing
-    (AURAADDEDOTHERHARMFUL), so a player reads the same words here as in the log
-    they already watch -- use your client's wording for both if it has one.
+    It opens a sentence as its subject. "Afflicted by" in the formats above is
+    deliberately the phrasing Blizzard's combat log uses for a debuff landing
+    (AURAADDEDOTHERHARMFUL), so a player reads the same words here as in the
+    log they already watch -- use your client's wording for both if it has one.
 ]]
 L["INCAPACITATED_ROLE_TANK"] = "坦克"
 L["INCAPACITATED_ROLE_HEALER"] = "治疗"
@@ -722,7 +778,7 @@ L["TANK_DEATHS_CLASS_LINE"] = "%s倒了！%s 死亡。"
 ]]
 L["SHIELD_WARNING"] = "有害护盾！%s 使用 %s，目标 %s。"
 L["SHIELD_WHISPER"] =
-	"有害护盾！请尽量别把 %s 套在 %s 身上。这个技能会让坦克无法获得怒气。"
+	"捣蛋牧师！请尽量别把 %s 套在 %s 身上。这个技能会让坦克无法获得怒气。"
 
 L["BAD_PET"] = "捣蛋宠物！%s 的宠物 %s 使用 %s，目标 %s。"
 L["BAD_PET_AOE"] = "捣蛋宠物！%s 的宠物 %s 使用 %s。"
@@ -733,8 +789,10 @@ L["BAD_PET_UNKNOWN_OWNER_AOE"] = "捣蛋宠物！%s 使用 %s。"
     inside a 255 byte chat limit, and the widest locale runs close to twice the
     English.
 ]]
-L["BAD_PET_WHISPER"] = "你的宠物 %s 使用了 %s，目标 %s。右键点击该技能即可关闭自动施放。"
-L["BAD_PET_WHISPER_AOE"] = "你的宠物 %s 使用了 %s。右键点击该技能即可关闭自动施放。"
+L["BAD_PET_WHISPER"] =
+	"捣蛋宠物！你的宠物 %s 使用了 %s，目标 %s。右键点击该技能即可关闭自动施放。"
+L["BAD_PET_WHISPER_AOE"] =
+	"捣蛋宠物！你的宠物 %s 使用了 %s。右键点击该技能即可关闭自动施放。"
 
 L["COLD_OPENER_MISS"] = "小心！%s 使用 %s，对 %s 未命中。"
 L["COLD_OPENER_DODGE"] = "小心！%s 使用 %s，被 %s 躲闪。"
@@ -746,10 +804,20 @@ L["COLD_OPENER_RESIST"] = "小心！%s 使用 %s，被 %s 抵抗。"
 L["ARMOR_REPORT"] = "护甲已削弱！%s 用了 %s 秒变得脆弱。"
 
 L["PARRY_WARNING"] = "招架加速！%s 正站在 %s 的正面。"
-L["PARRY_WHISPER"] = "招架加速！请站到 %s 背后：每次招架都会加快它的下一次攻击。"
+L["PARRY_WHISPER"] =
+	"捣蛋招架猴！请站到 %s 背后；每次招架都会让首领攻击得更快，让坦克承受更多伤害。"
+-- Parry Monkey's line. TRANSLATORS: %s is the player's own message, %d the count since joining the raid group.
+L["PARRY_CONFESSION"] = "%s (x%d)"
 
 L["NOVA"] = "新星！%s 使用 %s，目标 %s。"
 L["NOVA_AOE"] = "群体新星！%s 使用 %s。"
+--[[
+    Every whisper opens on "Naughty" and the culprit it is addressed to, the
+    Naughty List's own word, where the line the group sees opens on the news.
+    TRANSLATORS: %s is the spell.
+]]
+L["NOVA_WHISPER"] =
+	"捣蛋法师！你的 %s 把怪物冻在了坦克够不着的地方。请把它留到紧急时刻再用。"
 
 --[[
     Opens on a bang naming the news, like every other alert line.

@@ -130,7 +130,7 @@ ns.ITEMS = {
 How We Got the Data
 
 Last Validated
-	2026-10-20, Classic Era 1.15.9.70003
+	2026-10-28, Classic Era 1.15.9.70576
 
 Notes
 	- Every item a player can get that acts on someone besides its user, so the Data Review can search for more items like these from the item side, not only through the spells in Abilities. No feature reads this table yet. Validate Data exports it, and its DATA_TRACKED column marks the rows whose spell an Abilities row listens for.
@@ -151,12 +151,12 @@ Wowhead
 	None.
 
 wago.tools
-	https://wago.tools/db2/Item?build=1.15.9.70003
-	https://wago.tools/db2/ItemSparse?build=1.15.9.70003
-	https://wago.tools/db2/ItemEffect?build=1.15.9.70003
-	https://wago.tools/db2/SpellName?build=1.15.9.70003
-	https://wago.tools/db2/Spell?build=1.15.9.70003
-	https://wago.tools/db2/SpellEffect?build=1.15.9.70003
+	https://wago.tools/db2/Item?build=1.15.9.70576
+	https://wago.tools/db2/ItemSparse?build=1.15.9.70576
+	https://wago.tools/db2/ItemEffect?build=1.15.9.70576
+	https://wago.tools/db2/SpellName?build=1.15.9.70576
+	https://wago.tools/db2/Spell?build=1.15.9.70576
+	https://wago.tools/db2/SpellEffect?build=1.15.9.70576
 	https://wago.tools/db2/SummonProperties?build=1.15.9.70003
 
 QuestieDB

@@ -40,10 +40,17 @@ end
 ]]
 local TOGGLE_PAIR_WIDTH = 1.6
 
--- hidden is optional and goes on each pair's group, so a gated block collapses whole.
-function ns.OptionsTogglePairs(args, keyPrefix, startOrder, toggles, hidden)
+--[[
+    hidden is optional and goes on each pair's group, so a gated block collapses
+    whole. indent is optional too: it leads each pair with the blank cell a
+    sub-option row uses, for pairs listed under a label of their own.
+]]
+function ns.OptionsTogglePairs(args, keyPrefix, startOrder, toggles, hidden, indent)
 	for index = 1, #toggles, 2 do
 		local pair = {}
+		if indent then
+			pair.indent = { type = "description", name = " ", width = ns.OPTIONS_SUB_INDENT_WIDTH, order = 0 }
+		end
 		for offset = 0, 1 do
 			local toggle = toggles[index + offset]
 			if toggle then
@@ -83,14 +90,21 @@ end
 
 --[[
     The status line at the top of a page that a switch elsewhere has silenced:
-    All Alerts off, or, given parentKey, the feature this sub-page belongs to.
-    Without it a player can tick every box here and never learn why nothing
-    fires. tabKey is the parent's TAB_* key. Both switches re-run
+    All Alerts off; the General panel's group switch over this page's feature
+    (ns.FEATURE_GROUPS); or, given parentKey, the feature this sub-page belongs
+    to. Without it a player can tick every box here and never learn why nothing
+    fires. tabKey is the parent's TAB_* key. featureKey names the feature whose
+    group to ask, for a feature's own page, which passes no parentKey; a
+    sub-page's parentKey answers that too. Every one of these switches re-runs
     ns:ApplyProfile, which notifies every panel, so the line follows them.
 ]]
-function ns.AddQuietStatus(args, order, parentKey, tabKey)
+function ns.AddQuietStatus(args, order, parentKey, tabKey, featureKey)
+	featureKey = featureKey or parentKey
+	local function GroupOff()
+		return featureKey and not ns.IsFeatureGroupOn(featureKey)
+	end
 	local function Silenced()
-		return not ns.db.profile.enabled or (parentKey and not ns.db.profile[parentKey].enabled)
+		return not ns.db.profile.enabled or GroupOff() or (parentKey and not ns.db.profile[parentKey].enabled)
 	end
 	local function Hidden()
 		return not Silenced()
@@ -117,6 +131,10 @@ function ns.AddQuietStatus(args, order, parentKey, tabKey)
 				L["KILL_SWITCH_ENABLE"],
 				L["ADDON_TITLE"]
 			)
+		elseif GroupOff() then
+			-- The group's switch is captioned with its own label, on the group's own page, this page's parent.
+			local label = L[ns.FEATURE_GROUP_OF[featureKey].labelKey]
+			line = string.format(L["STATUS_FEATURE_OFF"], GetColor("TITLE") .. label .. "|r" .. help, off, label)
 		else
 			line =
 				string.format(L["STATUS_FEATURE_OFF"], GetColor("TITLE") .. L[tabKey] .. "|r" .. help, off, L[tabKey])

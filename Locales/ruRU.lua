@@ -8,6 +8,7 @@ end
 --------------------------------------------------------------------------------
 
 L["ADDON_TITLE"] = "Control Freak"
+L["ADDON_SHORT_NAME"] = "Control Freak"
 L["OPTIONS_DESCRIPTION"] =
 	"Боевой глашатай: сообщает о провокациях, прерываниях, страхе, смертях танка, плохих питомцах, парированиях, снижении брони и других критических событиях боя. Отслеживайте, кто спровоцировал, что не сработало, кто прервал заклинание и что произошло, с помощью настраиваемых оповещений."
 
@@ -32,27 +33,25 @@ L["ENABLE_MINIMAP_BUTTON_DESC"] = "Показывать кнопку Control Fre
 
 L["OPTIONS_MASTER_SWITCH_HEADER"] = "Главный переключатель"
 L["OPTIONS_FEATURES_HEADER"] = "Функции"
--- The Features block's switch captions. Each tab's own switch keeps its "Enable" caption.
-L["FEATURES_TAUNTS"] = "Отслеживание провокаций"
-L["FEATURES_INTERRUPTS"] = "Отслеживание прерываний"
-L["FEATURES_FEARS"] = "Отслеживание страха"
-L["FEATURES_INCAPACITATED"] = "Отслеживание потери контроля"
-L["FEATURES_TANK_DEATHS"] = "Отслеживание смертей танка"
-L["FEATURES_BAD_PRIESTS"] = "Отслеживание плохих жрецов"
-L["FEATURES_BAD_PETS"] = "Отслеживание плохих питомцев"
-L["FEATURES_PEER_PRESSURE"] = "Групповое давление"
-L["FEATURES_TANKING_TOOLS"] = "Инструменты танка"
+-- The Features block's group switches and their tooltip, whose %s is the group's own name, then each group's page summary. Its other switches read each tab's own name (TAB_*).
+L["OPTIONS_MONITORING_LABEL"] = "Отслеживание"
+L["OPTIONS_NAUGHTY_LIST_LABEL"] = "Чёрный список"
+L["OPTIONS_GROUP_ENABLE_DESC"] =
+	'Выключает разом всё, что находится в разделе "%s", или включает обратно. У каждой функции остаётся свой переключатель, так что после повторного включения всё вернётся как было.'
+L["OPTIONS_MONITORING_SUMMARY"] =
+	'Что произошло в бою: провокации, прерывания, страх, потеря контроля над персонажем, смерти танков и кулдауны игрока вашего класса. Если выключить "Отслеживание", замолчат сразу все шесть, а у каждой функции останется свой переключатель.'
+L["OPTIONS_NAUGHTY_LIST_SUMMARY"] =
+	'Кто-то в группе усложняет танку работу: кольцо мага, не-танк, чьи удары парирует босс, питомец с включённой провокацией, щит жреца на танке, которому нужна ярость. Если выключить "Чёрный список", замолчат сразу все четыре, а у каждой функции останется свой переключатель.'
 
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/freak"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Открывает окно настроек этого аддона."
 
 --[[
-    The add-on's own switch. KILL_SWITCH titles the mini-map tooltip's block for
-    it, naming its REACH rather than the act of throwing it. KILL_SWITCH_ENABLE
-    captions it under the General panel's Master Switch header, and
-    KILL_SWITCH_ENABLE_DESC is both that switch's tooltip and the mini-map
-    block's description, so the two cannot describe it differently.
+    The add-on's own switch. KILL_SWITCH names it in the status line a silenced
+    page opens on, naming its REACH rather than the act of throwing it.
+    KILL_SWITCH_ENABLE captions it under the General panel's Master Switch
+    header, and KILL_SWITCH_ENABLE_DESC is that switch's tooltip.
 ]]
 L["KILL_SWITCH"] = "Все оповещения"
 L["KILL_SWITCH_ENABLE"] = "Включить Control Freak"
@@ -99,9 +98,22 @@ L["STATE_ON"] = "Включено"
 L["STATE_OFF"] = "Выключено"
 L["LEFT_CLICK"] = "Левый щелчок"
 L["RIGHT_CLICK"] = "Правый щелчок"
+L["MINIMAP_SHIFT_LEFT_CLICK"] = "Shift + левый щелчок"
 L["SHIFT_MIDDLE_CLICK"] = "Shift + средний щелчок"
 L["ACTION_TOGGLE"] = "Переключить"
 L["MINIMAP_OPTIONS"] = "Настройки Control Freak"
+--[[
+    Each block's summary names everything its switch reaches, to show a player
+    what there is to turn on. TRANSLATORS: keep each to two lines in the
+    tooltip. TANKING_TOOLS_MINIMAP_SUMMARY, the third, sits with its tab below.
+]]
+L["MONITORING_MINIMAP_SUMMARY"] =
+	"Провокации, прерывания, страх, потеря контроля, смерти танков и групповое давление."
+L["NAUGHTY_LIST_MINIMAP_SUMMARY"] =
+	"Кольца льда, парируемые мартышки, питомцы с провокацией и щиты на танках с яростью."
+-- Replaces the three blocks while All Alerts is off, since none of their clicks would do anything.
+L["MINIMAP_ALL_ALERTS_OFF"] =
+	'"Все оповещения" выключены, так что ничего не срабатывает.'
 
 --------------------------------------------------------------------------------
 -- Feature Tabs
@@ -113,9 +125,11 @@ L["TAB_INTERRUPTS"] = "Прерывания"
 L["TAB_FEARS"] = "Страх"
 L["TAB_INCAPACITATED"] = "Потеря контроля"
 L["TAB_TANK_DEATHS"] = "Смерти танка"
-L["TAB_BAD_PRIESTS"] = "Плохие жрецы"
-L["TAB_BAD_PETS"] = "Плохие питомцы"
 L["TAB_PEER_PRESSURE"] = "Групповое давление"
+L["TAB_BAD_MAGES"] = "Плохие маги"
+L["TAB_BAD_PARRY_MONKEYS"] = "Плохие мартышки"
+L["TAB_BAD_PETS"] = "Плохие питомцы"
+L["TAB_BAD_PRIESTS"] = "Плохие жрецы"
 L["TAB_TANKING_TOOLS"] = "Инструменты танка"
 
 --------------------------------------------------------------------------------
@@ -149,7 +163,8 @@ L["SCOPE_INSTANCE_ONLY_DESC"] = "Срабатывает только в подз
 
 --[[
     The line at the top of a page that a switch somewhere else has silenced:
-    All Alerts on any feature page, or the feature a sub-page belongs to.
+    All Alerts on any feature page, the group a feature tab sits under, or the
+    feature a sub-page belongs to. A group uses STATUS_FEATURE_OFF too.
 
     TRANSLATORS: in both, the first %s is the name of the switch that is off
     (drawn gold) and the second is STATUS_OFF (drawn red). The rest are plain
@@ -192,33 +207,40 @@ L["ALERT_SOUND_PREVIEW_DESC"] =
 L["SOUND_NONE"] = "Нет"
 
 --[[
-    The block every tab draws: whose cast is the row, where its line goes is
-    the dropdown beside it, and the target filter is a ladder rather than a
+    The block every tab draws: whose cast is the row, beside it a Print box and
+    an Announce dropdown, and the target filter is a ladder rather than a
     switch. Each section names its own two rows -- see
     TAUNTS_SUCCESS_MINE below -- because "My" and "Others'" agree with the noun
     in some languages and a shared "%s" template could not.
 
     TRANSLATORS: ALERT_AGAINST_DESC quotes one rung and one row by name; that
     wording must match your TARGET_RUNG_ELITE_0 and ALERT_MARKED_ALWAYS, or the
-    tooltip explains a choice the player cannot find. The four rungs are a
-    threshold, widest first: each one counts itself and the ones after it,
-    which is why every rung that includes bosses says so. Keep that in your
-    translations -- a rung reading only "Elites" beside a separate "Bosses"
-    reads as two disjoint sets.
+    tooltip explains a choice the player cannot find. ALERT_PRINT_DESC and
+    ALERT_ANNOUNCE_DESC quote the Announce choices the same way. Keep
+    ALERT_PRINT_HEADER short: it heads a narrow column of boxes. The four
+    rungs are a threshold, widest first: each one counts itself and the ones
+    after it, which is why every rung that includes bosses says so. Keep that
+    in your translations -- a rung reading only "Elites" beside a separate
+    "Bosses" reads as two disjoint sets.
 
     ALERT_MARKED_ALWAYS is the one control that WIDENS a section rather than
     narrowing it: a marked target counts whatever the rung says. Keep "Always"
-    in it, and keep it distinct from ALERT_OUTPUT_ANNOUNCE -- this row decides
+    in it, and keep it distinct from the Announce choices -- this row decides
     WHETHER the alert fires, never where its line goes.
 ]]
 L["ALERT_MINE_DESC"] =
-	"Сообщает о ваших собственных действиях, включая действия вашего питомца. Список рядом задаёт, куда уходит строка."
-L["ALERT_OTHERS_DESC"] =
-	"Сообщает о действиях всех остальных в вашей группе. Список рядом задаёт, куда уходит строка."
-L["ALERT_OUTPUT_PRINT"] = "Выводить (только себе)"
-L["ALERT_OUTPUT_ANNOUNCE"] = "Объявлять"
-L["ALERT_OUTPUT_DESC"] =
-	'Куда уходит эта строка: в одно место, никогда в оба. "Выводить (только себе)" показывает её в вашем собственном окне и никому ничего не стоит. "Объявлять" вместо этого отправляет её в чат группы или рейда, а аддон, который пересказывает чужие действия всему рейду, быстро всем надоедает, так что здесь стоит подумать. "Объявлять" молчит, когда вы не в группе, а также на полях боя и аренах.'
+	"Ваши собственные действия, включая действия вашего питомца."
+L["ALERT_OTHERS_DESC"] = "Действия всех остальных в вашей группе."
+-- The two column headers over a section's rows, then the Announce dropdown's three choices.
+L["ALERT_PRINT_HEADER"] = "Вывод (только себе)"
+L["ALERT_ANNOUNCE_HEADER"] = "Объявлять"
+L["ALERT_ANNOUNCE_NEVER"] = "Никогда"
+L["ALERT_ANNOUNCE_PARTY"] = "В группе"
+L["ALERT_ANNOUNCE_GROUP"] = "В группе или рейде"
+L["ALERT_PRINT_DESC"] =
+	'Если отмечено, строка выводится в ваше собственное окно всякий раз, когда её не объявляют: когда вы одни, когда в "Объявлять" выбрано "Никогда", когда "В группе" встречает рейд, а также на поле боя или арене. Объявленная строка и так видна в вашем чате, поэтому дважды она не выводится.'
+L["ALERT_ANNOUNCE_DESC"] =
+	'Кто ещё видит строку. "В группе" отправляет её в чат группы, когда в группе пять человек или меньше, и молчит в рейде. "В группе или рейде" отправляет её в чат группы или рейда, смотря где вы. Аддон, который пересказывает чужие действия всему рейду, быстро всем надоедает, так что над этим вариантом стоит подумать. Ничего не объявляется, когда вы не в группе, а также на полях боя и аренах.'
 L["ALERT_AGAINST_DESC"] =
 	'Какие противники учитываются; каждый вариант включает и все следующие за ним. Боссами считаются противники с черепом вместо уровня (??). У босса подземелья нет собственного черепа, поэтому он считается элитным: вариант "Элита своего ур+ и боссы" оставляет его, отсекая противников пониже уровнем вокруг. Рейдовая метка перекрывает всё это, пока отмечен пункт "Всегда учитывать помеченные цели".'
 L["TARGET_RUNG_ALL"] = "Все"
@@ -316,7 +338,7 @@ L["TAUNTS_FAILED_OTHERS"] = "Чужие неудачные провокации"
 
 L["TAUNTS_AOE_HEADER"] = "Провокации по площади"
 L["TAUNTS_AOE_DESC"] =
-	"Провокация, которая разом забирает всех вокруг, а не одну цель."
+	"Провокация, которая разом привлекает к себе всех вокруг, а не одну цель. Сообщается о каждом применении, независимо от того, в кого оно попало, даже когда в группе нет танка."
 L["TAUNTS_AOE_ENABLE"] = "Сообщать о провокациях по площади"
 L["TAUNTS_AOE_MINE"] = "Мои провокации по площади"
 L["TAUNTS_AOE_OTHERS"] = "Чужие провокации по площади"
@@ -356,7 +378,7 @@ L["FEARS_ENABLE"] = "Включить отслеживание страха"
 
 L["FEARS_ALERT_HEADER"] = "Сработавший страх"
 L["FEARS_ALERT_DESC"] =
-	"Страх, который прошёл и разбросал пачку за пределы досягаемости танка. Учитывается только попадание: простое применение, сопротивление и иммунитет ничего не сдвинули, поэтому ни о чём из этого не сообщается."
+	"Страх, который разбрасывает пачку за пределы досягаемости танка. О страхе по площади сообщается при каждом применении, независимо от того, в кого он попал. О страхе на одну цель сообщается, только когда он прошёл: сопротивление или иммунитет ничего не сдвинули."
 L["FEARS_ALERT_ENABLE"] = "Сообщать о сработавшем страхе"
 L["FEARS_ALERT_MINE"] = "Мой сработавший страх"
 L["FEARS_ALERT_OTHERS"] = "Чужой сработавший страх"
@@ -397,10 +419,14 @@ L["INCAPACITATED_THRESHOLD_ONE"] = "%d сек."
 L["INCAPACITATED_THRESHOLD"] = "%d сек."
 L["INCAPACITATED_SHORT"] = "Моя короткая потеря контроля"
 L["INCAPACITATED_SHORT_DESC"] =
-	"Куда уходит строка, когда вас выводят из боя на время меньше указанного выше. Изначально она выводится в ваше собственное окно: оглушение, из которого вы вышли раньше, чем кто-то успел бы вас подстраховать, объясняет только что потерянное общее время восстановления и больше никого не касается."
+	"Вас вывели из боя на время меньше указанного выше. Изначально строка выводится только в ваше собственное окно: оглушение, из которого вы вышли раньше, чем кто-то успел бы вас подстраховать, объясняет только что потерянное общее время восстановления и больше никого не касается."
 L["INCAPACITATED_LONG"] = "Моя долгая потеря контроля"
 L["INCAPACITATED_LONG_DESC"] =
-	"Куда уходит строка, когда вас выводят из боя хотя бы на указанное выше время. Изначально она объявляется: именно на это у кого-то другого есть время отреагировать, а сами вы сказать об этом не можете. Эффект вовсе без длительности, например Контроль над разумом, считается долгим."
+	"Вас вывели из боя хотя бы на указанное выше время. Изначально строка объявляется в группе и выводится в окно в рейде: именно на это у кого-то другого есть время отреагировать, а сами вы сказать об этом не можете. Эффект вовсе без длительности, например Контроль над разумом, считается долгим."
+
+L["INCAPACITATED_EFFECTS_HEADER"] = "Учитываемые эффекты"
+L["INCAPACITATED_EFFECTS_DESC"] =
+	"Снимите галочку с эффекта, чтобы перестать о нём сообщать."
 
 L["INCAPACITATED_STUN"] = "Учитывать оглушения"
 L["INCAPACITATED_STUN_DESC"] =
@@ -452,11 +478,10 @@ L["TANK_DEATHS_ALERT_DESC"] =
 	"В рейде учитываются только игроки, назначенные главными танками, включая вас, а роль из поиска группы там ничего не значит. В группе учитываются все, кто выбрал роль танка в поиске группы. О смерти танка без того и другого не сообщается."
 L["TANK_DEATHS_ALERT_ENABLE"] = "Сообщать о смерти танка"
 L["TANK_DEATHS_ALERT_MINE"] = "Моя смерть"
-L["TANK_DEATHS_ALERT_MINE_DESC"] =
-	"Сообщает о вашей собственной смерти, пока вы танкуете. Список рядом задаёт, куда уходит строка."
+L["TANK_DEATHS_ALERT_MINE_DESC"] = "Ваша собственная смерть, пока вы танкуете."
 L["TANK_DEATHS_ALERT_OTHERS"] = "Смерти других танков"
 L["TANK_DEATHS_ALERT_OTHERS_DESC"] =
-	"Сообщает о смерти любого другого участника вашей группы, который танкует. Список рядом задаёт, куда уходит строка."
+	"Смерть любого другого участника вашей группы, который танкует."
 
 L["TANK_DEATHS_CLASS_HEADER"] = "Смерти по классам"
 L["TANK_DEATHS_CLASS_DESC"] =
@@ -465,36 +490,103 @@ L["TANK_DEATHS_CLASS_ROW_DESC"] =
 	"Сообщает, когда в вашей группе погибает персонаж класса %s."
 
 --------------------------------------------------------------------------------
--- Bad Priests
+-- Peer Pressure
 --------------------------------------------------------------------------------
 
-L["BAD_PRIESTS_SUMMARY"] =
-	"Лекари, которые делают то, что вредит танку больше, чем помогает."
--- Shown only on a client whose data has no Power Word: Shield row, which among the shipped ones is Season of Discovery's.
-L["BAD_PRIESTS_DISCOVERY_STATUS"] =
-	'В Сезоне открытий о плохих щитах никогда не сообщается: руна "Сила души" возвращает танкам ярость, а ни один аддон не видит чужих рун.'
-L["BAD_PRIESTS_ENABLE"] = "Включить отслеживание плохих жрецов"
+--[[
+    The alert is the whose shape with no target, like Fears: the line names a
+    classmate and a cooldown.
 
-L["BAD_PRIESTS_HEADER"] = "Плохие щиты"
-L["BAD_PRIESTS_DESC"] =
-	"Сообщает о Слове силы: Щит, наложенном на танкующего друида или воина. Ярость копится от получаемого урона, а поглощённый щитом урон её не даёт, так что щит из лучших побуждений лишает танка ярости, которой он держит угрозу."
-L["BAD_PRIESTS_ALERT_ENABLE"] = "Сообщать о плохих щитах"
-L["BAD_PRIESTS_HEALTH_DESC"] =
-	'Насколько должно упасть здоровье танка, чтобы щит перестал быть ошибкой. Щит на того, кто вот-вот погибнет, вполне оправдан, поэтому ниже выбранного здесь уровня предупреждение молчит. Выберите "Всегда", чтобы слышать о каждом щите.'
-L["BAD_PRIESTS_HEALTH_ALWAYS"] = "Всегда"
-L["BAD_PRIESTS_HEALTH_EXCEPT"] = "Кроме здоровья ниже %d%%"
--- The one row: the report is about somebody else's cast, so it is not "My" anything.
-L["BAD_PRIESTS_REPORT"] = "Предупреждения о плохих щитах"
-L["BAD_PRIESTS_REPORT_DESC"] =
-	'Куда уходит предупреждение, когда кто-то накладывает щит на танка, живущего за счёт ярости. Здесь нет пунктов "Мои" и "Чужие": применение за лекарем, а проблема у танка.'
-L["BAD_PRIESTS_SELF_ONLY"] = "Когда вы танкуете друидом или воином"
-L["BAD_PRIESTS_SELF_ONLY_DESC"] =
-	"Предупреждать только о щитах на вас и только пока вы танкуете друидом или воином. Снимите отметку, чтобы слышать о щите на любом участнике группы, который танкует одним из этих классов."
-L["BAD_PRIESTS_WHISPER"] = "Шептать наложившему щит"
-L["BAD_PRIESTS_WHISPER_DESC"] =
-	"Отправляет наложившему щит записку с объяснением, почему это вредит. Отправляется только одна, даже если Control Freak стоит у нескольких человек в вашей группе."
-L["BAD_PRIESTS_COOLDOWN_DESC"] =
-	"Сколько один лекарь молчит после того, как вызвал предупреждение о щите. Действует на вывод в чат, звук, объявление и шёпот, ведь лекарь, накладывающий щит всякий раз, как тот восстановится, не должен забивать ваше окно."
+    TRANSLATORS: the two rows' tooltips each say what they count, because
+    neither is "everybody's casts": only the player's own class ever reports,
+    and the My row has no pet to include.
+]]
+L["PEER_PRESSURE_SUMMARY"] =
+	"Получайте уведомления, когда другие игроки вашего класса используют свои кулдауны, чтобы поддаться групповому давлению."
+L["PEER_PRESSURE_ENABLE"] = "Включить групповое давление"
+
+L["PEER_PRESSURE_ALERT_HEADER"] = "Кулдауны"
+L["PEER_PRESSURE_ALERT_DESC"] =
+	'Кулдаун, использованный игроком вашего класса в вашей группе: сигнал использовать свой. Сообщается только о вашем классе, а в разделе "Отслеживаемые способности" выбирается, какие кулдауны учитываются.'
+L["PEER_PRESSURE_ALERT_ENABLE"] = "Сообщать о кулдаунах"
+L["PEER_PRESSURE_ALERT_MINE"] = "Мои кулдауны"
+L["PEER_PRESSURE_ALERT_MINE_DESC"] = "Ваши собственные отслеживаемые кулдауны."
+L["PEER_PRESSURE_ALERT_OTHERS"] = "Чужие кулдауны"
+L["PEER_PRESSURE_ALERT_OTHERS_DESC"] =
+	"Отслеживаемый кулдаун, использованный любым другим игроком вашего класса в вашей группе."
+
+L["PEER_PRESSURE_ABILITIES_DESC"] =
+	"Снимите галочку с кулдауна, чтобы перестать его отслеживать. Сообщается только о кулдаунах вашего класса."
+
+--------------------------------------------------------------------------------
+-- Bad Mages
+--------------------------------------------------------------------------------
+
+L["BAD_MAGES_SUMMARY"] =
+	"Маги, которые делают то, что оставляет пачку там, где танк до неё не достанет."
+L["BAD_MAGES_ENABLE"] = "Включить отслеживание плохих магов"
+
+L["BAD_MAGES_ALERT_HEADER"] = "Кольца льда"
+L["BAD_MAGES_ALERT_DESC"] =
+	"Сообщает о Кольце льда, которое замораживает пачку на месте, вне досягаемости танка."
+L["BAD_MAGES_ALERT_ENABLE"] = "Сообщать о кольцах льда"
+L["BAD_MAGES_ALERT_MINE"] = "Мои кольца льда"
+L["BAD_MAGES_ALERT_OTHERS"] = "Чужие кольца льда"
+L["BAD_MAGES_WHISPER_ENABLE"] = "Шептать магу"
+L["BAD_MAGES_WHISPER_ENABLE_DESC"] =
+	"Отправляет магу записку с просьбой приберечь Кольцо льда для экстренных случаев. Отправляется только одна, даже если Control Freak стоит у нескольких человек в вашей группе."
+L["BAD_MAGES_COOLDOWN_DESC"] =
+	"Сколько один маг молчит после того, как вызвал оповещение о кольце. Действует на вывод в чат, звук, объявление и шёпот, чтобы маг, который бьёт кольцом на каждом пулле, не забивал ваше окно."
+
+--------------------------------------------------------------------------------
+-- Bad Parry Monkeys
+--------------------------------------------------------------------------------
+
+L["BAD_PARRY_MONKEYS_SUMMARY"] =
+	"Игроки, которые не танкуют, стоят перед боссом и попадают под парирование. Каждое парирование ускоряет следующий удар босса по танку."
+L["BAD_PARRY_MONKEYS_ENABLE"] = "Включить отслеживание плохих мартышек"
+
+L["BAD_PARRY_MONKEYS_ALERT_HEADER"] = "Парирования"
+L["BAD_PARRY_MONKEYS_ALERT_DESC"] =
+	"Если противник парирует удары того, кто его не танкует, значит этот игрок стоит перед ним. Каждое парирование ускоряет следующий удар противника по тому, кто его держит."
+L["BAD_PARRY_MONKEYS_ALERT_ENABLE"] = "Сообщать о парированиях, цели:"
+L["BAD_PARRY_MONKEYS_ALERT_MINE"] = "Мои парирования"
+L["BAD_PARRY_MONKEYS_ALERT_MINE_DESC"] = "Противник парирует ваши атаки."
+L["BAD_PARRY_MONKEYS_ALERT_OTHERS"] = "Чужие парирования"
+L["BAD_PARRY_MONKEYS_ALERT_OTHERS_DESC"] =
+	"Противник парирует атаки любого другого участника вашей группы."
+L["BAD_PARRY_MONKEYS_IGNORE_TANKS"] = "Не учитывать танков"
+L["BAD_PARRY_MONKEYS_IGNORE_TANKS_DESC"] =
+	"Молчать, если парировали атаку танка: назначенного главным танком в рейде, а в группе игрока, выбравшего роль танка в поиске группы. Второй танк стоит перед боссом ради смены танков, и это не та ошибка, о которой стоит шептать. О ваших собственных парированиях сообщается по-прежнему."
+L["BAD_PARRY_MONKEYS_IGNORE_PETS"] = "Не учитывать питомцев"
+L["BAD_PARRY_MONKEYS_IGNORE_PETS_DESC"] =
+	"Молчать, если парировали питомца, в том числе вашего. Питомец стоит там, куда его послал хозяин, а строка с именем питомца никому в группе ничего не даёт. Питомцам в любом случае никогда не шепчут."
+L["BAD_PARRY_MONKEYS_WHISPER"] = "Шептать виновнику"
+L["BAD_PARRY_MONKEYS_WHISPER_DESC"] =
+	"Отправляет виновнику записку с просьбой встать позади противника. Отправляется только одна, даже если Control Freak стоит у нескольких человек в вашей группе."
+L["BAD_PARRY_MONKEYS_COOLDOWN_DESC"] =
+	"Сколько один виновник молчит после того, как вызвал предупреждение о парировании. Действует на вывод в чат, звук, объявление и шёпот, ведь тому, кто ещё не сдвинулся, незачем напоминать на каждом ударе."
+
+--[[
+    Parry Monkey, the section under Parries: the player owning up to their own
+    parries, with a running count, every so often. TRANSLATORS: the message is
+    the player's own words, so its default is a line a player would say about
+    themselves.
+]]
+L["BAD_PARRY_MONKEYS_MONKEY_HEADER"] = "Парируемая мартышка"
+L["BAD_PARRY_MONKEYS_MONKEY_DESC"] =
+	"Признавайтесь, когда рейдовый босс, которого вы не танкуете, парирует ваш удар, и называйте число всех парирований с тех пор, как вы вступили в рейд. Учитывается каждое парирование, а задержка ниже решает, как часто вы об этом говорите."
+L["BAD_PARRY_MONKEYS_MONKEY_ENABLE"] = "Сообщать о парируемой мартышке"
+L["BAD_PARRY_MONKEYS_MONKEY_MINE"] = "Мои признания"
+L["BAD_PARRY_MONKEYS_MONKEY_MINE_DESC"] =
+	"Ваши собственные парирования, вашими собственными словами."
+L["BAD_PARRY_MONKEYS_MONKEY_MESSAGE"] = "Сообщение"
+L["BAD_PARRY_MONKEYS_MONKEY_MESSAGE_DESC"] =
+	"Что говорится в вашем признании. Счёт идёт после него и начинается с нуля всякий раз, когда вы вступаете в рейд."
+L["BAD_PARRY_MONKEYS_MONKEY_MESSAGE_DEFAULT"] = "Я вредная парируемая мартышка!"
+L["BAD_PARRY_MONKEYS_MONKEY_COOLDOWN"] = "Задержка"
+L["BAD_PARRY_MONKEYS_MONKEY_COOLDOWN_DESC"] =
+	"Сколько вы молчите после признания. Парирования в промежутке всё равно учитываются, так что следующее признание несёт весь счёт."
 
 --------------------------------------------------------------------------------
 -- Bad Pets
@@ -520,53 +612,54 @@ L["BAD_PETS_ABILITIES_DESC"] =
 	"Снимите галочку со способности питомца, чтобы перестать её отслеживать."
 
 --------------------------------------------------------------------------------
--- Peer Pressure
+-- Bad Priests
 --------------------------------------------------------------------------------
 
---[[
-    The alert is the whose shape with no target, like Fears: the line names a
-    classmate and a cooldown.
+L["BAD_PRIESTS_SUMMARY"] =
+	"Лекари, которые делают то, что вредит танку больше, чем помогает."
+-- Shown only on a client whose data has no Power Word: Shield row, which among the shipped ones is Season of Discovery's.
+L["BAD_PRIESTS_DISCOVERY_STATUS"] =
+	'В Сезоне открытий о плохих щитах никогда не сообщается: руна "Сила души" возвращает танкам ярость, а ни один аддон не видит чужих рун.'
+L["BAD_PRIESTS_ENABLE"] = "Включить отслеживание плохих жрецов"
 
-    TRANSLATORS: the two rows' tooltips each say what they count, because
-    neither is "everybody's casts": only the player's own class ever reports,
-    and the My row has no pet to include.
-]]
-L["PEER_PRESSURE_SUMMARY"] =
-	"Получайте уведомления, когда другие игроки вашего класса используют свои кулдауны, чтобы поддаться групповому давлению."
-L["PEER_PRESSURE_ENABLE"] = "Включить групповое давление"
-
-L["PEER_PRESSURE_ALERT_HEADER"] = "Кулдауны"
-L["PEER_PRESSURE_ALERT_DESC"] =
-	'Кулдаун, использованный игроком вашего класса в вашей группе: сигнал использовать свой. Сообщается только о вашем классе, а в разделе "Отслеживаемые способности" выбирается, какие кулдауны учитываются.'
-L["PEER_PRESSURE_ALERT_ENABLE"] = "Сообщать о кулдаунах"
-L["PEER_PRESSURE_ALERT_MINE"] = "Мои кулдауны"
-L["PEER_PRESSURE_ALERT_MINE_DESC"] =
-	"Сообщает и о ваших собственных отслеживаемых кулдаунах. Список рядом задаёт, куда уходит строка."
-L["PEER_PRESSURE_ALERT_OTHERS"] = "Чужие кулдауны"
-L["PEER_PRESSURE_ALERT_OTHERS_DESC"] =
-	"Сообщает об отслеживаемом кулдауне, использованном любым другим игроком вашего класса в вашей группе. Список рядом задаёт, куда уходит строка."
-
-L["PEER_PRESSURE_ABILITIES_DESC"] =
-	"Снимите галочку с кулдауна, чтобы перестать его отслеживать. Сообщается только о кулдаунах вашего класса."
+L["BAD_PRIESTS_HEADER"] = "Плохие щиты"
+L["BAD_PRIESTS_DESC"] =
+	"Сообщает о Слове силы: Щит, наложенном на танкующего друида или воина. Ярость копится от получаемого урона, а поглощённый щитом урон её не даёт, так что щит из лучших побуждений лишает танка ярости, которой он держит угрозу. Щит до пулла, на танке, который ещё не в бою, не учитывается."
+L["BAD_PRIESTS_ALERT_ENABLE"] = "Сообщать о плохих щитах"
+L["BAD_PRIESTS_HEALTH_DESC"] =
+	'Насколько должно упасть здоровье танка, чтобы щит перестал быть ошибкой. Щит на того, кто вот-вот погибнет, вполне оправдан, поэтому ниже выбранного здесь уровня предупреждение молчит. Выберите "Всегда", чтобы слышать о каждом щите.'
+L["BAD_PRIESTS_HEALTH_ALWAYS"] = "Всегда"
+L["BAD_PRIESTS_HEALTH_EXCEPT"] = "Кроме здоровья ниже %d%%"
+-- The one row: the report is about somebody else's cast, so it is not "My" anything.
+L["BAD_PRIESTS_REPORT"] = "Предупреждения о плохих щитах"
+L["BAD_PRIESTS_REPORT_DESC"] =
+	'Кто-то накладывает щит на танка, живущего за счёт ярости. Здесь нет пунктов "Мои" и "Чужие": применение за лекарем, а проблема у танка.'
+L["BAD_PRIESTS_SELF_ONLY"] = "Когда вы танкуете друидом или воином"
+L["BAD_PRIESTS_SELF_ONLY_DESC"] =
+	"Предупреждать только о щитах на вас и только пока вы танкуете друидом или воином. Снимите отметку, чтобы слышать о щите на любом участнике группы, который танкует одним из этих классов."
+L["BAD_PRIESTS_WHISPER"] = "Шептать наложившему щит"
+L["BAD_PRIESTS_WHISPER_DESC"] =
+	"Отправляет наложившему щит записку с объяснением, почему это вредит. Отправляется только одна, даже если Control Freak стоит у нескольких человек в вашей группе."
+L["BAD_PRIESTS_COOLDOWN_DESC"] =
+	"Сколько один лекарь молчит после того, как вызвал предупреждение о щите. Действует на вывод в чат, звук, объявление и шёпот, ведь лекарь, накладывающий щит всякий раз, как тот восстановится, не должен забивать ваше окно."
 
 --------------------------------------------------------------------------------
 -- Tanking Tools
 --------------------------------------------------------------------------------
 
 --[[
-    The tab's summary says it ships off and where its four tools live, since
+    The tab's summary says it ships off and where its two tools live, since
     each tool is a page of its own and the tab page holds only the switch.
 
     The mini-map tooltip carries its own shorter one, because the button's
-    Right-Click toggles this tab and the tooltip has to say what it is turning
-    on. TRANSLATORS: it lists the four section headers below in your own words
-    for them; keep it to two lines in the tooltip.
+    Shift + Left-Click toggles this tab and the tooltip has to say what it is
+    turning on. TRANSLATORS: it lists the two section headers below in your
+    own words for them; keep it to two lines in the tooltip.
 ]]
 L["TANKING_TOOLS_SUMMARY"] =
-	'Пока в бета-версии, поэтому по умолчанию выключено. У каждого из инструментов ("Холодное начало", "Снижение брони", "Парирования" и "Кольца льда") есть своя страница в разделе "Инструменты танка".'
+	'Пока в бета-версии, поэтому по умолчанию выключено. У каждого из инструментов ("Холодное начало" и "Снижение брони") есть своя страница в разделе "Инструменты танка".'
 L["TANKING_TOOLS_ENABLE"] = "Включить инструменты танка"
-L["TANKING_TOOLS_MINIMAP_SUMMARY"] =
-	"Холодное начало, снижение брони, парирования и кольца льда."
+L["TANKING_TOOLS_MINIMAP_SUMMARY"] = "Холодное начало и снижение брони."
 
 L["TANKING_TOOLS_COLD_OPENER_HEADER"] = "Холодное начало"
 L["TANKING_TOOLS_COLD_OPENER_DESC"] =
@@ -574,7 +667,7 @@ L["TANKING_TOOLS_COLD_OPENER_DESC"] =
 L["TANKING_TOOLS_COLD_OPENER_ENABLE"] = "Сообщать о холодном начале, цели:"
 L["TANKING_TOOLS_COLD_OPENER_MINE"] = "Моё холодное начало"
 L["TANKING_TOOLS_COLD_OPENER_MINE_DESC"] =
-	"Сообщает о ваших собственных начальных способностях, которые не прошли. Список рядом задаёт, куда уходит строка."
+	"Ваши собственные начальные способности, которые не прошли."
 -- The caption before the window dropdown: "Within [10 Seconds of the Pull]".
 L["TANKING_TOOLS_COLD_OPENER_WITHIN"] = "В первые"
 L["TANKING_TOOLS_COLD_OPENER_WINDOW"] = "%d сек. боя"
@@ -588,42 +681,13 @@ L["TANKING_TOOLS_ARMOR_ENABLE"] = "Сообщать о снижении брон
 -- The one row: the report is the group's, so it is not "My" anything.
 L["TANKING_TOOLS_ARMOR_REPORT"] = "Отчёты о снижении брони"
 L["TANKING_TOOLS_ARMOR_REPORT_DESC"] =
-	'Куда уходит отчёт, когда группа сняла броню с цели. Здесь нет пунктов "Мои" и "Чужие": это работа группы, о которой сообщают вам.'
+	'Группа снимает броню с цели. Здесь нет пунктов "Мои" и "Чужие": это работа группы, о которой сообщают вам.'
 L["TANKING_TOOLS_ARMOR_FAERIE_FIRE"] = "Учитывать Волшебный огонь"
 L["TANKING_TOOLS_ARMOR_FAERIE_FIRE_DESC"] =
 	"Ждать Волшебного огня перед отчётом, в каком бы облике друид его ни применил. Не учитывается, если в группе нет друида."
 L["TANKING_TOOLS_ARMOR_RECKLESSNESS"] = "Учитывать Проклятие безрассудства"
 L["TANKING_TOOLS_ARMOR_RECKLESSNESS_DESC"] =
 	"Ждать Проклятия безрассудства перед отчётом. Не учитывается, если в группе нет чернокнижника."
-
-L["TANKING_TOOLS_PARRY_HEADER"] = "Парирования"
-L["TANKING_TOOLS_PARRY_DESC"] =
-	"Если противник парирует удары того, кто его не танкует, значит этот игрок стоит перед ним. Каждое парирование ускоряет следующий удар противника по тому, кто его держит."
-L["TANKING_TOOLS_PARRY_ENABLE"] = "Сообщать о парированиях, цели:"
-L["TANKING_TOOLS_PARRY_MINE"] = "Мои парирования"
-L["TANKING_TOOLS_PARRY_MINE_DESC"] =
-	"Сообщает, когда противник парирует ваши атаки. Список рядом задаёт, куда уходит строка."
-L["TANKING_TOOLS_PARRY_OTHERS"] = "Чужие парирования"
-L["TANKING_TOOLS_PARRY_OTHERS_DESC"] =
-	"Сообщает, когда противник парирует атаки любого другого участника вашей группы. Список рядом задаёт, куда уходит строка."
-L["TANKING_TOOLS_PARRY_IGNORE_TANKS"] = "Не учитывать танков"
-L["TANKING_TOOLS_PARRY_IGNORE_TANKS_DESC"] =
-	"Молчать, если парировали атаку танка: назначенного главным танком в рейде, а в группе игрока, выбравшего роль танка в поиске группы. Второй танк стоит перед боссом ради смены танков, и это не та ошибка, о которой стоит шептать. О ваших собственных парированиях сообщается по-прежнему."
-L["TANKING_TOOLS_PARRY_IGNORE_PETS"] = "Не учитывать питомцев"
-L["TANKING_TOOLS_PARRY_IGNORE_PETS_DESC"] =
-	"Молчать, если парировали атаку питомца, в том числе вашего. Питомец стоит там, куда его послал хозяин, а строка с именем питомца никому в группе ничего не даёт. Питомцам в любом случае никогда не шепчут."
-L["TANKING_TOOLS_PARRY_WHISPER"] = "Шептать виновнику"
-L["TANKING_TOOLS_PARRY_WHISPER_DESC"] =
-	"Отправляет виновнику записку с просьбой встать позади противника. Отправляется только одна, даже если Control Freak стоит у нескольких человек в вашей группе."
-L["TANKING_TOOLS_PARRY_COOLDOWN_DESC"] =
-	"Сколько один виновник молчит после того, как вызвал предупреждение о парировании. Действует на вывод в чат, звук, объявление и шёпот, ведь тому, кто ещё не сдвинулся, незачем напоминать на каждом ударе."
-
-L["TANKING_TOOLS_NOVA_HEADER"] = "Кольца льда"
-L["TANKING_TOOLS_NOVA_DESC"] =
-	"Сообщает о Кольце льда, которое замораживает пачку на месте, вне досягаемости танка."
-L["TANKING_TOOLS_NOVA_ENABLE"] = "Сообщать о кольцах льда"
-L["TANKING_TOOLS_NOVA_MINE"] = "Мои кольца льда"
-L["TANKING_TOOLS_NOVA_OTHERS"] = "Чужие кольца льда"
 
 --------------------------------------------------------------------------------
 -- Message Formats
@@ -690,10 +754,10 @@ L["INCAPACITATED_PLAIN_INDEFINITE"] = "%s выведен из строя! %s: %s
 
     TRANSLATORS: this is our own word for the person in that seat, not the
     client's group finder role label, which names a role rather than a person.
-    It opens a sentence as its subject. "Afflicted by" in the formats above is deliberately the
-    phrasing Blizzard's combat log uses for a debuff landing
-    (AURAADDEDOTHERHARMFUL), so a player reads the same words here as in the log
-    they already watch -- use your client's wording for both if it has one.
+    It opens a sentence as its subject. "Afflicted by" in the formats above is
+    deliberately the phrasing Blizzard's combat log uses for a debuff landing
+    (AURAADDEDOTHERHARMFUL), so a player reads the same words here as in the
+    log they already watch -- use your client's wording for both if it has one.
 ]]
 L["INCAPACITATED_ROLE_TANK"] = "Танк"
 L["INCAPACITATED_ROLE_HEALER"] = "Лекарь"
@@ -751,7 +815,7 @@ L["TANK_DEATHS_CLASS_LINE"] = "%s погиб! Это %s."
 ]]
 L["SHIELD_WARNING"] = "Плохой щит! %s: %s на %s."
 L["SHIELD_WHISPER"] =
-	"Плохой щит! Прошу не накладывать %s на %s: щит мешает танку копить ярость."
+	"Вредный жрец! Прошу не накладывать %s на %s: щит мешает танку копить ярость."
 
 L["BAD_PET"] = "Плохой питомец! %s: питомец %s применяет %s на %s."
 L["BAD_PET_AOE"] = "Плохой питомец! %s: питомец %s применяет %s."
@@ -763,9 +827,9 @@ L["BAD_PET_UNKNOWN_OWNER_AOE"] = "Плохой питомец! %s применя
     English.
 ]]
 L["BAD_PET_WHISPER"] =
-	"Ваш питомец %s: %s на %s. Отключите автоприменение: ПКМ по кнопке."
+	"Вредный питомец %s: %s на %s. ПКМ по кнопке выключит автокаст."
 L["BAD_PET_WHISPER_AOE"] =
-	"Ваш питомец %s применяет %s. Отключите автоприменение: ПКМ по кнопке."
+	"Вредный питомец %s применяет %s. ПКМ по кнопке выключит автокаст."
 
 L["COLD_OPENER_MISS"] = "Осторожно! %s: %s, промах по цели %s."
 L["COLD_OPENER_DODGE"] = "Осторожно! %s: %s, %s уклоняется."
@@ -778,10 +842,19 @@ L["ARMOR_REPORT"] = "Броня снята! Цель %s стала уязвим�
 
 L["PARRY_WARNING"] = "Ускорение от парирования! %s стоит перед целью %s."
 L["PARRY_WHISPER"] =
-	"Ускорение от парирования! Прошу зайти за цель %s: каждое парирование ускоряет её следующий удар."
+	"Вредная мартышка! Встаньте за цель %s: парирование ускоряет босса, и танк получает больше урона."
+-- Parry Monkey's line. TRANSLATORS: %s is the player's own message, %d the count since joining the raid group.
+L["PARRY_CONFESSION"] = "%s (x%d)"
 
 L["NOVA"] = "Кольцо льда! %s: %s на %s."
 L["NOVA_AOE"] = "Кольцо льда по площади! %s: %s."
+--[[
+    Every whisper opens on "Naughty" and the culprit it is addressed to, the
+    Naughty List's own word, where the line the group sees opens on the news.
+    TRANSLATORS: %s is the spell.
+]]
+L["NOVA_WHISPER"] =
+	"Вредный маг! Ваше %s заморозило пачку вне досягаемости танка. Приберегите его на крайний случай."
 
 --[[
     Opens on a bang naming the news, like every other alert line.

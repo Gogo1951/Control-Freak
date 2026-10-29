@@ -211,7 +211,7 @@ ns.ITEMS = {
 How We Got the Data
 
 Last Validated
-	2026-10-20, Season of Discovery 1.15.9.70003
+	2026-10-28, Season of Discovery 1.15.9.70576
 
 Notes
 	- Every item a player can get that acts on someone besides its user, so the Data Review can search for more items like these from the item side, not only through the spells in Abilities. No feature reads this table yet. Validate Data exports it, and its DATA_TRACKED column marks the rows whose spell an Abilities row listens for.
@@ -223,7 +223,7 @@ Notes
 	- Found two ways. From the spell side, every item's spell is followed through its triggered spells, looking for taunts, threat, fear, armor reduction, crowd control, party-wide auras, resurrection, summons and placed objects. From the item side, every item whose Use is a scripted dummy the tables can't follow is read by its description and sorted by hand. That is how the Gnomish gadgets, the Six Demon Bag and the Goblin Bomb Dispenser got in, and on this client's tables the dragonlings and the Battle Chicken too where their summon is scripted.
 	- Left out: quest items, spell books, companion pets and mounts, fireworks, toys and holiday items, brews, single-target scrolls and bandages (they help one player, not the group), test and placeholder items, and Gnomish Shrink Ray (a debuff with no kind here). Also left out: Abyss Shard, a free cast of the warlock's own Summon Voidwalker, and Mechanical Yeti, the reward toy from its Winterspring quest chain.
 	- Obtainable means QuestieDB lists a drop, vendor or quest reward, or a recipe creates it. QuestieDB lists no source for world drops and raid-boss drops, so Dazzling Longsword, Freezing Band, Tidal Charm, Princess Theradras' Scepter, Earthshaker, Ancient Cornerstone Grimoire, Dark Edge of Insanity and Dragon's Call stay as known drops. Stormwind Medallion, Hunting Net and Spiked Collar have no source anywhere and are left out as likely unobtainable.
-	- Holds the Classic Era rows plus Season of Discovery's own items: ids from 190000 up that QuestieDB's Classic table lacks. QuestieDB has no Season of Discovery table, so such an item is kept when it is uncommon or better or a recipe creates it. That leaves out the rune-quest props (Ominous Tome, the bait meats, Battle Totem, Tortured Soul and the like) and Scroll of Reintegration, a common resurrection scroll no recipe makes. The feasts (Specklefin Feast, Grand Lobster Banquet) are SERVICE: like a cauldron, they place something the group uses.
+	- Holds the Classic Era rows plus Season of Discovery's own items: ids from 190000 up that QuestieDB's Classic table lacks. QuestieDB's Season of Discovery item list gives most of them no source, so such an item is kept when it is uncommon or better or a recipe creates it. That leaves out the rune-quest props (Ominous Tome, the bait meats, Battle Totem, Tortured Soul and the like, and Infernal Lasso, which only weakens one quest boss), Scroll of Reintegration, a common resurrection scroll, and Scroll of Polymorph: Odd Melon, a common polymorph scroll. No recipe makes either scroll and QuestieDB lists no source for them. The feasts (Specklefin Feast, Grand Lobster Banquet) are SERVICE: like a cauldron, they place something the group uses.
 
 SQL (CMaNGOS)
 	TODO: Add SQL Query
@@ -232,14 +232,15 @@ Wowhead
 	None.
 
 wago.tools
-	https://wago.tools/db2/Item?build=1.15.9.70003
-	https://wago.tools/db2/ItemSparse?build=1.15.9.70003
-	https://wago.tools/db2/ItemEffect?build=1.15.9.70003
-	https://wago.tools/db2/SpellName?build=1.15.9.70003
-	https://wago.tools/db2/Spell?build=1.15.9.70003
-	https://wago.tools/db2/SpellEffect?build=1.15.9.70003
+	https://wago.tools/db2/Item?build=1.15.9.70576
+	https://wago.tools/db2/ItemSparse?build=1.15.9.70576
+	https://wago.tools/db2/ItemEffect?build=1.15.9.70576
+	https://wago.tools/db2/SpellName?build=1.15.9.70576
+	https://wago.tools/db2/Spell?build=1.15.9.70576
+	https://wago.tools/db2/SpellEffect?build=1.15.9.70576
 	https://wago.tools/db2/SummonProperties?build=1.15.9.70003
 
 QuestieDB
 	https://raw.githubusercontent.com/Questie/QuestieDB/master/data/Classic/classicItemDB.lua
+	https://raw.githubusercontent.com/Questie/QuestieDB/master/src/corrections/Sod/sodBaseItems.lua
 ]]

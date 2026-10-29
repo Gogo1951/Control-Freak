@@ -3,53 +3,171 @@ local _, ns = ...
 local L = ns.L
 local GetColor = ns.GetColor
 
--- Each switch's caption, keyed like ns.FEATURE_KEYS.
+--[[
+    Each switch's caption, keyed like ns.FEATURE_KEYS: the tab's own name, so
+    the switch reads exactly as the settings tree beside it does.
+]]
 local FEATURE_CAPTION_KEYS = {
-	taunts = "FEATURES_TAUNTS",
-	interrupts = "FEATURES_INTERRUPTS",
-	fears = "FEATURES_FEARS",
-	incapacitated = "FEATURES_INCAPACITATED",
-	tankDeaths = "FEATURES_TANK_DEATHS",
-	badPriests = "FEATURES_BAD_PRIESTS",
-	badPets = "FEATURES_BAD_PETS",
-	peerPressure = "FEATURES_PEER_PRESSURE",
-	tankingTools = "FEATURES_TANKING_TOOLS",
+	taunts = "TAB_TAUNTS",
+	interrupts = "TAB_INTERRUPTS",
+	fears = "TAB_FEARS",
+	incapacitated = "TAB_INCAPACITATED",
+	tankDeaths = "TAB_TANK_DEATHS",
+	badMages = "TAB_BAD_MAGES",
+	badParryMonkeys = "TAB_BAD_PARRY_MONKEYS",
+	badPets = "TAB_BAD_PETS",
+	badPriests = "TAB_BAD_PRIESTS",
+	peerPressure = "TAB_PEER_PRESSURE",
+	tankingTools = "TAB_TANKING_TOOLS",
 }
 
--- Each switch's icon, drawn ahead of its caption.
+-- Each feature switch's icon, drawn ahead of its caption. Block switches are gold instead and carry none.
 local FEATURE_ICONS = {
 	taunts = 136080,
 	interrupts = 132219, -- Kick
 	fears = 136183,
 	incapacitated = 135860,
 	tankDeaths = 132293,
-	badPriests = 135940, -- Power Word: Shield
+	badMages = "Interface\\Icons\\Spell_Frost_FrostNova",
+	badParryMonkeys = "Interface\\Icons\\Ability_Parry",
 	badPets = 132270, -- Growl
+	badPriests = 135940, -- Power Word: Shield
 	peerPressure = 136146,
-	tankingTools = 134951,
 }
 
---[[
-    The All Alerts switch alone under its own Master Switch header, since it
-    sits above every feature, then the Features header and the features in
-    tiers with a blank line between each: the three that report
-    what somebody cast, the two about the player's own seat, the two Bad tabs,
-    and Peer Pressure and Tanking Tools side by side at the bottom: the one
-    whose news is not about the fight going wrong, and the one that ships off,
-    which the Tanking Tools section below belongs to. Everything under the top
-    switch hides while it is off, since none of it fires then; the switch re-runs
-    ns:ApplyProfile, which redraws this panel. The lone switches still go
-    through ns.OptionsTogglePairs, so they sit in the same inset as the pairs.
-]]
-local FEATURE_TIERS = {
-	{ "taunts", "interrupts", "fears" },
-	{ "incapacitated", "tankDeaths" },
-	{ "badPets", "badPriests" },
-	{ "peerPressure", "tankingTools" },
+-- Each Tanking Tools switch's icon, keyed like ns.TANKING_TOOLS.
+local TOOL_ICONS = {
+	coldOpener = "Interface\\Icons\\Ability_Warrior_Charge",
+	armor = "Interface\\Icons\\Ability_Warrior_Sunder",
 }
+
+local function WithIcon(icon, text)
+	return "|T" .. icon .. ":16|t " .. text
+end
 
 local function AllAlertsOff()
 	return not ns.db.profile.enabled
+end
+
+--[[
+    A block's own switch: gold, full width, standing where a label would. It
+    reads as the heading of the switches indented under it, and is one.
+]]
+local function BlockSwitch(toggle)
+	toggle.name = GetColor("TITLE") .. toggle.name .. "|r"
+	toggle.width = "full"
+	return toggle
+end
+
+local function GroupSwitch(group)
+	return BlockSwitch({
+		type = "toggle",
+		name = L[group.labelKey],
+		desc = string.format(L["OPTIONS_GROUP_ENABLE_DESC"], L[group.labelKey]),
+		get = function()
+			return ns.IsFeatureGroupOn(group.features[1])
+		end,
+		-- Decides whether the combat log is registered at all, so the write re-runs ns:ApplyProfile.
+		set = function(_, value)
+			ns.db.profile.featureGroups[group.key] = value
+			ns:ApplyProfile()
+		end,
+	})
+end
+
+local function FeatureSwitch(key)
+	local toggle = ns.FeatureEnableToggle(function()
+		return ns.db.profile[key]
+	end, FEATURE_CAPTION_KEYS[key])
+	toggle.name = WithIcon(FEATURE_ICONS[key], toggle.name)
+	return toggle
+end
+
+--[[
+    One switch per tool, captioned with its sub-panel's name: the sub-panel's
+    "Enable Alerts for Cold Openers On" ends on the ladder beside it, which is
+    not drawn here. Each binds the same setting as the switch on its sub-panel,
+    and writes without ns:ApplyProfile, since the registration test reads only
+    the feature's switch.
+]]
+local function ToolSwitch(tool)
+	local key = tool.key
+	return {
+		type = "toggle",
+		name = WithIcon(TOOL_ICONS[key], L[tool.headerKey]),
+		desc = L["ALERT_SECTION_ENABLE_DESC"],
+		get = function()
+			return ns.db.profile.tankingTools[key].enabled
+		end,
+		set = function(_, value)
+			ns.db.profile.tankingTools[key].enabled = value
+		end,
+	}
+end
+
+--[[
+    The Features block, top to bottom:
+
+        [x] Monitoring                    the group switch, gold
+              [x] Taunts       [x] Interrupts
+              ...
+              [x] Tank Deaths  [x] Peer Pressure
+        [x] Naughty List
+              [x] Bad Mages    [x] Bad Parry Monkeys
+              [x] Bad Pets     [x] Bad Priests
+        [ ] Tanking Tools                 the feature's own switch, gold
+              [ ] Cold Openers [x] Armor Debuffs
+
+    A block switch silences everything indented under it without touching
+    their own switches, so the rows under one that is off stay drawn, greyed
+    out, still showing what will come back. Tanking Tools' block switch is the
+    feature's own enable, the same setting as its tab; its tools are the
+    sections under it.
+]]
+local function GroupBlock(group)
+	local children = {}
+	for _, key in ipairs(group.features) do
+		children[#children + 1] = FeatureSwitch(key)
+	end
+	return {
+		switch = GroupSwitch(group),
+		children = children,
+		off = function()
+			return not ns.IsFeatureGroupOn(group.features[1])
+		end,
+	}
+end
+
+local function TankingToolsBlock()
+	local tools = {}
+	for _, tool in ipairs(ns.TANKING_TOOLS) do
+		tools[#tools + 1] = ToolSwitch(tool)
+	end
+	local tankingTools = ns.FeatureEnableToggle(function()
+		return ns.db.profile.tankingTools
+	end, FEATURE_CAPTION_KEYS.tankingTools)
+	return {
+		switch = BlockSwitch(tankingTools),
+		children = tools,
+		off = function()
+			return not ns.db.profile.tankingTools.enabled
+		end,
+	}
+end
+
+--[[
+    One block at base: its switch at base + 1, then up to three rows of pairs
+    from base + 2, so a block needs seven orders after base. hidden goes on the
+    switch and every row, so the block collapses whole.
+]]
+local function AddBlock(args, prefix, base, block, hidden)
+	block.switch.order = base + 1
+	block.switch.hidden = hidden
+	args[prefix .. "Switch"] = block.switch
+	for _, child in ipairs(block.children) do
+		child.disabled = block.off
+	end
+	ns.OptionsTogglePairs(args, prefix .. "Row", base + 1, block.children, hidden, true)
 end
 
 local function AddFeatureToggles(args, startOrder)
@@ -69,59 +187,45 @@ local function AddFeatureToggles(args, startOrder)
 		},
 	})
 
-	-- The first tier's blank line doubles as the one under the Features header.
+	-- The first group's blank line doubles as the one under the Features header.
 	args.spaceFeatures0 = ns.OptionsSpacer(startOrder + 2, AllAlertsOff)
 	args.headerFeatures = ns.OptionsHeader(L["OPTIONS_FEATURES_HEADER"], startOrder + 3, AllAlertsOff)
 
-	-- Four orders per tier: its blank line, then up to two rows of pairs.
-	for tier, keys in ipairs(FEATURE_TIERS) do
-		local base = startOrder + 4 + (tier - 1) * 4
-		args["spaceFeatures" .. tier] = ns.OptionsSpacer(base, AllAlertsOff)
-		local toggles = {}
-		for _, key in ipairs(keys) do
-			local toggle = ns.FeatureEnableToggle(function()
-				return ns.db.profile[key]
-			end, FEATURE_CAPTION_KEYS[key])
-			toggle.name = "|T" .. FEATURE_ICONS[key] .. ":16|t " .. toggle.name
-			toggles[#toggles + 1] = toggle
-		end
-		ns.OptionsTogglePairs(args, "rowFeatures" .. tier .. "_", base, toggles, AllAlertsOff)
+	local blocks = {}
+	for _, group in ipairs(ns.FEATURE_GROUPS) do
+		blocks[#blocks + 1] = GroupBlock(group)
+	end
+	blocks[#blocks + 1] = TankingToolsBlock()
+
+	-- Eight orders per block: its blank line, then the block itself.
+	for index, block in ipairs(blocks) do
+		local base = startOrder + 4 + (index - 1) * 8
+		args["spaceFeatures" .. index] = ns.OptionsSpacer(base, AllAlertsOff)
+		AddBlock(args, "features" .. index, base, block, AllAlertsOff)
 	end
 end
 
 --[[
-    One switch per tool, so the tools can be turned off without opening each
-    sub-panel. Each binds the same setting as the switch on its own sub-panel,
-    and is captioned with that sub-panel's name: the sub-panel's "Enable Alerts
-    for Cold Openers On" ends on the ladder beside it, which is not drawn here.
-    Shown only while Tanking Tools and All Alerts are on; both switches re-run
-    ns:ApplyProfile, which redraws this panel when it changes.
+    A group's own page in the settings tree, the parent its features' tabs nest
+    under: the All Alerts status line, the group's summary, then the same block
+    the root panel draws for it, so the group switch and its features can be
+    worked from here without going back up. Nothing hides, the way a
+    sub-panel's blocks never do; the status line says when All Alerts has the
+    page silenced.
 ]]
-local function AddTankingToolToggles(args, order)
-	local hidden = function()
-		return AllAlertsOff() or not ns.db.profile.tankingTools.enabled
-	end
+function ns.BuildFeatureGroupOptions(group)
+	local args = {
+		summary = ns.OptionsDesc(L[group.summaryKey], 1),
+		summarySpace = ns.OptionsSpacer(2),
+	}
+	ns.AddQuietStatus(args, 0.4)
+	AddBlock(args, "group", 2, GroupBlock(group), ns.NeverHidden)
 
-	args.spaceTankingTools0 = ns.OptionsSpacer(order, hidden)
-	args.headerTankingTools = ns.OptionsHeader(L["TAB_TANKING_TOOLS"], order + 1, hidden)
-	args.spaceTankingTools1 = ns.OptionsSpacer(order + 2, hidden)
-
-	local toggles = {}
-	for _, tool in ipairs(ns.TANKING_TOOLS) do
-		local key = tool.key
-		toggles[#toggles + 1] = {
-			type = "toggle",
-			name = L[tool.headerKey],
-			desc = L["ALERT_SECTION_ENABLE_DESC"],
-			get = function()
-				return ns.db.profile.tankingTools[key].enabled
-			end,
-			set = function(_, value)
-				ns.db.profile.tankingTools[key].enabled = value
-			end,
-		}
-	end
-	ns.OptionsTogglePairs(args, "rowTankingTools", order + 2, toggles, hidden)
+	return {
+		type = "group",
+		name = L[group.labelKey],
+		args = args,
+	}
 end
 
 function ns.BuildGeneralOptions()
@@ -169,9 +273,8 @@ function ns.BuildGeneralOptions()
 		),
 	}
 
-	-- The switch at 23, the Features header at 24 and 25, then four tiers of four orders from 26 end at 41.
+	-- The switch at 23, the Features header at 24 and 25, then three blocks of eight orders from 26 end at 49.
 	AddFeatureToggles(args, 22)
-	AddTankingToolToggles(args, 42)
 
 	return {
 		type = "group",

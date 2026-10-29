@@ -98,8 +98,9 @@ ns.stateResets[#ns.stateResets + 1] = function()
 end
 
 --[[
-    Stamped by Features/Combat-Log.lua for every debuff landing on the player
-    while this section is switched on, and read back a moment later when
+    Stamped by Features/Combat-Log.lua for every debuff landing on the player,
+    and every interrupt aimed at them (a spell lockout is never an aura), while
+    this section is switched on, and read back a moment later when
     LOSS_OF_CONTROL_ADDED fires. Buffs never reach here -- a debuff is the only
     kind of aura that takes control away, and letting a heal over time overwrite
     the slot would cost the fear that landed beside it its caster.
@@ -222,7 +223,7 @@ end
     is what the reference aura does, and it is also what collapses the two cases
     -- one effect landing, and a second landing on top of it -- into one path.
 ]]
-function ns:LOSS_OF_CONTROL_ADDED()
+function ns:OnLossOfControlAdded()
 	if not HAS_LOSS_OF_CONTROL then
 		return
 	end
@@ -276,14 +277,14 @@ function ns:LOSS_OF_CONTROL_ADDED()
 	local rowKey = (not timed or duration >= threshold) and "long" or "short"
 
 	--[[
-	    The row's own switch, read here rather than left to ns:Alert. It IS read
-	    there too, but this section has a cooldown to protect: an effect whose row
-	    is switched off must not use up the window that would then swallow the next
-	    one that had somewhere to go. The same ordering every whisper cooldown in
-	    the add-on uses.
+	    Where the row sends the line, asked here rather than left to ns:Alert. It
+	    IS asked there too, but this section has a cooldown to protect: an effect
+	    whose row goes nowhere right now must not use up the window that would
+	    then swallow the next one that had somewhere to go. The same ordering
+	    every whisper cooldown in the add-on uses.
 	]]
-	local row = settings[rowKey]
-	if not row or not row.enabled then
+	local doPrint, channel = ns.ResolveAlertDestination(settings, MINE_FLAGS, rowKey)
+	if not doPrint and not channel then
 		return
 	end
 

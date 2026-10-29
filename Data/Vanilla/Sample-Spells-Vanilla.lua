@@ -45,7 +45,7 @@ ns.SAMPLE_SPELL_IDS = {
 How We Got the Data
 
 Last Validated
-	2026-10-20, Classic Era 1.15.9.70003
+	2026-10-28, Classic Era 1.15.9.70576
 
 Notes
 	- The spells the options panel's Example lines name, one per line that needs a spell, so the client supplies each name in the player's own language.
@@ -59,7 +59,7 @@ Wowhead
 	None.
 
 wago.tools
-	https://wago.tools/db2/SpellName?build=1.15.9.70003
+	https://wago.tools/db2/SpellName?build=1.15.9.70576
 
 QuestieDB
 	None.

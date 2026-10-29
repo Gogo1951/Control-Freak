@@ -15,7 +15,7 @@ ns.stateResets[#ns.stateResets + 1] = function()
 end
 
 -- The owner's pet is addressed as "partypetN" / "raidpetN", never "partyNpet".
-function ns.FindPetOwner(petGUID)
+local function FindPetOwner(petGUID)
 	if not petGUID then
 		return nil
 	end
@@ -74,7 +74,7 @@ function ns:HandleBadPets(
 	end
 	lastAlert[sourceGUID] = now
 
-	local _, ownerName, ownerGUID = ns.FindPetOwner(sourceGUID)
+	local _, ownerName, ownerGUID = FindPetOwner(sourceGUID)
 	local isMine = ownerGUID ~= nil and ownerGUID == ns.playerGUID
 
 	--[[

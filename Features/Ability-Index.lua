@@ -156,8 +156,8 @@ end
 
 --[[
     An ability's category names the ability; the feature it maps to names the
-    tab that owns the alert. Two of them land on the "somebody is doing something
-    wrong" tabs, Bad Priests and Bad Pets. COOLDOWN is the only category whose
+    tab that owns the alert. Three of them land on the "somebody is doing
+    something wrong" tabs, Bad Mages, Bad Pets and Bad Priests. COOLDOWN is the only category whose
     rows come from a file of their own (ABILITY_LISTS above).
 ]]
 ns.CATEGORY_FEATURE = {
@@ -165,6 +165,6 @@ ns.CATEGORY_FEATURE = {
 	FEAR = "fears",
 	PET_TAUNT = "badPets",
 	SHIELD = "badPriests",
-	NOVA = "tankingTools",
+	NOVA = "badMages",
 	COOLDOWN = "peerPressure",
 }

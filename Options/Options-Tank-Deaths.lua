@@ -95,9 +95,8 @@ function ns.BuildTankDeathsOptions()
 	args.byClassDescSpace = ns.OptionsSpacer(44, hidden)
 
 	--[[
-	    Orders step by tenths, the escape hatch Options/Options-Incapacitated.lua's
-	    nine effect rows established: nine whole steps from here would run
-	    straight through the sample below.
+	    Orders step by tenths: nine whole steps from here would run straight
+	    through the sample below.
 	]]
 	for index, row in ipairs(classRows) do
 		local class = row.class

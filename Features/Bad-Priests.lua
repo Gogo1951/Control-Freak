@@ -10,13 +10,16 @@ local _, ns = ...
     absent from the Wrath folder and every later one: the ids are never
     registered there and the section can never fire.
 
-    Three gates, cheapest first.
+    Four gates, cheapest first.
 
       class    the target has to be a rage tank at all. A priest shielding a
                paladin or a mage is nobody's problem.
       tanking  ns.FindTankUnit, the same seat test the scope gates read: Main
                Tank in a raid, the group finder's TANK role in a party. A feral
                druid in cat form is not tanking and does not want telling.
+      combat   a shield on a tank who is not in combat yet is a pre-bubble
+               before the pull, which is common and harmless, a maintainer
+               decision.
       health   a shield on somebody about to die is the right call, so the
                warning goes quiet below the line the player picked.
 
@@ -96,6 +99,10 @@ function ns:HandleBadPriest(
 
 	local unit = FindRageTank(settings, destGUID)
 	if not unit then
+		return
+	end
+
+	if not UnitAffectingCombat(unit) then
 		return
 	end
 
