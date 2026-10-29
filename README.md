@@ -6,7 +6,6 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 
 <img width="800" src="https://github.com/user-attachments/assets/80215a1a-26a7-4f6a-888a-9bb70e3cfd26" />
 
-
 ### Example Messages
 
 > **Taunt Lands, 🔊 & Self:** Taunt! Prima used [Taunt] on Lucifron // Control Freak
