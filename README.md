@@ -4,24 +4,24 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 
 **TL;DR:** Tells you what happened, who caused it, and what needs fixing while the fight is still happening. Less combat-log archaeology after the wipe, more information when it matters, so you can make better decisions and have cleaner runs.
 
-<img width="800" src="https://github.com/user-attachments/assets/5fa7a505-26bf-46c0-886a-9016fb1643a0" />
+### Example Messages
 
-> **🔊 & Self:** Taunt! Gogowarrior used [Taunt] on Anub'Rekhan // Control Freak
+> **Taunt Lands, 🔊 & Self:** Taunt! Prima used [Taunt] on Lucifron // Control Freak
 
-> **🔊 & Self:** Interrupt! Fathom's [Kick] on Kel'Thuzad stopped [Frostbolt] // Control Freak
+> **Cast Interrupted, 🔊 & Self:** Interrupt! Fathom's [Kick] on Gehennas stopped [Shadow Bolt] // Control Freak
 
-> **🔊 & Raid:** Healer Incapacitated for 5 seconds! Spek is afflicted by [Terrifying Roar] from Gluth // Control Freak
+> **Healer Incapacitated, 🔊 & Raid:** Healer Incapacitated for 8 seconds! Katz is afflicted by [Panic] from Magmadar // Control Freak
 
-> **Message To Robo:** Bad Pet! Robo's pet Fluffy used [Growl] on Grobbulus // Control Freak
+> **Pet Taunts a Boss, Message To Spek:** Naughty Pet! Your pet Fluffy used [Growl] on Baron Geddon. Right-click the ability to turn off auto-cast // Control Freak
 
-> **Self:** Armor Stripped! Thaddius became vulnerable after 2.4 seconds // Control Freak
+> **Armor Debuffs Stacked, Self:** Armor Stripped! Firemaw became vulnerable after 2.4 seconds // Control Freak
 
 ## Setup
 
 1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/control-freak) or [Wago](https://addons.wago.io/addons/control-freak).
 2. Type `/freak`, or Shift + Middle-Click the mini-map button, to open the Options Interface.
 3. Walk the tabs. Every tab but Tanking Tools is on out of the box, and most lines print only to your own window.
-4. Decide what your group hears. Four of your own lines announce out of the box, because the group needs them the moment they happen: a failed taunt, an AoE taunt, a fear you cast, and a long incapacitation.
+4. Decide what your group hears. Five of your own lines announce out of the box, because the group needs them the moment they happen: a failed taunt, an AoE taunt, a fear you cast, a long incapacitation in a party, and your own parries on a raid boss.
 5. Narrow each tab to when it matters, like only while you're tanking or only inside dungeons and raids.
 6. _"When you do things right, people won't be sure you've done anything at all."_
 
@@ -31,11 +31,11 @@ Combat announcer for taunts, interrupts, fears, tank deaths, bad pets, parries, 
 
 😵 **Incapacitated & Tank Deaths** // Call out dangerous stuns, fears, silences, and other loss-of-control effects with the spell, and dispel type. Get an immediate warning when a tank goes down.
 
-🐕 **Bad Pets & Bad Shields** // Alert the owners when a pet is misbehaving in your raid, and warn when Power Word: Shield prevents a high-health warrior or druid tank from generating rage.
+🐒 **Naughty List** // Catch pets left on taunt, shields that starve a rage tank, novas that strand the pull, and parry monkeys in front of the boss. A polite whisper can set them straight.
 
 🚂 **Feel Peer Pressure** // Get pinged the moment another player of your class pops a cooldown, so you can stack yours on top.
 
-🦺 **Your Alerts, Your Rules** // Customize where alerts appear, which enemies count, and which sounds play. Most alerts stay in your own window, while group announcements stay quiet when you're ungrouped or in PvP. One-time whispers prevent repeat mistakes from becoming a chorus.
+🦺 **Your Alerts, Your Rules** // Customize where alerts appear, which enemies count, and which sounds play. Most alerts stay in your own window, and group announcements stay quiet when you're ungrouped or in PvP.
 
 ## Tips & Tricks
 
@@ -47,11 +47,12 @@ Plenty of add-ons and WeakAuras already handled announcements, but each had its 
 
 | Click | What It Does |
 |---|---|
-| Left-Click | Turns every Control Freak alert on or off |
-| Right-Click | Turns Tanking Tools on or off |
+| Left-Click | Turns Monitoring on or off |
+| Right-Click | Turns the Naughty List on or off |
+| Shift + Left-Click | Turns Tanking Tools on or off |
 | Shift + Middle-Click | Opens the Options Interface |
 
-Hovering the button shows whether All Alerts is on right now, and Tanking Tools too while it is. Right-Click only works while All Alerts is on.
+Hovering the button shows which of the three are on right now. While All Alerts is off, only Shift + Middle-Click does anything.
 
 ## Testing & Localization Status
 
